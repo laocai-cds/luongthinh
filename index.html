@@ -292,9 +292,9 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
         </div>
       </div>
       <aside class="dpanel" aria-label="Biểu đồ tròn tình hình thu">
-        <div class="dhead"><b>Tình hình thu toàn Đảng bộ</b><small>Vòng ngoài là số tiền, vòng trong là số đơn vị</small></div>
+        <div class="dhead"><b>Tình hình thu toàn Đảng bộ</b><small>Vòng ngoài là đảng viên, vòng trong là đơn vị</small></div>
         <div class="dbody">
-          <div class="donut"><svg viewBox="0 0 220 220" id="donutsvg" role="img"></svg><div class="dcenter"><strong id="donutpct">0%</strong><span>đã thu</span></div></div>
+          <div class="donut"><svg viewBox="0 0 220 220" id="donutsvg" role="img"></svg><div class="dcenter"><strong id="donutpct">0%</strong><span>đảng viên đã nộp</span></div></div>
           <div class="dlegend" id="dlegend"></div>
         </div>
       </aside>
@@ -308,7 +308,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
       <div class="podium" id="podium"></div>
     </div>
     <div class="panel pad" style="margin-bottom:20px">
-      <div class="ph"><h2>Tiến độ theo đơn vị</h2><small>Mỗi cột là một đơn vị, xếp theo hạng</small></div>
+      <div class="ph"><h2>Tiến độ theo đơn vị</h2><small>Đảng viên đã nộp trên tổng số đảng viên (trừ miễn giảm), mỗi cột là một đơn vị</small></div>
       <div class="chartwrap">
         <div class="yax" aria-hidden="true"><span>100%</span><span>50%</span><span>0%</span></div>
         <div class="cscroll"><div class="plot" id="colchart" role="img"></div><div class="names" id="colnames" aria-hidden="true"></div></div>
@@ -342,7 +342,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
       <div class="tw"><table>
         <thead><tr>
           <th data-sort="rank">Hạng</th><th data-sort="name">Đơn vị</th>
-          <th class="n" data-sort="members">Đảng viên</th><th class="n" data-sort="pending">Chưa duyệt</th><th class="n" data-sort="unfiled">Chưa có hồ sơ</th>
+          <th class="n" data-sort="paidCount">Đảng viên đã nộp</th><th class="n" data-sort="pending">Chưa duyệt</th><th class="n" data-sort="noRecord">Chưa có hồ sơ</th>
           <th class="n" data-sort="declared">Đã kê khai</th><th class="n" data-sort="paid">Đã nộp</th>
           <th data-sort="progress">Tiến độ</th><th>Trạng thái</th>
         </tr></thead>
@@ -427,7 +427,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 
 <script>
 const INITIAL_UNITS=[{"STT":"1","Tên đơn vị":"Chi bộ Ban Xây dựng Đảng","Tổng sl đảng viên (1)":"4","Số lượng ĐV sinh hoạt chính thức (2)":"4","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"4","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":353000.0,"Tổng tiền đã nộp":353000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"2","Tên đơn vị":"Chi bộ Công ty TNHH Một thành viên Lâm nghiệp Việt Hưng","Tổng sl đảng viên (1)":"11","Số lượng ĐV sinh hoạt chính thức (2)":"11","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"0","Số đảng viên chưa có hồ sơ (9)":"11","Tổng tiền theo hồ sơ đã khai báo":0.0,"Tổng tiền đã nộp":0.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.0},{"STT":"3","Tên đơn vị":"Chi bộ Cơ quan Thường trực Hội đồng nhân dân","Tổng sl đảng viên (1)":"4","Số lượng ĐV sinh hoạt chính thức (2)":"4","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"4","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":437000.0,"Tổng tiền đã nộp":437000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"4","Tên đơn vị":"Chi bộ Cơ quan Ủy ban Kiểm tra Đảng ủy","Tổng sl đảng viên (1)":"4","Số lượng ĐV sinh hoạt chính thức (2)":"4","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"4","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":386000.0,"Tổng tiền đã nộp":386000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"5","Tên đơn vị":"Chi bộ Cơ quan Ủy ban MTTQ Việt Nam xã","Tổng sl đảng viên (1)":"6","Số lượng ĐV sinh hoạt chính thức (2)":"6","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"6","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":536000.0,"Tổng tiền đã nộp":536000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"6","Tên đơn vị":"Chi bộ Phòng Kinh tế","Tổng sl đảng viên (1)":"10","Số lượng ĐV sinh hoạt chính thức (2)":"10","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"10","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":947000.0,"Tổng tiền đã nộp":947000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"7","Tên đơn vị":"Chi bộ Phòng Văn hóa-Xã hội","Tổng sl đảng viên (1)":"7","Số lượng ĐV sinh hoạt chính thức (2)":"7","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"7","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":727000.0,"Tổng tiền đã nộp":727000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"8","Tên đơn vị":"Chi bộ Trung Tâm dịch vụ tổng hợp","Tổng sl đảng viên (1)":"8","Số lượng ĐV sinh hoạt chính thức (2)":"8","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"8","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":677000.0,"Tổng tiền đã nộp":677000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"9","Tên đơn vị":"Chi bộ Trung tâm phục vụ Hành chính công","Tổng sl đảng viên (1)":"4","Số lượng ĐV sinh hoạt chính thức (2)":"4","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"4","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":361000.0,"Tổng tiền đã nộp":361000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"10","Tên đơn vị":"Chi bộ Trạm Y tế Lương Thịnh","Tổng sl đảng viên (1)":"11","Số lượng ĐV sinh hoạt chính thức (2)":"11","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"11","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":1054000.0,"Tổng tiền đã nộp":1054000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"11","Tên đơn vị":"Chi bộ Văn Phòng Hội đồng nhân dân và Ủy ban nhân dân","Tổng sl đảng viên (1)":"9","Số lượng ĐV sinh hoạt chính thức (2)":"9","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"9","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":824000.0,"Tổng tiền đã nộp":824000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"12","Tên đơn vị":"Chi bộ Văn phòng Đảng ủy","Tổng sl đảng viên (1)":"6","Số lượng ĐV sinh hoạt chính thức (2)":"6","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"6","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":540000.0,"Tổng tiền đã nộp":540000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"13","Tên đơn vị":"Chi bộ thôn Khang Chính","Tổng sl đảng viên (1)":"47","Số lượng ĐV sinh hoạt chính thức (2)":"47","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"0","Số đảng viên chưa có hồ sơ (9)":"47","Tổng tiền theo hồ sơ đã khai báo":0.0,"Tổng tiền đã nộp":0.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.0},{"STT":"14","Tên đơn vị":"Chi bộ thôn Khe Lụa","Tổng sl đảng viên (1)":"58","Số lượng ĐV sinh hoạt chính thức (2)":"58","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"0","Số đảng viên chưa có hồ sơ (9)":"58","Tổng tiền theo hồ sơ đã khai báo":0.0,"Tổng tiền đã nộp":0.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.0},{"STT":"15","Tên đơn vị":"Chi bộ thôn Liên Thịnh","Tổng sl đảng viên (1)":"31","Số lượng ĐV sinh hoạt chính thức (2)":"31","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"0","Số đảng viên chưa có hồ sơ (9)":"31","Tổng tiền theo hồ sơ đã khai báo":0.0,"Tổng tiền đã nộp":0.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.0},{"STT":"16","Tên đơn vị":"Chi bộ thôn Lương Thiện","Tổng sl đảng viên (1)":"33","Số lượng ĐV sinh hoạt chính thức (2)":"33","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"2","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"31","Số đảng viên chưa có hồ sơ (9)":"2","Tổng tiền theo hồ sơ đã khai báo":744000.0,"Tổng tiền đã nộp":744000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"17","Tên đơn vị":"Chi bộ thôn Phương Đạo","Tổng sl đảng viên (1)":"24","Số lượng ĐV sinh hoạt chính thức (2)":"24","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"23","Số đảng viên chưa có hồ sơ (9)":"1","Tổng tiền theo hồ sơ đã khai báo":408000.0,"Tổng tiền đã nộp":408000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"18","Tên đơn vị":"Chi bộ thôn Quang Vinh","Tổng sl đảng viên (1)":"44","Số lượng ĐV sinh hoạt chính thức (2)":"44","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"0","Số đảng viên chưa có hồ sơ (9)":"44","Tổng tiền theo hồ sơ đã khai báo":0.0,"Tổng tiền đã nộp":0.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.0},{"STT":"19","Tên đơn vị":"Chi bộ thôn Yên Thành","Tổng sl đảng viên (1)":"37","Số lượng ĐV sinh hoạt chính thức (2)":"37","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"1","Số đảng viên chưa có hồ sơ (9)":"36","Tổng tiền theo hồ sơ đã khai báo":38000.0,"Tổng tiền đã nộp":38000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"20","Tên đơn vị":"Chi bộ thôn Yên Thịnh","Tổng sl đảng viên (1)":"34","Số lượng ĐV sinh hoạt chính thức (2)":"34","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"0","Số đảng viên chưa có hồ sơ (9)":"34","Tổng tiền theo hồ sơ đã khai báo":0.0,"Tổng tiền đã nộp":0.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.0},{"STT":"21","Tên đơn vị":"Chi bộ thôn Yên Định","Tổng sl đảng viên (1)":"31","Số lượng ĐV sinh hoạt chính thức (2)":"31","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"2","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"1","Số đảng viên chưa có hồ sơ (9)":"28","Tổng tiền theo hồ sơ đã khai báo":97000.0,"Tổng tiền đã nộp":56000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.5773},{"STT":"22","Tên đơn vị":"Chi bộ thôn Đồng Bằng","Tổng sl đảng viên (1)":"46","Số lượng ĐV sinh hoạt chính thức (2)":"46","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"16","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"29","Số đảng viên chưa có hồ sơ (9)":"1","Tổng tiền theo hồ sơ đã khai báo":1328000.0,"Tổng tiền đã nộp":981000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.7387},{"STT":"23","Tên đơn vị":"Chi bộ thôn Đồng Hào","Tổng sl đảng viên (1)":"43","Số lượng ĐV sinh hoạt chính thức (2)":"43","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"4","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"38","Số đảng viên chưa có hồ sơ (9)":"5","Tổng tiền theo hồ sơ đã khai báo":1231000.0,"Tổng tiền đã nộp":1231000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"24","Tên đơn vị":"Đảng bộ Trường Mầm Non Lương Thịnh","Tổng sl đảng viên (1)":"38","Số lượng ĐV sinh hoạt chính thức (2)":"38","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"38","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":3618000.0,"Tổng tiền đã nộp":3618000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"25","Tên đơn vị":"Đảng bộ Trường Tiểu Học Lương Thịnh","Tổng sl đảng viên (1)":"48","Số lượng ĐV sinh hoạt chính thức (2)":"48","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"0","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"48","Số đảng viên chưa có hồ sơ (9)":"0","Tổng tiền theo hồ sơ đã khai báo":6502000.0,"Tổng tiền đã nộp":6502000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":1.0},{"STT":"26","Tên đơn vị":"Đảng bộ Trường Trung học cơ sở Lương Thịnh","Tổng sl đảng viên (1)":"36","Số lượng ĐV sinh hoạt chính thức (2)":"36","Số lượng ĐV sinh hoạt tạm thời (3)":"0","Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)":"0","Số lượng được miễn giảm ĐP (5)":"0","Chưa duyệt (6)":"1","Đã duyệt, chưa nộp (7)":"0","Đã duyệt, đã nộp (8)":"33","Số đảng viên chưa có hồ sơ (9)":"2","Tổng tiền theo hồ sơ đã khai báo":4038000.0,"Tổng tiền đã nộp":3988000.0,"Tỷ lệ hoàn thành\n đảng phí thực tế":0.9876}];
-const KEYS={stt:'STT',name:'Tên đơn vị',members:'Tổng sl đảng viên (1)',pending:'Chưa duyệt (6)',paidCount:'Đã duyệt, đã nộp (8)',unfiled:'Số đảng viên chưa có hồ sơ (9)',declared:'Tổng tiền theo hồ sơ đã khai báo',paid:'Tổng tiền đã nộp',progress:'Tỷ lệ hoàn thành\n đảng phí thực tế'};
+const KEYS={stt:'STT',name:'Tên đơn vị',members:'Tổng sl đảng viên (1)',pending:'Chưa duyệt (6)',paidCount:'Đã duyệt, đã nộp (8)',unfiled:'Số đảng viên chưa có hồ sơ (9)',declared:'Tổng tiền theo hồ sơ đã khai báo',paid:'Tổng tiền đã nộp',progress:'Tỷ lệ hoàn thành\n đảng phí thực tế',exempt:'Số lượng được miễn giảm ĐP (5)',moved:'Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)',approved:'Đã duyệt, chưa nộp (7)'};
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -435,11 +435,17 @@ const nf=new Intl.NumberFormat('vi-VN');
 const num=n=>nf.format(Math.round(n||0));
 const money=n=>num(n)+' ₫';
 const pct=n=>(Number(n||0)*100).toFixed(1).replace('.',',')+'%';
-const v=(r,k)=>Number(r[KEYS[k]])||0;
+// Tỷ lệ = đảng viên đã nộp / (tổng đảng viên - miễn giảm - chuyển sinh hoạt tạm thời)
+const v=(r,k)=>{
+  if(k==='due')return Math.max(0,v(r,'members')-v(r,'exempt')-v(r,'moved'));
+  if(k==='noRecord')return Math.max(0,v(r,'unfiled')-v(r,'exempt'));
+  if(k==='progress'){const d=v(r,'due');return d>0?Math.min(1,v(r,'paidCount')/d):0}
+  return Number(r[KEYS[k]])||0;
+};
 const nm=r=>r[KEYS.name]||'';
 const short=r=>nm(r).replace(/^(Chi bộ|Đảng bộ)\s+/,'');
-const cls=r=>v(r,'progress')>=.999&&v(r,'declared')>0?'complete':v(r,'paid')>0?'partial':'empty';
-function status(r){const p=v(r,'progress');if(p>=.999&&v(r,'declared')>0)return['Đã hoàn thành','done'];if(v(r,'paid')>0)return['Đang thu','partial'];if(v(r,'members')>0)return['Chưa phát sinh','empty'];return['Chưa cập nhật','empty']}
+const cls=r=>v(r,'due')>0&&v(r,'paidCount')>=v(r,'due')?'complete':v(r,'paidCount')>0?'partial':'empty';
+function status(r){const c=cls(r);if(c==='complete')return['Đã hoàn thành','done'];if(c==='partial')return['Đang thu','partial'];if(v(r,'members')>0)return['Chưa phát sinh','empty'];return['Chưa cập nhật','empty']}
 
 let units=[],rankOf=new Map(),pendingRows=[],pendingHeaders=[];
 let payments=[];try{payments=JSON.parse(localStorage.getItem('lt_payments')||'[]')}catch(e){}
@@ -452,7 +458,7 @@ function start(){
   render();
   const h=location.hash.slice(1);page(['overview','units','import'].includes(h)?h:'overview',true);
 }
-function totals(){return units.reduce((a,r)=>{a.members+=v(r,'members');a.pending+=v(r,'pending');a.unfiled+=v(r,'unfiled');a.declared+=v(r,'declared');a.paid+=v(r,'paid');return a},{members:0,pending:0,unfiled:0,declared:0,paid:0})}
+function totals(){return units.reduce((a,r)=>{['members','pending','unfiled','declared','paid','paidCount','due','exempt','noRecord','approved'].forEach(k=>a[k]+=v(r,k));return a},{members:0,pending:0,unfiled:0,declared:0,paid:0,paidCount:0,due:0,exempt:0,noRecord:0,approved:0})}
 
 function countUp(el,to,fmt){
   if(REDUCED){el.textContent=fmt(to);return}
@@ -470,42 +476,50 @@ function ring(r,w,segs){
   live.forEach(s=>{const len=s.v/tot*100;out+=`<circle class="seg" cx="110" cy="110" r="${r}" fill="none" stroke="${s.c}" stroke-width="${w}" pathLength="100" data-len="${Math.max(.2,len-gap).toFixed(2)}" stroke-dasharray="0 100" stroke-dashoffset="${(-acc).toFixed(2)}"/>`;acc+=len});
   return out;
 }
-function renderDonut(t,rate,remain,active,done){
+function renderDonut(t,rate,active){
   const sc={done:0,part:0,empty:0};
   active.forEach(r=>{const c=status(r)[1];if(c==='done')sc.done++;else if(c==='partial')sc.part++;else sc.empty++});
+  const mem=[
+    {l:'Đã nộp',v:t.paidCount,c:'#e3b23c'},
+    {l:'Đã duyệt, chưa nộp',v:t.approved,c:'#ff8a6b'},
+    {l:'Chưa duyệt hồ sơ',v:t.pending,c:'#ffb066'},
+    {l:'Chưa có hồ sơ',v:t.noRecord,c:'#ffffff59'},
+    {l:'Miễn giảm',v:t.exempt,c:'#9ec5ff'}
+  ];
   const svg=$('#donutsvg');
-  svg.setAttribute('aria-label',`Biểu đồ tròn: đã thu ${pct(rate)} số tiền kê khai; ${sc.done} đơn vị hoàn thành, ${sc.part} đang thu, ${sc.empty} chưa phát sinh`);
-  svg.innerHTML=`<circle cx="110" cy="110" r="94" fill="none" stroke="#ffffff17" stroke-width="18"/><circle cx="110" cy="110" r="70" fill="none" stroke="#ffffff17" stroke-width="10"/><g transform="rotate(-90 110 110)">${ring(94,18,[{v:t.paid,c:'#e3b23c'},{v:remain,c:'#ffffff4d'}])}${ring(70,10,[{v:sc.done,c:'#6fd3a0'},{v:sc.part,c:'#ffd166'},{v:sc.empty,c:'#ffffff59'}])}</g>`;
-  $('#dlegend').innerHTML=`<div class="dgroup"><p>Số tiền, vòng ngoài</p><div style="--c:#e3b23c"><span>Đã thu</span><b>${money(t.paid)}</b></div><div style="--c:#ffffff59"><span>Còn phải thu</span><b>${money(remain)}</b></div></div><div class="dgroup"><p>Số đơn vị, vòng trong</p><div style="--c:#6fd3a0"><span>Hoàn thành</span><b>${sc.done}</b></div><div style="--c:#ffd166"><span>Đang thu</span><b>${sc.part}</b></div><div style="--c:#ffffff59"><span>Chưa phát sinh</span><b>${sc.empty}</b></div></div>`;
+  svg.setAttribute('aria-label',`Biểu đồ tròn: ${t.paidCount} trên ${t.due} đảng viên đã nộp, đạt ${pct(rate)}; ${sc.done} đơn vị hoàn thành, ${sc.part} đang thu, ${sc.empty} chưa phát sinh`);
+  svg.innerHTML=`<circle cx="110" cy="110" r="94" fill="none" stroke="#ffffff17" stroke-width="18"/><circle cx="110" cy="110" r="70" fill="none" stroke="#ffffff17" stroke-width="10"/><g transform="rotate(-90 110 110)">${ring(94,18,mem)}${ring(70,10,[{v:sc.done,c:'#6fd3a0'},{v:sc.part,c:'#ffd166'},{v:sc.empty,c:'#ffffff59'}])}</g>`;
+  const rows=mem.filter(m=>m.v>0).map(m=>`<div style="--c:${m.c}"><span>${m.l}</span><b>${num(m.v)}</b></div>`).join('');
+  $('#dlegend').innerHTML=`<div class="dgroup"><p>Đảng viên, vòng ngoài</p>${rows}</div><div class="dgroup"><p>Đơn vị, vòng trong</p><div style="--c:#6fd3a0"><span>Hoàn thành</span><b>${sc.done}</b></div><div style="--c:#ffd166"><span>Đang thu</span><b>${sc.part}</b></div><div style="--c:#ffffff59"><span>Chưa phát sinh</span><b>${sc.empty}</b></div></div>`;
 }
 function growDonut(){
   $$('#donutsvg .seg').forEach(c=>{const L=Number(c.dataset.len),go=()=>{c.style.strokeDasharray=`${L} ${100-L}`};c.style.strokeDasharray='0 100';if(REDUCED)go();else requestAnimationFrame(()=>requestAnimationFrame(go))});
 }
 function render(){
-  const t=totals(),rate=t.declared?t.paid/t.declared:0,remain=Math.max(0,t.declared-t.paid);
+  const t=totals(),rate=t.due?t.paidCount/t.due:0;
   const active=units.filter(r=>v(r,'members')>0),done=units.filter(r=>cls(r)==='complete').length;
 
   $('#lede').textContent='Dữ liệu giới hạn ở 26 đơn vị được đánh dấu đỏ trong bảng tính nguồn.';
-  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${money(remain)}</b><small>Còn phải thu</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>19/10/2026</b><small>Dữ liệu cập nhật</small></div>`;
-  renderDonut(t,rate,remain,active,done);
+  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>19/10/2026</b><small>Dữ liệu cập nhật</small></div>`;
+  renderDonut(t,rate,active);
 
   $('#stats').innerHTML=[
-    ['Tổng số đảng viên',`<strong data-c="${t.members}" data-f="num">0</strong>`,`Tại ${units.length} đơn vị trực thuộc`],
+    ['Tổng số đảng viên',`<strong data-c="${t.members}" data-f="num">0</strong>`,`Tại ${units.length} đơn vị · ${num(t.exempt)} miễn giảm`],
     ['Tổng tiền đã kê khai',`<strong data-c="${t.declared}" data-f="money">0</strong>`,'Theo hồ sơ đã khai báo'],
-    ['Đã thu trong kỳ',`<strong data-c="${t.paid}" data-f="money">0</strong>`,`<b>${pct(rate)}</b> so với tổng tiền kê khai`],
-    ['Hồ sơ cần xử lý',`<strong data-c="${t.pending+t.unfiled}" data-f="num">0</strong>`,`${num(t.pending)} chưa duyệt · ${num(t.unfiled)} chưa có hồ sơ`]
+    ['Đã thu trong kỳ',`<strong data-c="${t.paid}" data-f="money">0</strong>`,`<b>${pct(rate)}</b> đảng viên đã nộp (${t.paidCount}/${t.due})`],
+    ['Hồ sơ cần xử lý',`<strong data-c="${t.pending+t.noRecord+t.approved}" data-f="num">0</strong>`,`${num(t.pending)} chưa duyệt · ${num(t.noRecord)} chưa có hồ sơ`]
   ].map(([a,b,c])=>`<div class="stat"><span>${a}</span>${b}<small>${c}</small></div>`).join('');
 
   // top 3
-  const lead=units.filter(r=>v(r,'declared')>0).slice(0,3);
-  $('#podium').innerHTML=[1,0,2].filter(i=>lead[i]).map(i=>{const r=lead[i];return `<div class="step s${i+1}"><span class="no">${i+1}</span><b>${esc(nm(r))}</b><strong>${pct(v(r,'progress'))}</strong><small>Đã nộp ${money(v(r,'paid'))} · ${v(r,'members')} đảng viên</small></div>`}).join('');
+  const lead=units.filter(r=>v(r,'paidCount')>0).slice(0,3);
+  $('#podium').innerHTML=[1,0,2].filter(i=>lead[i]).map(i=>{const r=lead[i];return `<div class="step s${i+1}"><span class="no">${i+1}</span><b>${esc(nm(r))}</b><strong>${pct(v(r,'progress'))}</strong><small>${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}</small></div>`}).join('');
 
   // column chart: tiến độ từng đơn vị, theo hạng
   const n=units.length,lab=s=>s.length>26?s.slice(0,25)+'…':s;
   $('#colchart').style.setProperty('--n',n);$('#colnames').style.setProperty('--n',n);
   $('#colchart').style.gridTemplateColumns=$('#colnames').style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
-  $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị đạt 100%`);
-  $('#colchart').innerHTML=units.map(r=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · đã nộp ${money(v(r,'paid'))} / kê khai ${money(v(r,'declared'))}"><div class="cb ${cls(r)}" data-h="${p*100}"><em>${Math.round(p*100)}%</em></div></div>`}).join('');
+  $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị nộp đủ`);
+  $('#colchart').innerHTML=units.map(r=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · ${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}"><div class="cb ${cls(r)}" data-h="${p*100}"><em>${Math.round(p*100)}%</em></div></div>`}).join('');
   $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(short(r)))}</span></div>`).join('');
   $('#chartlegend').innerHTML=[['Đã hoàn thành','#2f7d4f'],['Đang thu','#b98a1d'],['Chưa phát sinh','#9aa3a1']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
 
@@ -516,11 +530,12 @@ function render(){
   $('#split').innerHTML=groups.filter(g=>g.n).map(g=>`<i style="flex:${g.n};background:${g.c}" title="${g.l}: ${g.n}"></i>`).join('');
   $('#splitlegend').innerHTML=groups.map(g=>`<span style="--c:${g.c}">${g.l} <b>${g.n}</b></span>`).join('');
 
-  const chase=[...units].filter(r=>v(r,'unfiled')+v(r,'pending')>0).sort((a,b)=>(v(b,'unfiled')+v(b,'pending'))-(v(a,'unfiled')+v(a,'pending'))).slice(0,6);
-  $('#chase').innerHTML=chase.length?chase.map(r=>`<div class="chase"><span>${esc(short(r))}</span><em>${v(r,'unfiled')?v(r,'unfiled')+' chưa có hồ sơ':''}${v(r,'unfiled')&&v(r,'pending')?' · ':''}${v(r,'pending')?v(r,'pending')+' chưa duyệt':''}</em></div>`).join(''):'<p class="empty">Không còn hồ sơ tồn đọng.</p>';
+  const need=r=>v(r,'noRecord')+v(r,'pending')+v(r,'approved');
+  const chase=[...units].filter(r=>need(r)>0).sort((a,b)=>need(b)-need(a)).slice(0,6);
+  $('#chase').innerHTML=chase.length?chase.map(r=>{const bits=[];if(v(r,'noRecord'))bits.push(v(r,'noRecord')+' chưa có hồ sơ');if(v(r,'pending'))bits.push(v(r,'pending')+' chưa duyệt');if(v(r,'approved'))bits.push(v(r,'approved')+' chưa nộp');return `<div class="chase"><span>${esc(short(r))}</span><em>${bits.join(' · ')}</em></div>`}).join(''):'<p class="empty">Không còn hồ sơ tồn đọng.</p>';
 
   renderTx();fillTables();
-  $('#totalunits').textContent=`${units.length} đơn vị · số liệu tổng hợp`;
+  $('#totalunits').textContent=`${units.length} đơn vị · Tiến độ = đảng viên đã nộp / (tổng đảng viên − miễn giảm − chuyển sinh hoạt tạm thời)`;
   $('#unitcount').textContent=`${units.length} đơn vị trong danh sách`;
 
   {
@@ -549,11 +564,11 @@ const progCell=r=>`<div class="pbar"><div class="track"><i class="${cls(r)}" dat
 const rk=r=>`<span class="rk ">${rankOf.get(r)}</span>`;
 function fillTables(){
   const q=($('#search').value||'').toLocaleLowerCase('vi'),f=state.filter;
-  let list=units.filter(r=>nm(r).toLocaleLowerCase('vi').includes(q)).filter(r=>f==='all'||(f==='has'?v(r,'members')>0:(v(r,'pending')+v(r,'unfiled')>0||v(r,'progress')<.999)));
+  let list=units.filter(r=>nm(r).toLocaleLowerCase('vi').includes(q)).filter(r=>f==='all'||(f==='has'?v(r,'members')>0:(v(r,'pending')+v(r,'noRecord')+v(r,'approved')>0||v(r,'progress')<1)));
   list=sorted(list);
   $('#rowcount').textContent=`Hiển thị ${list.length} / ${units.length} đơn vị`;
   $('#noresult').hidden=list.length>0;
-  $('#tbody').innerHTML=list.map(r=>{const[s,c]=status(r);return `<tr><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'members')}</td><td class="n">${v(r,'pending')}</td><td class="n">${v(r,'unfiled')}</td><td class="n">${money(v(r,'declared'))}</td><td class="n"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td><td><span class="pill ${c}">${s}</span></td></tr>`}).join('');
+  $('#tbody').innerHTML=list.map(r=>{const[s,c]=status(r);return `<tr><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'paidCount')}/${v(r,'due')}</td><td class="n">${v(r,'pending')}</td><td class="n">${v(r,'noRecord')}</td><td class="n">${money(v(r,'declared'))}</td><td class="n"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td><td><span class="pill ${c}">${s}</span></td></tr>`}).join('');
   const q2=($('#search2').value||'').toLocaleLowerCase('vi');
   const l2=sorted(units.filter(r=>nm(r).toLocaleLowerCase('vi').includes(q2)));
   $('#tbody2').innerHTML=l2.map(r=>`<tr><td class="hint">${esc(r[KEYS.stt])}</td><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'members')}</td><td class="n">${v(r,'pending')}</td><td class="n">${v(r,'paidCount')}</td><td class="n"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td></tr>`).join('');
@@ -596,7 +611,7 @@ $('#savePayment').onclick=()=>{
 
 /* export + refresh */
 $('#exportBtn').onclick=()=>{
-  const rows=[['Đơn vị','Đảng viên','Chưa duyệt','Chưa có hồ sơ','Tổng kê khai','Đã nộp','Tỷ lệ'],...units.map(r=>[nm(r),v(r,'members'),v(r,'pending'),v(r,'unfiled'),v(r,'declared'),v(r,'paid'),v(r,'progress')])];
+  const rows=[['Đơn vị','Tổng đảng viên','Miễn giảm','Phải nộp','Đã nộp (đảng viên)','Chưa duyệt','Chưa có hồ sơ','Tổng kê khai','Tiền đã nộp','Tỷ lệ đảng viên đã nộp'],...units.map(r=>[nm(r),v(r,'members'),v(r,'exempt'),v(r,'due'),v(r,'paidCount'),v(r,'pending'),v(r,'noRecord'),v(r,'declared'),v(r,'paid'),v(r,'progress')])];
   const csv='﻿'+rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='theo-doi-dang-phi-luong-thinh.csv';a.click();URL.revokeObjectURL(a.href);
 };
