@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#4a0e11">
 <meta name="description" content="Theo dõi tình hình thu nộp đảng phí tại Đảng bộ xã Lương Thịnh.">
 <title>Thu nộp đảng phí · Đảng bộ xã Lương Thịnh</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238f1d22'/%3E%3Cg%20fill='%23e3b23c'%3E%3Cg%20transform='rotate%2840%2032%2034%29'%3E%3Crect%20x='29.2'%20y='13'%20width='5.6'%20height='47'%20rx='2.4'/%3E%3Cpath%20d='M16%208.5%20Q16%207%2017.5%207%20H43%20Q47%207%2047%2011.5%20V14%20Q47%2015.5%2045.5%2015.5%20H17.5%20Q16%2015.5%2016%2014%20Z'/%3E%3C/g%3E%3Cpath%20d='M47.5%2057%20Q46%2058.5%2044.5%2057%20L33.5%2042.5%20L40%2037.5%20L48%2054.5%20Q48.8%2056%2047.5%2057%20Z'/%3E%3Cpath%20d='M37%2042.5%20C11%2044%203%2016%2031%205.5%20C19%2017%2025%2032.5%2042%2033.5%20Z'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238f1d22'/%3E%3Cg%20fill='%23e3b23c'%20transform='translate(64%200)%20scale(-1%201)'%3E%3Cg%20transform='rotate%2840%2032%2034%29'%3E%3Crect%20x='29.2'%20y='13'%20width='5.6'%20height='47'%20rx='2.4'/%3E%3Cpath%20d='M16%208.5%20Q16%207%2017.5%207%20H43%20Q47%207%2047%2011.5%20V14%20Q47%2015.5%2045.5%2015.5%20H17.5%20Q16%2015.5%2016%2014%20Z'/%3E%3C/g%3E%3Cpath%20d='M47.5%2057%20Q46%2058.5%2044.5%2057%20L33.5%2042.5%20L40%2037.5%20L48%2054.5%20Q48.8%2056%2047.5%2057%20Z'/%3E%3Cpath%20d='M37%2042.5%20C11%2044%203%2016%2031%205.5%20C19%2017%2025%2032.5%2042%2033.5%20Z'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -244,7 +244,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 <header class="bar">
   <div class="wrap">
     <div class="brand">
-      <div class="seal" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 64 64"><g fill="#e3b23c"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></svg></div>
+      <div class="seal" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 64 64"><g fill="#e3b23c" transform="translate(64 0) scale(-1 1)"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></svg></div>
       <div><b>Đảng bộ xã Lương Thịnh</b><small>Thu nộp đảng phí</small></div>
     </div>
     <nav class="tabs" aria-label="Chuyên mục">
@@ -453,7 +453,7 @@ function terraces(rate){
     clips+=`<clipPath id="tc${k}"><rect class="fillrect" x="${x0}" y="0" width="${w.toFixed(1)}" height="${H}" style="transition-delay:${k*140}ms"/></clipPath>`;
     fill+=`<path d="${d}" fill="url(#gold)" stroke="#4a0e11" stroke-opacity=".55" stroke-width="2" clip-path="url(#tc${k})"/><path d="M${x0},${y} C${x0+90},${y-18} ${x1-150},${y+8} ${x1},${y-12}" fill="none" stroke="#ffffff30" stroke-width="1.2" clip-path="url(#tc${k})"/>`;
   }
-  const star='<g transform="translate(400 2) scale(.95)"><g fill="#e3b23c"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></g>';
+  const star='<g transform="translate(400 2) scale(.95)"><g fill="#e3b23c" transform="translate(64 0) scale(-1 1)"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></g>';
   return `<svg class="terr" id="terr" viewBox="0 0 ${W} ${H}" role="img" aria-label="Năm thửa ruộng bậc thang, đã đổ vàng ${pct(rate)}"><defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c98f22"/><stop offset="1" stop-color="#f1cd6a"/></linearGradient>${clips}</defs>${star}${base}${fill}</svg>`;
 }
 
