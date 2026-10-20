@@ -199,7 +199,8 @@ td.n,th.n{text-align:right;white-space:nowrap}
 .col{height:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:4px 4px 0 0;cursor:default}
 .col:hover{background:#00000008}
 .cb{position:relative;width:62%;max-width:26px;height:0;border-radius:5px 5px 0 0;transform-origin:50% 100%;transition:height 1.2s cubic-bezier(.34,1.5,.5,1),filter .2s,transform .2s}
-.cb::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,transparent 0,#ffffff66 50%,transparent 100%);background-size:100% 220%;background-repeat:no-repeat;background-position:0 220%;animation:shine 1.3s ease-out both;animation-delay:calc(var(--i,0)*45ms + 1000ms)}
+.cb::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,transparent 0,#ffffff66 50%,transparent 100%);background-size:100% 220%;background-repeat:no-repeat;background-position:0 220%}
+.play .cb::after{animation:shine 1.3s ease-out both;animation-delay:calc(var(--i,0)*45ms + 1000ms)}
 @keyframes shine{to{background-position:0 -120%}}
 .col:hover .cb{filter:brightness(1.15);transform:scaleX(1.18)}
 .cb em{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);padding-bottom:3px;font:600 10.5px/1 var(--body);font-style:normal;color:var(--muted);white-space:nowrap}
@@ -321,7 +322,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
     </div>
     <div class="panel pad" style="margin-bottom:20px">
       <div class="ph"><h2>Tiến độ theo đơn vị</h2><small>Đảng viên đã nộp trên tổng số đảng viên (trừ miễn giảm), mỗi cột là một đơn vị</small></div>
-      <div class="chartwrap">
+      <div class="chartwrap play">
         <div class="yax" aria-hidden="true"><span>100%</span><span>50%</span><span>0%</span></div>
         <div class="cscroll"><div class="plot" id="colchart" role="img"></div><div class="names" id="colnames" aria-hidden="true"></div></div>
       </div>
@@ -478,15 +479,18 @@ function countUp(el,to,fmt){
   const step=t=>{const p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);el.textContent=fmt(to*e);if(p<1)requestAnimationFrame(step)};
   requestAnimationFrame(step);
 }
+function resetTo(el,prop,val){const tr=el.style.transition;el.style.transition='none';el.style[prop]=val;void el.getBoundingClientRect();el.style.transition=tr}
 function growBars(root){
-  $$(root+' [data-w]').forEach(el=>{el.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.width=el.dataset.w))});
+  $$(root+' [data-w]').forEach(el=>{resetTo(el,'width','0');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.width=el.dataset.w))});
   $$(root+' [data-h]').forEach((el,i)=>{
     const d=REDUCED?0:i*45;
-    el.style.height='0';el.style.transitionDelay=d+'ms,0ms,0ms';
+    resetTo(el,'height','0');el.style.transitionDelay=d+'ms,0ms,0ms';
     requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.height=el.dataset.h+'%'));
     const em=el.querySelector('em');
     if(em){const to=Math.round(Number(el.dataset.h));if(REDUCED)em.textContent=to+'%';else{em.textContent='0%';setTimeout(()=>countUp(em,to/100,x=>Math.round(x*100)+'%'),d)}}
   });
+  const cw=document.querySelector(root+'.chartwrap')||document.querySelector(root+' .chartwrap');
+  if(cw){cw.classList.remove('play');void cw.offsetWidth;cw.classList.add('play')}
 }
 
 function ring(r,w,segs){
@@ -511,7 +515,18 @@ function renderDonut(t,rate,active){
   $('#dlegend').innerHTML=`<div class="dgroup"><p>Đảng viên, vòng ngoài</p>${rows}</div><div class="dgroup"><p>Đơn vị, vòng trong</p><div style="--c:#6fd3a0"><span>Hoàn thành</span><b>${sc.done}</b></div><div style="--c:#ffd166"><span>Đang thu</span><b>${sc.part}</b></div><div style="--c:#ffffff59"><span>Chưa phát sinh</span><b>${sc.empty}</b></div></div>`;
 }
 function growDonut(){
-  $$('#donutsvg .seg').forEach(c=>{const L=Number(c.dataset.len),go=()=>{c.style.strokeDasharray=`${L} ${100-L}`};c.style.strokeDasharray='0 100';if(REDUCED)go();else requestAnimationFrame(()=>requestAnimationFrame(go))});
+  $$('#donutsvg .seg').forEach(c=>{const L=Number(c.dataset.len),go=()=>{c.style.strokeDasharray=`${L} ${100-L}`};resetTo(c,'strokeDasharray','0 100');if(REDUCED)go();else requestAnimationFrame(()=>requestAnimationFrame(go))});
+}
+let lastRate=0,loopTimer=null;
+function replayDonut(){
+  $$('#donutsvg .spin').forEach(g=>{g.style.animation='none';void g.getBoundingClientRect();g.style.animation=''});
+  const dc=$('.dcenter');dc.style.animation='none';void dc.offsetWidth;dc.style.animation='';
+  growDonut();countUp($('#donutpct'),lastRate,x=>pct(x));
+}
+// Lặp lại hiệu ứng của hai biểu đồ theo chu kỳ khi đang xem tab Tổng quan
+function startLoop(){
+  clearInterval(loopTimer);if(REDUCED)return;
+  loopTimer=setInterval(()=>{if(document.hidden||!$('#overview').classList.contains('on'))return;replayDonut();growBars('.chartwrap')},9000);
 }
 function render(){
   const t=totals(),rate=t.due?t.paidCount/t.due:0;
@@ -558,7 +573,7 @@ function render(){
 
   {
     $$('[data-c]').forEach(el=>countUp(el,Number(el.dataset.c),el.dataset.f==='money'?money:num));
-    countUp($('#donutpct'),rate,x=>pct(x));
+    lastRate=rate;countUp($('#donutpct'),rate,x=>pct(x));
     growDonut();
     growBars('#overview');
   }
@@ -674,7 +689,7 @@ $('#syncBtn').onclick=async()=>{
     toast('Không gửi được yêu cầu đồng bộ.');
   }finally{b.disabled=false;b.textContent='Đồng bộ lên Google Sheet'}
 };
-start();
+start();startLoop();
 </script>
 </body>
 </html>
