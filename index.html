@@ -235,18 +235,22 @@ td.amb{color:#a35f00;font-weight:700}td.red{color:var(--lac);font-weight:700}td.
 .step.s3 .no{color:var(--muted)}
 /* column chart */
 .chartwrap{display:grid;grid-template-columns:44px minmax(0,1fr)}
-.yax{height:230px;padding-top:20px;display:flex;flex-direction:column;justify-content:space-between;font-size:11.5px;line-height:1;color:var(--muted)}
+.yax{height:240px;padding-top:30px;display:flex;flex-direction:column;justify-content:space-between;font-size:11.5px;line-height:1;color:var(--muted)}
 .cscroll{overflow-x:auto;padding-bottom:4px}
 .plot,.names{display:grid;gap:6px;min-width:calc(var(--n)*34px)}
-.plot{height:230px;padding-top:20px;border-bottom:1px solid var(--rule);background:linear-gradient(var(--rule-2) 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box}
+.plot{height:240px;padding-top:30px;border-bottom:1px solid var(--rule);background:linear-gradient(var(--rule-2) 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box}
 .col{height:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:4px 4px 0 0;cursor:default}
 .col:hover{background:#00000008}
-.cb{position:relative;width:62%;max-width:26px;height:0;border-radius:5px 5px 0 0;transform-origin:50% 100%;transition:height .9s cubic-bezier(.34,1.5,.5,1),filter .2s,transform .2s}
+.cb{position:relative;width:54%;max-width:22px;height:0;border-radius:5px 5px 0 0;transform-origin:50% 100%;transition:height .9s cubic-bezier(.34,1.5,.5,1),filter .2s,transform .2s}
 .cb::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,transparent 0,#ffffff66 50%,transparent 100%);background-size:100% 220%;background-repeat:no-repeat;background-position:0 220%}
 .play .cb::after{animation:shine .9s ease-out both;animation-delay:calc(var(--i,0)*25ms + 400ms)}
 @keyframes shine{to{background-position:0 -120%}}
 .col:hover .cb{filter:brightness(1.15);transform:scaleX(1.18)}
-.cb em{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);padding-bottom:3px;font:600 10.5px/1 var(--body);font-style:normal;color:var(--muted);white-space:nowrap}
+.cb .t3,.cb .s3{position:absolute;pointer-events:none;background:inherit}
+.cb .t3{left:0;bottom:100%;width:100%;height:8px;transform-origin:0 100%;transform:skewX(-45deg);border-radius:2px 2px 0 0;box-shadow:inset 0 0 0 20px #ffffff59}
+.cb .s3{left:100%;top:0;width:8px;height:100%;transform-origin:0 0;transform:skewY(-45deg);border-radius:0 0 2px 0;box-shadow:inset 0 0 0 40px #00000047}
+.col{filter:drop-shadow(3px 4px 3px #1d1d1d26)}
+.cb em{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);padding-bottom:11px;font:600 10.5px/1 var(--body);font-style:normal;color:var(--muted);white-space:nowrap}
 .cb.complete{background:linear-gradient(180deg,#46a874,#2f7d4f)}
 .cb.partial{background:linear-gradient(180deg,#dcae3f,#b98a1d)}
 .cb.empty{background:#9aa3a1;min-height:3px}
@@ -594,7 +598,7 @@ function render(){
   $('#colchart').style.setProperty('--n',n);$('#colnames').style.setProperty('--n',n);
   $('#colchart').style.gridTemplateColumns=$('#colnames').style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
   $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị nộp đủ`);
-  $('#colchart').innerHTML=units.map((r,i)=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · ${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}"><div class="cb ${cls(r)}" data-h="${p*100}" style="--i:${i}"><em>${Math.round(p*100)}%</em></div></div>`}).join('');
+  $('#colchart').innerHTML=units.map((r,i)=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · ${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}"><div class="cb ${cls(r)}" data-h="${p*100}" style="--i:${i}"><i class="t3"></i><i class="s3"></i><em>${Math.round(p*100)}%</em></div></div>`}).join('');
   $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(short(r)))}</span></div>`).join('');
   $('#chartlegend').innerHTML=[['Đã hoàn thành','#2f7d4f'],['Đang thu','#b98a1d'],['Chưa phát sinh','#9aa3a1']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
 
