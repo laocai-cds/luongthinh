@@ -45,8 +45,12 @@ button,input,select{font:inherit;color:inherit}
 .brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .seal{width:42px;height:42px;display:grid;place-items:center;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px #ffffff40}
 .seal img{width:100%;height:100%;object-fit:cover;display:block}
-.brand b{font:700 15px/1.15 var(--display);letter-spacing:.1px;display:block;white-space:nowrap}
-.brand small{font-size:12px;color:#ffffffa6}
+.brand b{font:800 18px/1.1 var(--display);letter-spacing:.04em;text-transform:uppercase;display:block;white-space:nowrap;
+  background:linear-gradient(100deg,#b98a1d 0%,#f7de98 18%,#e3b23c 36%,#fff6c9 50%,#e3b23c 64%,#b98a1d 82%,#f7de98 100%);background-size:220% 100%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#e3b23c;filter:drop-shadow(0 1px 0 #3a060b99);animation:goldsheen 4s linear infinite}
+@keyframes goldsheen{from{background-position:0 0}to{background-position:-220% 0}}
+@media(prefers-reduced-motion:reduce){.brand b{animation:none}}
+.brand small{font-size:12px;color:#ffffffa6;letter-spacing:.02em}
 .tabs{display:flex;gap:2px;height:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
 .tab{background:none;border:0;color:#ffffffb8;padding:0 16px;cursor:pointer;font-weight:500;white-space:nowrap;position:relative;height:100%}
@@ -74,7 +78,6 @@ button,input,select{font:inherit;color:inherit}
 .hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),#f7de98 50%,var(--gold))}
 .hero .wm{position:absolute;right:-90px;top:-70px;width:600px;height:600px;opacity:.09;pointer-events:none}
 .hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,500px);gap:48px;align-items:center;padding-top:54px;padding-bottom:60px}
-.hero .orgname{font:800 clamp(1.6rem,4vw,2.6rem)/1.1 var(--display);letter-spacing:-.01em;color:#f7d674;margin:0 0 10px;text-shadow:0 2px 14px #5a0b1166}
 .hero h1{font:800 clamp(2.3rem,5vw,3.7rem)/1.02 var(--display);letter-spacing:-.03em;margin:0 0 14px}
 .hero .lede{margin:0;color:#ffffffd1;max-width:44ch}
 .heroline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:28px 0 30px;max-width:470px}
@@ -256,7 +259,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 .toast.on{transform:none;opacity:1}
 .foot{padding:26px 0 40px;color:var(--muted);font-size:12.5px}
 
-@media(max-width:1100px){.barright .btn .lbl{display:none}}
+@media(max-width:1400px){.barright .btn .lbl{display:none}}
 @media(max-width:960px){
   .hero .wrap{grid-template-columns:1fr;gap:30px;padding-top:40px;padding-bottom:44px}
   .cols,.imp{grid-template-columns:1fr}
@@ -270,8 +273,11 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
   .dpanel{padding:20px 18px}
   .heroline{gap:16px 20px}
   .wrap{padding:0 16px}
-  .bar .wrap{gap:12px;height:58px}
-  .brand>div:last-child{display:none}
+  .bar .wrap{gap:4px 12px;height:auto;flex-wrap:wrap;padding-top:8px;padding-bottom:0}
+  .brand{flex:1;min-width:0}
+  .brand b{font-size:15px;white-space:normal;letter-spacing:.03em}
+  .brand small{display:none}
+  .tabs{order:3;width:100%;height:42px}
   .barright .btn .lbl{display:none}
   .tab{padding:0 11px}
   .pad{padding:18px 16px}
@@ -311,7 +317,6 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
     <svg class="wm" viewBox="0 0 64 64" aria-hidden="true"><g fill="#ffd166" transform="translate(64 0) scale(-1 1)"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></svg>
     <div class="wrap">
       <div>
-        <div class="orgname">Đảng bộ xã Lương Thịnh</div>
         <h1>Thu nộp đảng phí</h1>
         <p class="lede" id="lede">Tình hình thu nộp tại các chi bộ, đảng bộ trực thuộc Đảng bộ xã Lương Thịnh.</p>
         <div class="heroline" id="heroline"></div>
