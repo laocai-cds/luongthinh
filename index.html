@@ -241,9 +241,9 @@ td.amb{color:#a35f00;font-weight:700}td.red{color:var(--lac);font-weight:700}td.
 .plot{height:240px;padding-top:30px;border-bottom:1px solid var(--rule);background:linear-gradient(var(--rule-2) 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box}
 .col{height:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:4px 4px 0 0;cursor:default}
 .col:hover{background:#00000008}
-.cb{position:relative;width:54%;max-width:22px;height:0;border-radius:5px 5px 0 0;transform-origin:50% 100%;transition:height .5s cubic-bezier(.34,1.4,.5,1),filter .2s,transform .2s}
+.cb{position:relative;width:54%;max-width:22px;height:0;border-radius:5px 5px 0 0;transform-origin:50% 100%;transition:height .8s cubic-bezier(.34,1.4,.5,1),filter .2s,transform .2s}
 .cb::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,transparent 0,#ffffff66 50%,transparent 100%);background-size:100% 220%;background-repeat:no-repeat;background-position:0 220%}
-.play .cb::after{animation:shine .5s ease-out both;animation-delay:calc(var(--i,0)*55ms + 150ms)}
+.play .cb::after{animation:shine .8s ease-out both;animation-delay:calc(var(--i,0)*120ms + 250ms)}
 @keyframes shine{to{background-position:0 -120%}}
 .col:hover .cb{filter:brightness(1.15);transform:scaleX(1.18)}
 .cb .t3,.cb .s3{position:absolute;pointer-events:none;background:inherit}
@@ -534,11 +534,11 @@ function resetTo(el,prop,val){const tr=el.style.transition;el.style.transition='
 function growBars(root){
   $$(root+' [data-w]').forEach(el=>{resetTo(el,'width','0');requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.width=el.dataset.w))});
   $$(root+' [data-h]').forEach((el,i)=>{
-    const d=REDUCED?0:i*55;
+    const d=REDUCED?0:i*120;
     resetTo(el,'height','0');el.style.transitionDelay=d+'ms,0ms,0ms';
     requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.height=el.dataset.h+'%'));
     const em=el.querySelector('em');
-    if(em){const to=Math.round(Number(el.dataset.h));if(REDUCED)em.textContent=to+'%';else{em.textContent='0%';setTimeout(()=>countUp(em,to/100,x=>Math.round(x*100)+'%',450),d)}}
+    if(em){const to=Math.round(Number(el.dataset.h));if(REDUCED)em.textContent=to+'%';else{em.textContent='0%';setTimeout(()=>countUp(em,to/100,x=>Math.round(x*100)+'%',700),d)}}
   });
   const cw=document.querySelector(root+'.chartwrap')||document.querySelector(root+' .chartwrap');
   if(cw){cw.classList.remove('play');void cw.offsetWidth;cw.classList.add('play')}
@@ -572,7 +572,7 @@ let lastRate=0,loopTimer=null;
 // Biểu đồ tròn quay liên tục bằng CSS; biểu đồ cột mọc lại mỗi 2 giây khi đang xem tab Tổng quan
 function startLoop(){
   clearInterval(loopTimer);if(REDUCED)return;
-  loopTimer=setInterval(()=>{if(document.hidden||!$('#overview').classList.contains('on'))return;growBars('.chartwrap')},2000);
+  loopTimer=setInterval(()=>{if(document.hidden||!$('#overview').classList.contains('on'))return;growBars('.chartwrap')},4000);
 }
 function render(){
   const t=totals(),rate=t.due?t.paidCount/t.due:0;
