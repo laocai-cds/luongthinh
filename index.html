@@ -74,6 +74,7 @@ button,input,select{font:inherit;color:inherit}
 .hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),#f7de98 50%,var(--gold))}
 .hero .wm{position:absolute;right:-90px;top:-70px;width:600px;height:600px;opacity:.09;pointer-events:none}
 .hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,500px);gap:48px;align-items:center;padding-top:54px;padding-bottom:60px}
+.hero .orgname{font:800 clamp(1.6rem,4vw,2.6rem)/1.1 var(--display);letter-spacing:-.01em;color:#f7d674;margin:0 0 10px;text-shadow:0 2px 14px #5a0b1166}
 .hero h1{font:800 clamp(2.3rem,5vw,3.7rem)/1.02 var(--display);letter-spacing:-.03em;margin:0 0 14px}
 .hero .lede{margin:0;color:#ffffffd1;max-width:44ch}
 .heroline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:28px 0 30px;max-width:470px}
@@ -310,6 +311,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
     <svg class="wm" viewBox="0 0 64 64" aria-hidden="true"><g fill="#ffd166" transform="translate(64 0) scale(-1 1)"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></svg>
     <div class="wrap">
       <div>
+        <div class="orgname">Đảng bộ xã Lương Thịnh</div>
         <h1>Thu nộp đảng phí</h1>
         <p class="lede" id="lede">Tình hình thu nộp tại các chi bộ, đảng bộ trực thuộc Đảng bộ xã Lương Thịnh.</p>
         <div class="heroline" id="heroline"></div>
