@@ -191,6 +191,32 @@ td.n,th.n{text-align:right;white-space:nowrap}
 .pill.done{background:var(--paddy-bg);color:var(--paddy)}
 .pill.partial{background:var(--amber-bg);color:var(--amber)}
 .pill.empty{background:var(--gray-bg);color:var(--gray)}
+/* bảng màu sắc */
+thead th{background:linear-gradient(180deg,#8f1820,#6f1016);color:#fff;border-bottom:0;font-weight:700;letter-spacing:.01em}
+thead th:first-child{border-top-left-radius:10px}thead th:last-child{border-top-right-radius:10px}
+th[data-sort]:hover{color:#ffe08a}
+tbody tr.row td:first-child{box-shadow:inset 4px 0 0 var(--gray)}
+tbody tr.row.complete{background:linear-gradient(90deg,#e8f4ec,#fff 45%)}
+tbody tr.row.complete td:first-child{box-shadow:inset 4px 0 0 var(--paddy)}
+tbody tr.row.partial{background:linear-gradient(90deg,#fdf1d9,#fff 45%)}
+tbody tr.row.partial td:first-child{box-shadow:inset 4px 0 0 var(--gold-d)}
+tbody tr.row.empty{background:linear-gradient(90deg,#f6e6e6,#fff 45%)}
+tbody tr.row.empty td:first-child{box-shadow:inset 4px 0 0 var(--lac-2)}
+tbody tr.row:hover{filter:brightness(.98)}
+td.pc b{color:var(--paddy);font-size:14px}tbody tr.row.empty td.pc b{color:var(--lac)}
+td.mny b{color:#14633a}tbody tr.row.empty td.mny b{color:var(--muted);font-weight:500}
+td.amb{color:#a35f00;font-weight:700}td.red{color:var(--lac);font-weight:700}td.zero{color:#b3b8b0}
+.rk{min-width:30px;height:30px;border-radius:50%;color:#fff;box-shadow:0 2px 6px #0003}
+.rk.complete{background:linear-gradient(145deg,#3fa56a,#1f7a47)}
+.rk.partial{background:linear-gradient(145deg,#efbe45,#c18a15)}
+.rk.empty{background:linear-gradient(145deg,#d65a5a,#a8232b)}
+.rk.m1{background:linear-gradient(145deg,#fff1a8,#e3b23c 45%,#a8760f);color:#4a3200;box-shadow:0 0 0 2px #f7de98,0 3px 8px #b98a1d66}
+.rk.m2{background:linear-gradient(145deg,#fff,#c9cfd6 50%,#8c949e);color:#2d3640;box-shadow:0 0 0 2px #e4e8ec,0 3px 8px #6b758066}
+.rk.m3{background:linear-gradient(145deg,#f6c79a,#cd8a4f 50%,#8d5524);color:#3a1d05;box-shadow:0 0 0 2px #f0d2b3,0 3px 8px #8d552466}
+.track i.complete{background:linear-gradient(90deg,#2f9a5e,#46c07f)}
+.track i.partial{background:linear-gradient(90deg,#c18a15,#f0c04e)}
+.pill{padding:4px 11px;font-weight:700}
+.pill.done{background:#d3ecdc;color:#14633a}.pill.partial{background:#fbe7b4;color:#8a5200}.pill.empty{background:#f4d3d3;color:#9a1c24}
 .tfoot{padding:12px 24px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--rule)}
 .noresult{padding:28px 24px;color:var(--muted)}
 
@@ -610,17 +636,18 @@ function sorted(list){
   });
 }
 const progCell=r=>`<div class="pbar"><div class="track"><i class="${cls(r)}" data-w="${Math.min(100,v(r,'progress')*100)}%"></i></div><b>${pct(v(r,'progress'))}</b></div>`;
-const rk=r=>`<span class="rk ">${rankOf.get(r)}</span>`;
+const rk=r=>{const n=rankOf.get(r);return `<span class="rk ${n<=3?'m'+n:cls(r)}">${n}</span>`};
+const zc=(x,c)=>x>0?`<td class="n ${c}">${x}</td>`:'<td class="n zero">0</td>';
 function fillTables(){
   const q=($('#search').value||'').toLocaleLowerCase('vi'),f=state.filter;
   let list=units.filter(r=>nm(r).toLocaleLowerCase('vi').includes(q)).filter(r=>f==='all'||(f==='has'?v(r,'members')>0:(v(r,'pending')+v(r,'noRecord')+v(r,'approved')>0||v(r,'progress')<1)));
   list=sorted(list);
   $('#rowcount').textContent=`Hiển thị ${list.length} / ${units.length} đơn vị`;
   $('#noresult').hidden=list.length>0;
-  $('#tbody').innerHTML=list.map(r=>{const[s,c]=status(r);return `<tr><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'paidCount')}/${v(r,'due')}</td><td class="n">${v(r,'pending')}</td><td class="n">${v(r,'noRecord')}</td><td class="n">${money(v(r,'declared'))}</td><td class="n"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td><td><span class="pill ${c}">${s}</span></td></tr>`}).join('');
+  $('#tbody').innerHTML=list.map(r=>{const[s,c]=status(r);return `<tr class="row ${cls(r)}"><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n pc"><b>${v(r,'paidCount')}</b>/${v(r,'due')}</td>${zc(v(r,'pending'),'amb')}${zc(v(r,'noRecord'),'red')}<td class="n">${money(v(r,'declared'))}</td><td class="n mny"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td><td><span class="pill ${c}">${s}</span></td></tr>`}).join('');
   const q2=($('#search2').value||'').toLocaleLowerCase('vi');
   const l2=sorted(units.filter(r=>nm(r).toLocaleLowerCase('vi').includes(q2)));
-  $('#tbody2').innerHTML=l2.map(r=>`<tr><td class="hint">${esc(r[KEYS.stt])}</td><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'members')}</td><td class="n">${v(r,'pending')}</td><td class="n">${v(r,'paidCount')}</td><td class="n"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td></tr>`).join('');
+  $('#tbody2').innerHTML=l2.map(r=>`<tr class="row ${cls(r)}"><td class="hint">${esc(r[KEYS.stt])}</td><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'members')}</td>${zc(v(r,'pending'),'amb')}<td class="n pc"><b>${v(r,'paidCount')}</b></td><td class="n mny"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td></tr>`).join('');
   $$('th[data-sort]').forEach(th=>th.setAttribute('aria-sort',th.dataset.sort===state.sort.k?(state.sort.dir>0?'ascending':'descending'):'none'));
   growBars('#overview .tw');growBars('#units .tw');
 }
