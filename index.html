@@ -85,7 +85,7 @@ button,input,select{font:inherit;color:inherit}
 .heroline b{display:block;font:700 1.25rem/1.2 var(--display);letter-spacing:-.01em}
 .heroline small{color:#ffffffbd;font-size:12.5px}
 .heroact{display:flex;gap:10px;flex-wrap:wrap}
-.dpanel{position:relative;overflow:hidden;background:linear-gradient(160deg,#0ea5e975,#1d4ed880 55%,#0b1f6aa6);border:1px solid #7dd3fc66;border-radius:18px;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 28px 60px -26px #031a4acc,inset 0 0 46px #38bdf829,inset 0 1px 0 #ffffff40}
+.dpanel{position:relative;overflow:hidden;background:linear-gradient(160deg,#0ea5e966,#1d4ed87a 55%,#0b1f6a85);border:1px solid #7dd3fc66;border-radius:18px;padding:24px;backdrop-filter:blur(14px) saturate(1.5);-webkit-backdrop-filter:blur(14px) saturate(1.5);box-shadow:0 28px 60px -26px #031a4a99,inset 0 0 46px #38bdf829,inset 0 1px 0 #ffffff40}
 .dpanel::before{content:'';position:absolute;inset:0;background:linear-gradient(#7dd3fc12 1px,transparent 1px) 0 0/100% 14px;pointer-events:none;animation:scan 6s linear infinite;opacity:.7}
 @keyframes scan{to{background-position:0 14px}}
 .dpanel>*{position:relative}
@@ -420,21 +420,21 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
   .pagehead h1{font-size:1.35rem}
 }
 /* biểu đồ cột: kính xanh trong suốt kiểu hệ thống AI */
-.aipanel{position:relative;overflow:hidden;color:#e6f6ff;border-color:#7dd3fc66;background:linear-gradient(160deg,#0b3a78 0%,#0a2a63 55%,#071a45 100%);box-shadow:0 24px 50px -28px #031a4acc,inset 0 0 46px #38bdf826,inset 0 1px 0 #ffffff33}
+.aipanel{position:relative;overflow:hidden;color:#e6f6ff;border-color:#7dd3fc66;background:linear-gradient(160deg,#1a5fc9a6 0%,#123c8e99 55%,#0b2a7aa6 100%);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);box-shadow:0 24px 50px -28px #031a4a99,inset 0 0 46px #38bdf826,inset 0 1px 0 #ffffff33}
 .aipanel::before{content:'';position:absolute;inset:0;background:radial-gradient(500px 220px at 85% 0%,#38d4ff2e,transparent 70%),linear-gradient(#7dd3fc10 1px,transparent 1px) 0 0/100% 14px;pointer-events:none;animation:scan 6s linear infinite}
 .aipanel>*{position:relative}
-.aipanel .ph h2{color:#fff}.aipanel .ph small{color:#a9cdf0}
-.aipanel .yax,.aipanel .cb em{color:#a9cdf0}
+.aipanel .ph h2{color:#fff}.aipanel .ph small{color:#cfe8ff}
+.aipanel .yax,.aipanel .cb em{color:#d6ecff}
 .aipanel .nlab span{color:#cfe8ff}
 .aipanel .plot{border-bottom-color:#7dd3fc66;background:linear-gradient(#7dd3fc26 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box;position:relative}
 .aipanel .plot::after{content:'';position:absolute;top:0;bottom:0;left:0;width:70px;background:linear-gradient(90deg,transparent,#38d4ff40 70%,#bff0ff88);border-right:1px solid #bff0ffcc;pointer-events:none;animation:vscan 4s linear infinite;mix-blend-mode:screen}
 @keyframes vscan{from{transform:translateX(-80px)}to{transform:translateX(calc(100vw))}}
 .aipanel .col:hover{background:#38d4ff1a}
-.aipanel .cb.complete{background:linear-gradient(180deg,#7de8ff99,#1ea7ff66);box-shadow:0 0 14px #38d4ff77,inset 0 0 0 1px #bff0ff99}
-.aipanel .cb.partial{background:linear-gradient(180deg,#a8bbff99,#5b78ff66);box-shadow:0 0 14px #7c9cff77,inset 0 0 0 1px #d0daffaa}
-.aipanel .cb.empty{background:#9fb3d955;box-shadow:inset 0 0 0 1px #cfe8ff66}
-.aipanel .cb .t3{box-shadow:inset 0 0 0 20px #ffffff4d;border:1px solid #ffffff55}
-.aipanel .cb .s3{box-shadow:inset 0 0 0 40px #02163e55}
+.aipanel .cb.complete{background:linear-gradient(180deg,#7de8ff66,#1ea7ff2e);box-shadow:0 0 16px #38d4ff66,inset 0 0 0 1px #bff0ffcc}
+.aipanel .cb.partial{background:linear-gradient(180deg,#a8bbff66,#5b78ff2e);box-shadow:0 0 16px #7c9cff66,inset 0 0 0 1px #d0daffcc}
+.aipanel .cb.empty{background:#9fb3d933;box-shadow:inset 0 0 0 1px #cfe8ff66}
+.aipanel .cb .t3{box-shadow:inset 0 0 0 20px #ffffff33;border:1px solid #ffffff55}
+.aipanel .cb .s3{box-shadow:inset 0 0 0 40px #02163e33}
 .aipanel .col{filter:drop-shadow(0 0 4px #38d4ff55)}
 .aipanel .legend{color:#bcdcf7}
 @media(prefers-reduced-motion:reduce){.aipanel::before,.aipanel .plot::after{animation:none}.aipanel .plot::after{display:none}}
