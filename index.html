@@ -81,10 +81,12 @@ button,input,select{font:inherit;color:inherit}
 .dcenter span{font-size:12px;color:#ffffffcc;margin-top:4px}
 .seg{transition:stroke-dasharray 1.6s cubic-bezier(.22,.7,.2,1)}
 .spin{transform-box:view-box;transform-origin:110px 110px}
-.spin.cw{transform:rotate(-90deg);animation:spinCW 2s cubic-bezier(.2,.75,.2,1) both}
-.spin.ccw{transform:rotate(-90deg);animation:spinCCW 2.2s cubic-bezier(.2,.75,.2,1) both}
+.spin.cw{transform:rotate(-90deg);animation:spinCW 2s cubic-bezier(.2,.75,.2,1) both,rotCW 22s linear 2s infinite}
+.spin.ccw{transform:rotate(-90deg);animation:spinCCW 2.2s cubic-bezier(.2,.75,.2,1) both,rotCCW 16s linear 2.2s infinite}
 @keyframes spinCW{from{transform:rotate(-450deg)}to{transform:rotate(-90deg)}}
 @keyframes spinCCW{from{transform:rotate(270deg)}to{transform:rotate(-90deg)}}
+@keyframes rotCW{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
+@keyframes rotCCW{from{transform:rotate(-90deg)}to{transform:rotate(-450deg)}}
 .orbit{transform-box:view-box;transform-origin:110px 110px;animation:orbit 48s linear infinite}
 @keyframes orbit{to{transform:rotate(360deg)}}
 .dcenter{animation:pop .9s .5s cubic-bezier(.3,1.5,.5,1) both}
@@ -518,15 +520,10 @@ function growDonut(){
   $$('#donutsvg .seg').forEach(c=>{const L=Number(c.dataset.len),go=()=>{c.style.strokeDasharray=`${L} ${100-L}`};resetTo(c,'strokeDasharray','0 100');if(REDUCED)go();else requestAnimationFrame(()=>requestAnimationFrame(go))});
 }
 let lastRate=0,loopTimer=null;
-function replayDonut(){
-  $$('#donutsvg .spin').forEach(g=>{g.style.animation='none';void g.getBoundingClientRect();g.style.animation=''});
-  const dc=$('.dcenter');dc.style.animation='none';void dc.offsetWidth;dc.style.animation='';
-  growDonut();countUp($('#donutpct'),lastRate,x=>pct(x));
-}
-// Lặp lại hiệu ứng của hai biểu đồ theo chu kỳ khi đang xem tab Tổng quan
+// Biểu đồ tròn quay liên tục bằng CSS; biểu đồ cột mọc lại theo chu kỳ khi đang xem tab Tổng quan
 function startLoop(){
   clearInterval(loopTimer);if(REDUCED)return;
-  loopTimer=setInterval(()=>{if(document.hidden||!$('#overview').classList.contains('on'))return;replayDonut();growBars('.chartwrap')},9000);
+  loopTimer=setInterval(()=>{if(document.hidden||!$('#overview').classList.contains('on'))return;growBars('.chartwrap')},9000);
 }
 function render(){
   const t=totals(),rate=t.due?t.paidCount/t.due:0;
