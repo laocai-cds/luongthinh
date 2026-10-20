@@ -419,6 +419,25 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
   .search{font-size:13px}.chip{padding:5px 10px;font-size:12px}
   .pagehead h1{font-size:1.35rem}
 }
+/* biểu đồ cột: kính xanh trong suốt kiểu hệ thống AI */
+.aipanel{position:relative;overflow:hidden;color:#e6f6ff;border-color:#7dd3fc66;background:linear-gradient(160deg,#0b3a78 0%,#0a2a63 55%,#071a45 100%);box-shadow:0 24px 50px -28px #031a4acc,inset 0 0 46px #38bdf826,inset 0 1px 0 #ffffff33}
+.aipanel::before{content:'';position:absolute;inset:0;background:radial-gradient(500px 220px at 85% 0%,#38d4ff2e,transparent 70%),linear-gradient(#7dd3fc10 1px,transparent 1px) 0 0/100% 14px;pointer-events:none;animation:scan 6s linear infinite}
+.aipanel>*{position:relative}
+.aipanel .ph h2{color:#fff}.aipanel .ph small{color:#a9cdf0}
+.aipanel .yax,.aipanel .cb em{color:#a9cdf0}
+.aipanel .nlab span{color:#cfe8ff}
+.aipanel .plot{border-bottom-color:#7dd3fc66;background:linear-gradient(#7dd3fc26 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box;position:relative}
+.aipanel .plot::after{content:'';position:absolute;top:0;bottom:0;left:0;width:70px;background:linear-gradient(90deg,transparent,#38d4ff40 70%,#bff0ff88);border-right:1px solid #bff0ffcc;pointer-events:none;animation:vscan 4s linear infinite;mix-blend-mode:screen}
+@keyframes vscan{from{transform:translateX(-80px)}to{transform:translateX(calc(100vw))}}
+.aipanel .col:hover{background:#38d4ff1a}
+.aipanel .cb.complete{background:linear-gradient(180deg,#7de8ff99,#1ea7ff66);box-shadow:0 0 14px #38d4ff77,inset 0 0 0 1px #bff0ff99}
+.aipanel .cb.partial{background:linear-gradient(180deg,#a8bbff99,#5b78ff66);box-shadow:0 0 14px #7c9cff77,inset 0 0 0 1px #d0daffaa}
+.aipanel .cb.empty{background:#9fb3d955;box-shadow:inset 0 0 0 1px #cfe8ff66}
+.aipanel .cb .t3{box-shadow:inset 0 0 0 20px #ffffff4d;border:1px solid #ffffff55}
+.aipanel .cb .s3{box-shadow:inset 0 0 0 40px #02163e55}
+.aipanel .col{filter:drop-shadow(0 0 4px #38d4ff55)}
+.aipanel .legend{color:#bcdcf7}
+@media(prefers-reduced-motion:reduce){.aipanel::before,.aipanel .plot::after{animation:none}.aipanel .plot::after{display:none}}
 @media(prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
   }
@@ -475,7 +494,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
       <div class="ph"><h2>Top 3 đơn vị dẫn đầu</h2><small>Xếp theo tiến độ; đồng hạng thì xét số tiền đã nộp</small></div>
       <div class="podium" id="podium"></div>
     </div>
-    <div class="panel pad" style="margin-bottom:20px">
+    <div class="panel pad aipanel" style="margin-bottom:20px">
       <div class="ph"><h2>Tiến độ theo đơn vị</h2><small>Đảng viên đã nộp trên tổng số đảng viên (trừ miễn giảm), mỗi cột là một đơn vị</small></div>
       <div class="chartwrap play">
         <div class="yax" aria-hidden="true"><span>100%</span><span>50%</span><span>0%</span></div>
@@ -713,7 +732,7 @@ function render(){
   $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị nộp đủ`);
   $('#colchart').innerHTML=units.map((r,i)=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · ${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}"><div class="cb ${cls(r)}" data-h="${p*100}" style="--i:${i}"><i class="t3"></i><i class="s3"></i><em>${Math.round(p*100)}%</em></div></div>`}).join('');
   $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(short(r)))}</span></div>`).join('');
-  $('#chartlegend').innerHTML=[['Đã hoàn thành','#2f7d4f'],['Đang thu','#b98a1d'],['Chưa phát sinh','#9aa3a1']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
+  $('#chartlegend').innerHTML=[['Đã hoàn thành','#38d4ff'],['Đang thu','#7c9cff'],['Chưa phát sinh','#9fb3d9']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
 
   // split by status
   const groups=[['Đã hoàn thành','#2f7d4f'],['Đang thu','#c98f22'],['Chưa phát sinh','#9aa3a1']].map(([l,c])=>({l,c,n:0}));
