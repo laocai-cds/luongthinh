@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#4a0e11">
 <meta name="description" content="Theo dõi tình hình thu nộp đảng phí tại Đảng bộ xã Lương Thịnh.">
-<title>Thu nộp đảng phí · Lương Thịnh</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238f1d22'/%3E%3Cpolygon points='32,12 38,27 54,27 41,36 46,52 32,42 18,52 23,36 10,27 26,27' fill='%23e3b23c'/%3E%3C/svg%3E">
+<title>Thu nộp đảng phí · Đảng bộ xã Lương Thịnh</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%238f1d22'/%3E%3Cg%20fill='%23e3b23c'%3E%3Cg%20transform='rotate%2840%2032%2034%29'%3E%3Crect%20x='29.2'%20y='13'%20width='5.6'%20height='47'%20rx='2.4'/%3E%3Cpath%20d='M16%208.5%20Q16%207%2017.5%207%20H43%20Q47%207%2047%2011.5%20V14%20Q47%2015.5%2045.5%2015.5%20H17.5%20Q16%2015.5%2016%2014%20Z'/%3E%3C/g%3E%3Cpath%20d='M47.5%2057%20Q46%2058.5%2044.5%2057%20L33.5%2042.5%20L40%2037.5%20L48%2054.5%20Q48.8%2056%2047.5%2057%20Z'/%3E%3Cpath%20d='M37%2042.5%20C11%2044%203%2016%2031%205.5%20C19%2017%2025%2032.5%2042%2033.5%20Z'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&display=swap" rel="stylesheet">
@@ -32,7 +32,7 @@ button,input,select{font:inherit;color:inherit}
 .bar .wrap{display:flex;align-items:center;gap:28px;height:64px}
 .brand{display:flex;align-items:center;gap:12px;flex-shrink:0}
 .seal{width:36px;height:36px;display:grid;place-items:center;background:var(--lac);border-radius:9px;box-shadow:inset 0 0 0 1px #ffffff29}
-.brand b{font:700 16px/1.1 var(--display);letter-spacing:.2px;display:block}
+.brand b{font:700 15px/1.15 var(--display);letter-spacing:.1px;display:block;white-space:nowrap}
 .brand small{font-size:12px;color:#ffffffa6}
 .tabs{display:flex;gap:2px;height:100%;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
@@ -41,7 +41,6 @@ button,input,select{font:inherit;color:inherit}
 .tab[aria-current=page]{color:#fff;font-weight:600}
 .tab[aria-current=page]::after{content:'';position:absolute;left:14px;right:14px;bottom:0;height:3px;background:var(--gold);border-radius:3px 3px 0 0}
 .barright{margin-left:auto;display:flex;align-items:center;gap:8px}
-.upd{font-size:12px;color:#ffffff94;margin-right:6px;white-space:nowrap}
 
 /* buttons */
 .btn{border:1px solid var(--rule);background:var(--paper);border-radius:var(--r);padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer;transition:background .15s,border-color .15s}
@@ -53,7 +52,7 @@ button,input,select{font:inherit;color:inherit}
 .btn.ghost-light:hover{background:#ffffff14;border-color:#ffffff99}
 .btn.solid{background:var(--lac);border-color:var(--lac);color:#fff}
 .btn.solid:hover{background:var(--lac-2)}
-.bar .btn{background:#ffffff14;border-color:#ffffff2e;color:#fff;padding:7px 12px}
+.bar .btn{white-space:nowrap;background:#ffffff14;border-color:#ffffff2e;color:#fff;padding:7px 12px}
 .bar .btn:hover{background:#ffffff26}
 
 /* hero */
@@ -181,6 +180,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 .toast.on{transform:none;opacity:1}
 .foot{padding:26px 0 40px;color:var(--muted);font-size:12.5px}
 
+@media(max-width:1100px){.barright .btn .lbl{display:none}}
 @media(max-width:960px){
   .hero .wrap{grid-template-columns:1fr;gap:6px}
   .heroact{padding-bottom:20px}
@@ -192,7 +192,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 @media(max-width:700px){
   .wrap{padding:0 16px}
   .bar .wrap{gap:12px;height:58px}
-  .brand>div:last-child,.upd{display:none}
+  .brand>div:last-child{display:none}
   .barright .btn .lbl{display:none}
   .tab{padding:0 11px}
   .pad{padding:18px 16px}
@@ -210,8 +210,8 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 <header class="bar">
   <div class="wrap">
     <div class="brand">
-      <div class="seal" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 64 64"><polygon points="32,6 40,25 60,25 44,38 50,58 32,46 14,58 20,38 4,25 24,25" fill="#e3b23c"/></svg></div>
-      <div><b>Lương Thịnh</b><small>Thu nộp đảng phí</small></div>
+      <div class="seal" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 64 64"><g fill="#e3b23c"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></svg></div>
+      <div><b>Đảng bộ xã Lương Thịnh</b><small>Thu nộp đảng phí</small></div>
     </div>
     <nav class="tabs" aria-label="Chuyên mục">
       <button class="tab" data-page="overview">Tổng quan</button>
@@ -219,7 +219,6 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
       <button class="tab" data-page="import">Nhập dữ liệu</button>
     </nav>
     <div class="barright">
-      <span class="upd">Cập nhật 19/10/2026</span>
       <button class="btn" id="recordBtn">＋<span class="lbl"> Ghi nhận thu</span></button>
       <button class="btn" id="exportBtn" title="Xuất báo cáo CSV">⇩<span class="lbl"> Xuất CSV</span></button>
       <button class="btn" id="refreshBtn" title="Làm mới số liệu">↻<span class="lbl"> Làm mới</span></button>
@@ -409,7 +408,7 @@ function terraces(rate){
     clips+=`<clipPath id="tc${k}"><rect class="fillrect" x="${x0}" y="0" width="${w.toFixed(1)}" height="${H}" style="transition-delay:${k*140}ms"/></clipPath>`;
     fill+=`<path d="${d}" fill="url(#gold)" stroke="#4a0e11" stroke-opacity=".55" stroke-width="2" clip-path="url(#tc${k})"/><path d="M${x0},${y} C${x0+90},${y-18} ${x1-150},${y+8} ${x1},${y-12}" fill="none" stroke="#ffffff30" stroke-width="1.2" clip-path="url(#tc${k})"/>`;
   }
-  const star='<polygon transform="translate(430 34)" points="0,-20 6,-6 22,-6 9,3 14,18 0,9 -14,18 -9,3 -22,-6 -6,-6" fill="#e3b23c"/>';
+  const star='<g transform="translate(400 2) scale(.95)"><g fill="#e3b23c"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></g>';
   return `<svg class="terr" id="terr" viewBox="0 0 ${W} ${H}" role="img" aria-label="Năm thửa ruộng bậc thang, đã đổ vàng ${pct(rate)}"><defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c98f22"/><stop offset="1" stop-color="#f1cd6a"/></linearGradient>${clips}</defs>${star}${base}${fill}</svg>`;
 }
 
@@ -418,7 +417,7 @@ function render(){
   const active=units.filter(r=>v(r,'members')>0),done=units.filter(r=>cls(r)==='complete').length;
 
   $('#lede').textContent='Dữ liệu giới hạn ở 26 đơn vị được đánh dấu đỏ trong bảng tính nguồn.';
-  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${money(remain)}</b><small>Còn phải thu</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div>`;
+  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${money(remain)}</b><small>Còn phải thu</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>19/10/2026</b><small>Dữ liệu cập nhật</small></div>`;
   $('#terrwrap').innerHTML=terraces(rate);
 
   $('#stats').innerHTML=[
