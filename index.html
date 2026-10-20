@@ -85,14 +85,17 @@ button,input,select{font:inherit;color:inherit}
 .heroline b{display:block;font:700 1.25rem/1.2 var(--display);letter-spacing:-.01em}
 .heroline small{color:#ffffffbd;font-size:12.5px}
 .heroact{display:flex;gap:10px;flex-wrap:wrap}
-.dpanel{background:linear-gradient(160deg,#ffffff24,#ffffff0e);border:1px solid #ffffff33;border-radius:18px;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 28px 60px -26px #3d060cb3}
+.dpanel{position:relative;overflow:hidden;background:linear-gradient(160deg,#0ea5e975,#1d4ed880 55%,#0b1f6aa6);border:1px solid #7dd3fc66;border-radius:18px;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 28px 60px -26px #031a4acc,inset 0 0 46px #38bdf829,inset 0 1px 0 #ffffff40}
+.dpanel::before{content:'';position:absolute;inset:0;background:linear-gradient(#7dd3fc12 1px,transparent 1px) 0 0/100% 14px;pointer-events:none;animation:scan 6s linear infinite;opacity:.7}
+@keyframes scan{to{background-position:0 14px}}
+.dpanel>*{position:relative}
 .dhead b{display:block;font:700 1.08rem/1.25 var(--display)}
 .dhead small{color:#ffffffb8;font-size:12.5px}
 .dbody{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px;align-items:center;margin-top:18px}
 .donut{position:relative;aspect-ratio:1}
 .donut svg{display:block;width:100%;height:100%}
 .dcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.dcenter strong{font:800 clamp(1.3rem,2.6vw,1.65rem)/1 var(--display);letter-spacing:-.03em;color:var(--gold)}
+.dcenter strong{font:800 clamp(1.3rem,2.6vw,1.65rem)/1 var(--display);letter-spacing:-.03em;color:#c8f1ff;text-shadow:0 0 14px #38bdf8cc,0 0 30px #38bdf866}
 .dcenter span{font-size:12px;color:#ffffffcc;margin-top:4px}
 .seg{transition:stroke-dasharray 1.6s cubic-bezier(.22,.7,.2,1)}
 .spin{transform-box:view-box;transform-origin:110px 110px}
@@ -102,6 +105,17 @@ button,input,select{font:inherit;color:inherit}
 @keyframes spinCCW{from{transform:rotate(270deg)}to{transform:rotate(-90deg)}}
 @keyframes rotCW{from{transform:rotate(-90deg)}to{transform:rotate(270deg)}}
 @keyframes rotCCW{from{transform:rotate(-90deg)}to{transform:rotate(-450deg)}}
+.spin{filter:drop-shadow(0 0 3px #38bdf8aa)}
+.sweep{transform-box:view-box;transform-origin:110px 110px;animation:sweep 4s linear infinite}
+@keyframes sweep{to{transform:rotate(360deg)}}
+.techring{transform-box:view-box;transform-origin:110px 110px;animation:techring 14s linear infinite reverse}
+@keyframes techring{to{transform:rotate(360deg)}}
+.node{transform-box:view-box;transform-origin:110px 110px;animation:sweep var(--t,6s) linear infinite}
+.core{transform-box:view-box;transform-origin:110px 110px;animation:corepulse 2.4s ease-in-out infinite}
+@keyframes corepulse{0%,100%{opacity:.55;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
+.pulse{transform-box:view-box;transform-origin:110px 110px;animation:ping 2.8s ease-out infinite}
+@keyframes ping{from{opacity:.7;transform:scale(.55)}to{opacity:0;transform:scale(1.02)}}
+@media(prefers-reduced-motion:reduce){.sweep,.techring,.node,.core,.pulse,.dpanel::before{animation:none}}
 .orbit{transform-box:view-box;transform-origin:110px 110px;animation:orbit 48s linear infinite}
 @keyframes orbit{to{transform:rotate(360deg)}}
 .dcenter{animation:pop .9s .5s cubic-bezier(.3,1.5,.5,1) both}
@@ -643,17 +657,26 @@ function renderDonut(t,rate,active){
   const sc={done:0,part:0,empty:0};
   active.forEach(r=>{const c=status(r)[1];if(c==='done')sc.done++;else if(c==='partial')sc.part++;else sc.empty++});
   const mem=[
-    {l:'Đã nộp',v:t.paidCount,c:'#e3b23c'},
-    {l:'Đã duyệt, chưa nộp',v:t.approved,c:'#ff8a6b'},
-    {l:'Chưa duyệt hồ sơ',v:t.pending,c:'#ffb066'},
-    {l:'Chưa có hồ sơ',v:t.noRecord,c:'#ffffff59'},
-    {l:'Miễn giảm',v:t.exempt,c:'#9ec5ff'}
+    {l:'Đã nộp',v:t.paidCount,c:'#38d4ff'},
+    {l:'Đã duyệt, chưa nộp',v:t.approved,c:'#7c9cff'},
+    {l:'Chưa duyệt hồ sơ',v:t.pending,c:'#b49bff'},
+    {l:'Chưa có hồ sơ',v:t.noRecord,c:'#ffffff4d'},
+    {l:'Miễn giảm',v:t.exempt,c:'#5eead4'}
   ];
   const svg=$('#donutsvg');
   svg.setAttribute('aria-label',`Biểu đồ tròn: ${t.paidCount} trên ${t.due} đảng viên đã nộp, đạt ${pct(rate)}; ${sc.done} đơn vị hoàn thành, ${sc.part} đang thu, ${sc.empty} chưa phát sinh`);
-  svg.innerHTML=`<circle cx="110" cy="110" r="94" fill="none" stroke="#ffffff17" stroke-width="18"/><circle cx="110" cy="110" r="70" fill="none" stroke="#ffffff17" stroke-width="10"/><circle class="orbit" cx="110" cy="110" r="108" fill="none" stroke="#ffffff55" stroke-width="1.2" stroke-dasharray="1.5 7" stroke-linecap="round"/><g class="spin cw">${ring(94,18,mem)}</g><g class="spin ccw">${ring(70,10,[{v:sc.done,c:'#6fd3a0'},{v:sc.part,c:'#ffd166'},{v:sc.empty,c:'#ffffff59'}])}</g>`;
+  const wedge=(a0,a1,o)=>{const p=a=>[110+108*Math.cos(a*Math.PI/180),110+108*Math.sin(a*Math.PI/180)];const [x0,y0]=p(a0),[x1,y1]=p(a1);return `<path d="M110 110 L${x0.toFixed(2)} ${y0.toFixed(2)} A108 108 0 0 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="#38d4ff" opacity="${o}"/>`};
+  const sweep=[0,1,2,3,4,5,6,7].map(i=>wedge(-i*7-7,-i*7,((8-i)/8*.38).toFixed(3))).join('');
+  svg.innerHTML=`<defs><radialGradient id="coreg"><stop offset="0" stop-color="#38d4ff" stop-opacity=".55"/><stop offset=".6" stop-color="#2563eb" stop-opacity=".18"/><stop offset="1" stop-color="#2563eb" stop-opacity="0"/></radialGradient><clipPath id="dclip"><circle cx="110" cy="110" r="108"/></clipPath></defs>`+
+   `<g clip-path="url(#dclip)"><g class="sweep">${sweep}</g></g>`+
+   `<circle class="core" cx="110" cy="110" r="58" fill="url(#coreg)"/><circle class="pulse" cx="110" cy="110" r="58" fill="none" stroke="#7de3ff" stroke-width="1.4"/>`+
+   `<circle cx="110" cy="110" r="94" fill="none" stroke="#7dd3fc22" stroke-width="18"/><circle cx="110" cy="110" r="70" fill="none" stroke="#7dd3fc22" stroke-width="10"/>`+
+   `<circle class="techring" cx="110" cy="110" r="106" fill="none" stroke="#9fe6ff" stroke-opacity=".7" stroke-width="1.2" stroke-dasharray="14 5 2 5"/><circle class="orbit" cx="110" cy="110" r="108.5" fill="none" stroke="#bff0ff88" stroke-width="2" stroke-dasharray="1 6.2" stroke-linecap="round"/>`+
+   `<circle cx="110" cy="110" r="82" fill="none" stroke="#7dd3fc40" stroke-width=".8" stroke-dasharray="2 4"/>`+
+   `<g class="spin cw">${ring(94,18,mem)}</g><g class="spin ccw">${ring(70,10,[{v:sc.done,c:'#5eead4'},{v:sc.part,c:'#93c5fd'},{v:sc.empty,c:'#ffffff4d'}])}</g>`+
+   `<g class="node" style="--t:5s"><circle cx="110" cy="1.5" r="3" fill="#e6fbff"/><circle cx="110" cy="1.5" r="6" fill="#38d4ff" opacity=".35"/></g><g class="node" style="--t:9s;animation-direction:reverse"><circle cx="110" cy="218.5" r="2.4" fill="#bde6ff"/><circle cx="110" cy="218.5" r="5" fill="#7c9cff" opacity=".35"/></g>`;
   const rows=mem.filter(m=>m.v>0).map(m=>`<div style="--c:${m.c}"><span>${m.l}</span><b>${num(m.v)}</b></div>`).join('');
-  $('#dlegend').innerHTML=`<div class="dgroup"><p>Đảng viên, vòng ngoài</p>${rows}</div><div class="dgroup"><p>Đơn vị, vòng trong</p><div style="--c:#6fd3a0"><span>Hoàn thành</span><b>${sc.done}</b></div><div style="--c:#ffd166"><span>Đang thu</span><b>${sc.part}</b></div><div style="--c:#ffffff59"><span>Chưa phát sinh</span><b>${sc.empty}</b></div></div>`;
+  $('#dlegend').innerHTML=`<div class="dgroup"><p>Đảng viên, vòng ngoài</p>${rows}</div><div class="dgroup"><p>Đơn vị, vòng trong</p><div style="--c:#5eead4"><span>Hoàn thành</span><b>${sc.done}</b></div><div style="--c:#93c5fd"><span>Đang thu</span><b>${sc.part}</b></div><div style="--c:#ffffff4d"><span>Chưa phát sinh</span><b>${sc.empty}</b></div></div>`;
 }
 function growDonut(){
   $$('#donutsvg .seg').forEach(c=>{const L=Number(c.dataset.len),go=()=>{c.style.strokeDasharray=`${L} ${100-L}`};resetTo(c,'strokeDasharray','0 100');if(REDUCED)go();else requestAnimationFrame(()=>requestAnimationFrame(go))});
