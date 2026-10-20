@@ -153,6 +153,40 @@ td.n,th.n{text-align:right;white-space:nowrap}
 .tfoot{padding:12px 24px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--rule)}
 .noresult{padding:28px 24px;color:var(--muted)}
 
+/* podium */
+.podium{display:grid;grid-template-columns:1fr 1.12fr 1fr;gap:12px;align-items:end}
+.step{display:flex;flex-direction:column;gap:3px;padding:18px 20px;border-radius:var(--r) var(--r) 0 0}
+.step .no{font:800 2.6rem/1 var(--display);letter-spacing:-.04em}
+.step b{font-weight:700;font-size:1.02rem;line-height:1.3;margin-top:6px}
+.step strong{font:800 1.7rem/1.1 var(--display);letter-spacing:-.03em;margin-top:6px}
+.step small{font-size:12.5px;opacity:.82}
+.step.s1{min-height:226px;background:linear-gradient(180deg,var(--lac),var(--lac-d));color:#fff}
+.step.s1 .no,.step.s1 strong{color:var(--gold)}
+.step.s2{min-height:184px;background:#f5e5b8}
+.step.s2 .no{color:var(--gold-d)}
+.step.s3{min-height:150px;background:#e9e6df}
+.step.s3 .no{color:var(--muted)}
+/* column chart */
+.chartwrap{display:grid;grid-template-columns:44px minmax(0,1fr)}
+.yax{height:230px;padding-top:20px;display:flex;flex-direction:column;justify-content:space-between;font-size:11.5px;line-height:1;color:var(--muted)}
+.cscroll{overflow-x:auto;padding-bottom:4px}
+.plot,.names{display:grid;gap:6px;min-width:calc(var(--n)*34px)}
+.plot{height:230px;padding-top:20px;border-bottom:1px solid var(--rule);background:linear-gradient(var(--rule-2) 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box}
+.col{height:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:4px 4px 0 0;cursor:default}
+.col:hover{background:#00000008}
+.cb{position:relative;width:62%;max-width:26px;height:0;border-radius:4px 4px 0 0;transition:height 1.1s cubic-bezier(.22,.7,.2,1)}
+.cb em{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);padding-bottom:3px;font:600 10.5px/1 var(--body);font-style:normal;color:var(--muted);white-space:nowrap}
+.cb.complete{background:var(--paddy)}
+.cb.partial{background:var(--gold-d)}
+.cb.empty{background:#9aa3a1;min-height:3px}
+.nlab{display:flex;justify-content:center;padding-top:8px}
+.nlab span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;line-height:1.2;color:var(--ink);max-height:128px;overflow:hidden;white-space:nowrap}
+@media(max-width:700px){
+  .podium{grid-template-columns:1fr}
+  .step.s1{order:-1}
+  .step.s1,.step.s2,.step.s3{min-height:0;border-radius:var(--r)}
+}
+
 /* import */
 .imp{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .drop{border:2px dashed #c4ccc6;border-radius:10px;padding:34px 20px;text-align:center;background:#fafbf9;transition:background .15s,border-color .15s}
@@ -246,18 +280,28 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
   <div class="strip"><div class="wrap" id="stats"></div></div>
 
   <div class="wrap" style="padding-top:28px">
-    <div class="cols">
-      <div class="panel pad">
-        <div class="ph"><h2>Thu theo đơn vị</h2><small>10 đơn vị có số kê khai lớn nhất</small></div>
-        <div id="bars"></div>
+    <div class="panel pad" style="margin-bottom:20px">
+      <div class="ph"><h2>Top 3 đơn vị dẫn đầu</h2><small>Xếp theo tiến độ; đồng hạng thì xét số tiền đã nộp</small></div>
+      <div class="podium" id="podium"></div>
+    </div>
+    <div class="panel pad" style="margin-bottom:20px">
+      <div class="ph"><h2>Tiến độ theo đơn vị</h2><small>Mỗi cột là một đơn vị, xếp theo hạng</small></div>
+      <div class="chartwrap">
+        <div class="yax" aria-hidden="true"><span>100%</span><span>50%</span><span>0%</span></div>
+        <div class="cscroll"><div class="plot" id="colchart" role="img"></div><div class="names" id="colnames" aria-hidden="true"></div></div>
       </div>
+      <div class="legend" id="chartlegend" style="margin:16px 0 0"></div>
+    </div>
+    <div class="cols">
       <div class="panel pad">
         <div class="ph"><h2>Trạng thái các đơn vị</h2></div>
         <div class="split" id="split" role="img"></div>
         <div class="legend" id="splitlegend"></div>
         <p class="sub">Cần đôn đốc hồ sơ</p>
         <div id="chase"></div>
-        <p class="sub" style="margin-top:22px">Giao dịch ghi nhận trên máy này</p>
+      </div>
+      <div class="panel pad">
+        <div class="ph"><h2>Giao dịch ghi nhận trên máy này</h2></div>
         <div id="txlist"></div>
       </div>
     </div>
@@ -379,7 +423,7 @@ let payments=[];try{payments=JSON.parse(localStorage.getItem('lt_payments')||'[]
 const state={filter:'all',sort:{k:'rank',dir:1},played:false};
 
 function start(){
-  units=[...INITIAL_UNITS].sort((a,b)=>v(b,'progress')-v(a,'progress'));
+  units=[...INITIAL_UNITS].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));
   units.forEach((r,i)=>rankOf.set(r,i+1));
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
   render();
@@ -395,6 +439,7 @@ function countUp(el,to,fmt){
 }
 function growBars(root){
   $$(root+' [data-w]').forEach(el=>{el.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.width=el.dataset.w))});
+  $$(root+' [data-h]').forEach(el=>{el.style.height='0';requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.height=el.dataset.h+'%'))});
 }
 
 function terraces(rate){
@@ -427,10 +472,18 @@ function render(){
     ['Hồ sơ cần xử lý',`<strong data-c="${t.pending+t.unfiled}" data-f="num">0</strong>`,`${num(t.pending)} chưa duyệt · ${num(t.unfiled)} chưa có hồ sơ`]
   ].map(([a,b,c])=>`<div class="stat"><span>${a}</span>${b}<small>${c}</small></div>`).join('');
 
-  // bars: top 10 by declared
-  const top=[...active].sort((a,b)=>v(b,'declared')-v(a,'declared')).slice(0,10),max=Math.max(1,...top.map(r=>v(r,'declared')));
-  $('#bars').innerHTML=top.map(r=>{const d=v(r,'declared'),p=v(r,'paid');
-    return `<div class="urow"><div class="utop"><b title="${esc(nm(r))}">${esc(short(r))}</b><span>${money(p)} / ${money(d)}</span></div><div class="track" style="width:${Math.max(14,d/max*100)}%"><i class="${p>=d&&d>0?'complete':'partial'}" data-w="${d?(p/d*100):0}%"></i></div></div>`}).join('');
+  // top 3
+  const lead=units.filter(r=>v(r,'declared')>0).slice(0,3);
+  $('#podium').innerHTML=[1,0,2].filter(i=>lead[i]).map(i=>{const r=lead[i];return `<div class="step s${i+1}"><span class="no">${i+1}</span><b>${esc(nm(r))}</b><strong>${pct(v(r,'progress'))}</strong><small>Đã nộp ${money(v(r,'paid'))} · ${v(r,'members')} đảng viên</small></div>`}).join('');
+
+  // column chart: tiến độ từng đơn vị, theo hạng
+  const n=units.length,lab=s=>s.length>26?s.slice(0,25)+'…':s;
+  $('#colchart').style.setProperty('--n',n);$('#colnames').style.setProperty('--n',n);
+  $('#colchart').style.gridTemplateColumns=$('#colnames').style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
+  $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị đạt 100%`);
+  $('#colchart').innerHTML=units.map(r=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · đã nộp ${money(v(r,'paid'))} / kê khai ${money(v(r,'declared'))}"><div class="cb ${cls(r)}" data-h="${p*100}"><em>${Math.round(p*100)}%</em></div></div>`}).join('');
+  $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(short(r)))}</span></div>`).join('');
+  $('#chartlegend').innerHTML=[['Đã hoàn thành','#2f7d4f'],['Đang thu','#b98a1d'],['Chưa phát sinh','#9aa3a1']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
 
   // split by status
   const groups=[['Đã hoàn thành','#2f7d4f'],['Đang thu','#c98f22'],['Chưa phát sinh','#9aa3a1']].map(([l,c])=>({l,c,n:0}));
