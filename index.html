@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#4a0e11">
+<meta name="theme-color" content="#6f1016">
 <meta name="description" content="Theo dõi tình hình thu nộp đảng phí tại Đảng bộ xã Lương Thịnh.">
 <title>Thu nộp đảng phí · Đảng bộ xã Lương Thịnh</title>
 <link rel="icon" type="image/png" href="logo.png">
@@ -14,7 +14,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <style>
 :root{
-  --lac:#8f1d22;--lac-d:#4a0e11;--lac-2:#b02a30;--gold:#e3b23c;--gold-d:#b98a1d;
+  --lac:#b0222b;--lac-d:#6f1016;--lac-2:#cf2f38;--gold:#e3b23c;--gold-d:#b98a1d;
   --mist:#eef0ec;--paper:#fff;--ink:#1d2326;--muted:#667070;--rule:#d9ddd8;--rule-2:#e8ebe7;
   --paddy:#2f7d4f;--paddy-bg:#e1f0e6;--amber:#a85f0e;--amber-bg:#fbebc9;--gray:#6d7675;--gray-bg:#e7e9e6;
   --display:'Bricolage Grotesque','Be Vietnam Pro',system-ui,sans-serif;
@@ -58,20 +58,33 @@ button,input,select{font:inherit;color:inherit}
 .bar .btn:hover{background:#ffffff26}
 
 /* hero */
-.hero{background:radial-gradient(900px 380px at 82% 120%,#b02a3055,transparent 70%),linear-gradient(180deg,var(--lac-d),#6a1418 120%);color:#fff;overflow:hidden}
-.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,520px);gap:40px;align-items:end;padding-top:44px}
-.hero h1{font:800 clamp(2.3rem,5.2vw,3.9rem)/1 var(--display);letter-spacing:-.03em;margin:0 0 12px;max-width:12ch}
-.hero .lede{margin:0 0 26px;color:#ffffffc4;max-width:46ch}
-.bignum{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
-.bignum strong{font:800 clamp(3rem,7vw,5.2rem)/.95 var(--display);letter-spacing:-.04em;color:var(--gold)}
-.bignum span{color:#ffffffc4;max-width:20ch;line-height:1.35}
-.heroline{display:flex;gap:28px;flex-wrap:wrap;margin:18px 0 26px;color:#ffffffd9}
-.heroline b{display:block;font:700 20px/1.2 var(--display);color:#fff}
-.heroline small{color:#ffffff99;font-size:12px}
-.heroact{display:flex;gap:10px;flex-wrap:wrap;padding-bottom:44px}
-.terr{display:block;width:100%;height:auto;margin-bottom:-2px}
-.terr .fillrect{transform-box:fill-box;transform-origin:0 50%;transform:scaleX(0);transition:transform 1.3s cubic-bezier(.22,.7,.2,1)}
-.terr.go .fillrect{transform:scaleX(1)}
+.hero{position:relative;color:#fff;overflow:hidden;background:radial-gradient(720px 380px at 88% 8%,#ff6a6a33,transparent 65%),linear-gradient(135deg,#c8282f 0%,#a41f27 48%,#7b121a 100%)}
+.hero::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(115deg,#ffffff09 0 1px,transparent 1px 15px);pointer-events:none}
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:4px;background:linear-gradient(90deg,var(--gold),#f7de98 50%,var(--gold))}
+.hero .wm{position:absolute;right:-90px;top:-70px;width:600px;height:600px;opacity:.09;pointer-events:none}
+.hero .wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,500px);gap:48px;align-items:center;padding-top:54px;padding-bottom:60px}
+.hero h1{font:800 clamp(2.3rem,5vw,3.7rem)/1.02 var(--display);letter-spacing:-.03em;margin:0 0 14px}
+.hero .lede{margin:0;color:#ffffffd1;max-width:44ch}
+.heroline{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;margin:28px 0 30px;max-width:470px}
+.heroline>div{border-top:1px solid #ffffff3d;padding-top:10px}
+.heroline b{display:block;font:700 1.25rem/1.2 var(--display);letter-spacing:-.01em}
+.heroline small{color:#ffffffbd;font-size:12.5px}
+.heroact{display:flex;gap:10px;flex-wrap:wrap}
+.dpanel{background:linear-gradient(160deg,#ffffff24,#ffffff0e);border:1px solid #ffffff33;border-radius:18px;padding:24px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);box-shadow:0 28px 60px -26px #3d060cb3}
+.dhead b{display:block;font:700 1.08rem/1.25 var(--display)}
+.dhead small{color:#ffffffb8;font-size:12.5px}
+.dbody{display:grid;grid-template-columns:minmax(0,200px) minmax(0,1fr);gap:24px;align-items:center;margin-top:18px}
+.donut{position:relative;aspect-ratio:1}
+.donut svg{display:block;width:100%;height:100%}
+.dcenter{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.dcenter strong{font:800 clamp(1.3rem,2.6vw,1.65rem)/1 var(--display);letter-spacing:-.03em;color:var(--gold)}
+.dcenter span{font-size:12px;color:#ffffffcc;margin-top:4px}
+.seg{transition:stroke-dasharray 1.4s cubic-bezier(.22,.7,.2,1)}
+.dlegend{display:grid;gap:16px}
+.dgroup p{margin:0 0 4px;font-size:12px;color:#ffffffa8}
+.dgroup div{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:3px 0}
+.dgroup div span:first-child:before{content:'';display:inline-block;width:10px;height:10px;border-radius:3px;background:var(--c);margin-right:8px;vertical-align:-1px}
+.dgroup div b{font-weight:700;white-space:nowrap}
 
 /* ledger strip */
 .strip{background:var(--paper);border-bottom:1px solid var(--rule)}
@@ -218,14 +231,17 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 
 @media(max-width:1100px){.barright .btn .lbl{display:none}}
 @media(max-width:960px){
-  .hero .wrap{grid-template-columns:1fr;gap:6px}
-  .heroact{padding-bottom:20px}
+  .hero .wrap{grid-template-columns:1fr;gap:30px;padding-top:40px;padding-bottom:44px}
   .cols,.imp{grid-template-columns:1fr}
   .strip .wrap{grid-template-columns:1fr 1fr}
   .stat:nth-child(3){border-left:0;padding-left:0}
   .stat:nth-child(n+3){border-top:1px solid var(--rule-2)}
 }
 @media(max-width:700px){
+  .dbody{grid-template-columns:1fr;gap:18px}
+  .donut{max-width:220px;margin:0 auto;width:100%}
+  .dpanel{padding:20px 18px}
+  .heroline{gap:16px 20px}
   .wrap{padding:0 16px}
   .bar .wrap{gap:12px;height:58px}
   .brand>div:last-child{display:none}
@@ -238,8 +254,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 }
 @media(prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
-  .terr .fillrect{transform:scaleX(1)}
-}
+  }
 </style>
 </head>
 <body>
@@ -265,18 +280,24 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
 <main>
 <section class="page on" id="overview" aria-label="Tổng quan">
   <div class="hero">
+    <svg class="wm" viewBox="0 0 64 64" aria-hidden="true"><g fill="#ffd166" transform="translate(64 0) scale(-1 1)"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></svg>
     <div class="wrap">
       <div>
         <h1>Thu nộp đảng phí</h1>
         <p class="lede" id="lede">Tình hình thu nộp tại các chi bộ, đảng bộ trực thuộc Đảng bộ xã Lương Thịnh.</p>
-        <div class="bignum"><strong id="bigpct">0%</strong><span>đã thu so với tổng tiền kê khai</span></div>
         <div class="heroline" id="heroline"></div>
         <div class="heroact">
           <button class="btn gold" id="recordBtn2">Ghi nhận thu</button>
           <button class="btn ghost-light" data-goto="import">Nhập từ Excel</button>
         </div>
       </div>
-      <div id="terrwrap"></div>
+      <aside class="dpanel" aria-label="Biểu đồ tròn tình hình thu">
+        <div class="dhead"><b>Tình hình thu toàn Đảng bộ</b><small>Vòng ngoài là số tiền, vòng trong là số đơn vị</small></div>
+        <div class="dbody">
+          <div class="donut"><svg viewBox="0 0 220 220" id="donutsvg" role="img"></svg><div class="dcenter"><strong id="donutpct">0%</strong><span>đã thu</span></div></div>
+          <div class="dlegend" id="dlegend"></div>
+        </div>
+      </aside>
     </div>
   </div>
   <div class="strip"><div class="wrap" id="stats"></div></div>
@@ -444,28 +465,29 @@ function growBars(root){
   $$(root+' [data-h]').forEach(el=>{el.style.height='0';requestAnimationFrame(()=>requestAnimationFrame(()=>el.style.height=el.dataset.h+'%'))});
 }
 
-function terraces(rate){
-  const W=520,H=300,n=5,shades=['#6e171b','#62141a','#561217','#4b1014','#400e11'];
-  let base='',fill='',clips='';
-  for(let k=n-1;k>=0;k--){
-    const y=252-k*46,h=48,x0=k*36,x1=W-k*28;
-    const d=`M${x0},${y} C${x0+90},${y-18} ${x1-150},${y+8} ${x1},${y-12} L${x1},${y+h} L${x0},${y+h} Z`;
-    const f=Math.max(0,Math.min(1,rate*n-k)),w=(x1-x0)*f;
-    base+=`<path d="${d}" fill="${shades[k]}"/>`;
-    clips+=`<clipPath id="tc${k}"><rect class="fillrect" x="${x0}" y="0" width="${w.toFixed(1)}" height="${H}" style="transition-delay:${k*140}ms"/></clipPath>`;
-    fill+=`<path d="${d}" fill="url(#gold)" stroke="#4a0e11" stroke-opacity=".55" stroke-width="2" clip-path="url(#tc${k})"/><path d="M${x0},${y} C${x0+90},${y-18} ${x1-150},${y+8} ${x1},${y-12}" fill="none" stroke="#ffffff30" stroke-width="1.2" clip-path="url(#tc${k})"/>`;
-  }
-  const star='<g transform="translate(400 2) scale(.95)"><g fill="#e3b23c" transform="translate(64 0) scale(-1 1)"><g transform="rotate(40 32 34)"><rect x="29.2" y="13" width="5.6" height="47" rx="2.4"/><path d="M16 8.5 Q16 7 17.5 7 H43 Q47 7 47 11.5 V14 Q47 15.5 45.5 15.5 H17.5 Q16 15.5 16 14 Z"/></g><path d="M47.5 57 Q46 58.5 44.5 57 L33.5 42.5 L40 37.5 L48 54.5 Q48.8 56 47.5 57 Z"/><path d="M37 42.5 C11 44 3 16 31 5.5 C19 17 25 32.5 42 33.5 Z"/></g></g>';
-  return `<svg class="terr" id="terr" viewBox="0 0 ${W} ${H}" role="img" aria-label="Năm thửa ruộng bậc thang, đã đổ vàng ${pct(rate)}"><defs><linearGradient id="gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#c98f22"/><stop offset="1" stop-color="#f1cd6a"/></linearGradient>${clips}</defs>${star}${base}${fill}</svg>`;
+function ring(r,w,segs){
+  const live=segs.filter(s=>s.v>0),tot=live.reduce((a,s)=>a+s.v,0)||1,gap=live.length>1?1.1:0;let acc=0,out='';
+  live.forEach(s=>{const len=s.v/tot*100;out+=`<circle class="seg" cx="110" cy="110" r="${r}" fill="none" stroke="${s.c}" stroke-width="${w}" pathLength="100" data-len="${Math.max(.2,len-gap).toFixed(2)}" stroke-dasharray="0 100" stroke-dashoffset="${(-acc).toFixed(2)}"/>`;acc+=len});
+  return out;
 }
-
+function renderDonut(t,rate,remain,active,done){
+  const sc={done:0,part:0,empty:0};
+  active.forEach(r=>{const c=status(r)[1];if(c==='done')sc.done++;else if(c==='partial')sc.part++;else sc.empty++});
+  const svg=$('#donutsvg');
+  svg.setAttribute('aria-label',`Biểu đồ tròn: đã thu ${pct(rate)} số tiền kê khai; ${sc.done} đơn vị hoàn thành, ${sc.part} đang thu, ${sc.empty} chưa phát sinh`);
+  svg.innerHTML=`<circle cx="110" cy="110" r="94" fill="none" stroke="#ffffff17" stroke-width="18"/><circle cx="110" cy="110" r="70" fill="none" stroke="#ffffff17" stroke-width="10"/><g transform="rotate(-90 110 110)">${ring(94,18,[{v:t.paid,c:'#e3b23c'},{v:remain,c:'#ffffff4d'}])}${ring(70,10,[{v:sc.done,c:'#6fd3a0'},{v:sc.part,c:'#ffd166'},{v:sc.empty,c:'#ffffff59'}])}</g>`;
+  $('#dlegend').innerHTML=`<div class="dgroup"><p>Số tiền, vòng ngoài</p><div style="--c:#e3b23c"><span>Đã thu</span><b>${money(t.paid)}</b></div><div style="--c:#ffffff59"><span>Còn phải thu</span><b>${money(remain)}</b></div></div><div class="dgroup"><p>Số đơn vị, vòng trong</p><div style="--c:#6fd3a0"><span>Hoàn thành</span><b>${sc.done}</b></div><div style="--c:#ffd166"><span>Đang thu</span><b>${sc.part}</b></div><div style="--c:#ffffff59"><span>Chưa phát sinh</span><b>${sc.empty}</b></div></div>`;
+}
+function growDonut(){
+  $$('#donutsvg .seg').forEach(c=>{const L=Number(c.dataset.len),go=()=>{c.style.strokeDasharray=`${L} ${100-L}`};c.style.strokeDasharray='0 100';if(REDUCED)go();else requestAnimationFrame(()=>requestAnimationFrame(go))});
+}
 function render(){
   const t=totals(),rate=t.declared?t.paid/t.declared:0,remain=Math.max(0,t.declared-t.paid);
   const active=units.filter(r=>v(r,'members')>0),done=units.filter(r=>cls(r)==='complete').length;
 
   $('#lede').textContent='Dữ liệu giới hạn ở 26 đơn vị được đánh dấu đỏ trong bảng tính nguồn.';
   $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${money(remain)}</b><small>Còn phải thu</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>19/10/2026</b><small>Dữ liệu cập nhật</small></div>`;
-  $('#terrwrap').innerHTML=terraces(rate);
+  renderDonut(t,rate,remain,active,done);
 
   $('#stats').innerHTML=[
     ['Tổng số đảng viên',`<strong data-c="${t.members}" data-f="num">0</strong>`,`Tại ${units.length} đơn vị trực thuộc`],
@@ -503,8 +525,8 @@ function render(){
 
   {
     $$('[data-c]').forEach(el=>countUp(el,Number(el.dataset.c),el.dataset.f==='money'?money:num));
-    countUp($('#bigpct'),rate,x=>pct(x));
-    const s=$('#terr');if(s){if(REDUCED)s.classList.add('go');else requestAnimationFrame(()=>requestAnimationFrame(()=>s.classList.add('go')))}
+    countUp($('#donutpct'),rate,x=>pct(x));
+    growDonut();
     growBars('#overview');
   }
 }
