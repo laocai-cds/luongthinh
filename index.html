@@ -666,7 +666,6 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
       <div class="livepill" id="livePill" hidden aria-label="Lượt truy cập"><span class="ldot"></span><b data-live="online">0</b><small>online</small><i></i><b data-live="total">0</b><small>lượt</small></div>
       <button class="btn" id="reportBtn" title="Tạo báo cáo (In/PDF, Excel, Word)">📄<span class="lbl"> Tạo báo cáo</span></button>
       <button class="btn" id="exportBtn" title="Xuất báo cáo CSV">⇩<span class="lbl"> Xuất CSV</span></button>
-      <button class="btn" id="refreshBtn" title="Làm mới số liệu">↻<span class="lbl"> Làm mới</span></button>
     </div>
   </div>
 </header>
@@ -1261,7 +1260,7 @@ $('#exportBtn').onclick=()=>{
   const csv='﻿'+rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='theo-doi-dang-phi-luong-thinh.csv';a.click();URL.revokeObjectURL(a.href);
 };
-$('#refreshBtn').onclick=async()=>{const x=await loadFromSheet();render();
+const _rf=async()=>{const x=await loadFromSheet();render();
   toast(x.state==='ok'?'Đã cập nhật số liệu từ Google Sheet.':x.state==='noep'?'Đã làm mới. Chưa cấu hình Google Sheet để tải số liệu.':x.state==='empty'?'Google Sheet chưa có dữ liệu khớp 26 đơn vị.':'Không đọc được Google Sheet, đang hiển thị số liệu có sẵn.')};
 
 /* import */
