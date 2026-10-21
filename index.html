@@ -657,6 +657,24 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .mcol.sel{background:#1f5fae12;box-shadow:inset 0 0 0 1px #1f5fae40}
 .mcol.none i{background:#e3e9f2}
 .mchart{border-bottom-color:#dbe5f3}
+
+/* thống kê truy cập và chân trang gọn, đồng bộ */
+.livebar{padding:14px 0 0}
+.livebar .wrap{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.lcard{flex:none;padding:12px 18px;gap:14px;border-radius:10px;background:#fff;color:var(--ink);border:1px solid #dbe5f3;border-left:3px solid #1f5fae;box-shadow:none}
+.lcard svg{color:#1f5fae}
+.lcard small{color:#5a6b82;font-size:12px;letter-spacing:0}
+.lcard b{font-size:1.35rem;color:#12335c}
+.foot{padding:18px 0 28px}
+.credit{max-width:none;margin:0;padding:14px 0 0;border:0;border-top:1px solid var(--rule);border-radius:0;background:none;gap:12px;justify-content:center;text-align:left}
+.cr-ic{width:30px;height:30px;border-radius:8px;font-size:.95rem;box-shadow:none}
+.cr-t{display:block}
+.cr-k{display:inline;font:500 12.5px var(--body);letter-spacing:0;text-transform:none;color:var(--muted)}
+.cr-k::after{content:': '}
+.cr-t b{display:inline;font:700 13px var(--body);color:var(--lac-d)}
+.cr-o{display:inline;font-size:12.5px;color:var(--muted)}
+.cr-o::before{content:' · '}
+@media(max-width:700px){.livebar .wrap{gap:8px}.credit{justify-content:flex-start}.cr-t{line-height:1.5}}
 </style>
 </head>
 <body>
