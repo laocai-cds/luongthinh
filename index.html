@@ -767,7 +767,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
           <div class="state" id="syncState" role="status">Chưa chọn tệp Excel.</div>
           <label class="f" for="syncMonth" style="margin-top:12px;display:block">Số liệu thuộc tháng</label>
           <select class="input" id="syncMonth" style="max-width:220px"></select>
-          <p class="hint" style="margin:6px 0 12px">Mỗi tháng có một sheet riêng trong Google Sheet (ví dụ “Tháng 10-2026”). Mặc định là tháng hiện tại theo giờ thực; chọn tháng cũ để bổ sung số liệu lịch sử, không ghi đè số liệu mới nhất.</p>
+          <p class="hint" style="margin:6px 0 12px">Mỗi tháng có một sheet riêng trong Google Sheet (Thang1 … Thang12, ví dụ “Thang10”). Mặc định là tháng hiện tại theo giờ thực; chọn tháng cũ để bổ sung số liệu lịch sử, không ghi đè số liệu mới nhất.</p>
           <div class="sendrow">
             <button class="btn solid" id="syncBtn" type="button" disabled>Đồng bộ lên Google Sheet</button>
             <a class="btn" id="openSheet" href="#" target="_blank" rel="noopener" hidden>Mở Google Sheet để kiểm tra</a>
@@ -888,7 +888,9 @@ async function loadFromSheet(){const ep=sheetEndpoint();if(!ep){dataSrc='backup'
 
 /* ===== Thu theo tháng ===== */
 const MONTH_TAB='Thu theo tháng';
-const monthTab=k=>'Tháng '+k.slice(5)+'-'+k.slice(0,4);// mỗi tháng một sheet: “Tháng 10-2026”
+const monthTab=k=>'Thang'+(+k.slice(5))+(+k.slice(0,4)===new Date().getFullYear()?'':'-'+k.slice(0,4));// mỗi tháng một sheet: Thang1…Thang12 (năm khác: Thang10-2025)
+const MCOLS=['STT','Tên đơn vị','Tổng sl đảng viên (1)','Số lượng ĐV sinh hoạt chính thức (2)','Số lượng ĐV sinh hoạt tạm thời (3)','Số lượng ĐV đã chuyển sinh hoạt đảng tạm thời (4)','Số lượng được miễn giảm ĐP (5)','Chưa duyệt (6)','Đã duyệt, chưa nộp (7)','Đã duyệt, đã nộp (8)','Số đảng viên chưa có hồ sơ (9)','Tổng tiền theo hồ sơ đã khai báo','Tổng tiền đã nộp','Tỷ lệ hoàn thành\n đảng phí thực tế'];
+const MGROUP=['STT','Tên đơn vị','Đảng viên','','','','','Hồ sơ đảng phí','','','','Số tiền','',''];
 let monthly={};try{monthly=JSON.parse(localStorage.getItem('lt_monthly')||'{}')||{}}catch(_){}
 const mkey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 const mshort=n=>n>=1e6?(Math.round(n/1e5)/10).toLocaleString('vi-VN')+' tr':n>=1e3?Math.round(n/1e3).toLocaleString('vi-VN')+' k':String(n);
@@ -931,7 +933,8 @@ function fillSyncMonth(){const el=$('#syncMonth');if(!el)return;const now=new Da
 function pushMonthly(ep,k){
   const tk=($('#syncToken')&&$('#syncToken').value.trim())||'';
   const post=b=>{try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)})}catch(_){}};
-  if(k&&msnap[k]){const H=Object.keys(msnap[k].rows[0]||{});post({tab:monthTab(k),headers:H,rows:msnap[k].rows.map(r=>H.map(h=>r[h]==null?'':r[h])),token:tk,source:'website-month-sheet'})}
+  if(k&&msnap[k]){const rows=msnap[k].rows.map(r=>MCOLS.map((h,i)=>{const x=r[h];if(x==null)return '';return i>=2&&i<=12?pnum(x):(i===13?v(r,'progress'):x)}));
+    post({tab:monthTab(k),headers:MGROUP,rows:[MCOLS,...rows],token:tk,source:'website-month-sheet'})}
   const stamp='Lúc '+new Date().toLocaleString('vi-VN',{hour12:false});
   post({tab:MONTH_TAB,headers:['Tháng','Lũy kế đã nộp (₫)','Ghi nhận'],rows:Object.keys(monthly).sort().map(k=>[k,monthly[k].cum,stamp]),token:tk,source:'website-monthly'})}
 const sigOf=rows=>rows.map(r=>[v(r,'members'),v(r,'paidCount'),v(r,'paid')].join(',')).join(';');
