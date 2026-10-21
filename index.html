@@ -767,7 +767,7 @@ const short=r=>nm(r).replace(/^(Chi bộ|Đảng bộ)\s+/,'');
 const cls=r=>v(r,'due')>0&&v(r,'paidCount')>=v(r,'due')?'complete':v(r,'paidCount')>0?'partial':'empty';
 function status(r){const c=cls(r);if(c==='complete')return['Đã hoàn thành','done'];if(c==='partial')return['Đang thu','partial'];if(v(r,'members')>0)return['Chưa phát sinh','empty'];return['Chưa cập nhật','empty']}
 
-let units=[],rankOf=new Map(),pendingRows=[],pendingHeaders=[],dataStamp='19/10/2026';
+let units=[],rankOf=new Map(),pendingRows=[],pendingHeaders=[],dataStamp='19/10/2026',dataSrc='backup';
 let payments=[];try{payments=JSON.parse(localStorage.getItem('lt_payments')||'[]')}catch(e){}
 const state={filter:'all',sort:{k:'rank',dir:1},played:false};
 
@@ -790,14 +790,18 @@ function applySheet(d){
   if(d.lastSync){const t=new Date(d.lastSync);if(!isNaN(t)){const p=n=>String(n).padStart(2,'0');dataStamp=`${p(t.getDate())}/${p(t.getMonth()+1)}/${t.getFullYear()} ${p(t.getHours())}:${p(t.getMinutes())}`}}
   return hit;
 }
-async function loadFromSheet(){const ep=sheetEndpoint();if(!ep)return{state:'noep'};
-  try{const d=await jsonp(ep+'?action=read');if(!d||!d.ok)return{state:'bad'};const hit=applySheet(d);return hit?{state:'ok',hit,lastSync:d.lastSync}:{state:'empty',lastSync:d.lastSync}}catch(e){return{state:'fail'}}}
+async function loadFromSheet(){const ep=sheetEndpoint();if(!ep){dataSrc='backup';return{state:'noep'}}
+  const done=r=>{dataSrc=r.state==='ok'?'sheet':(dataSrc==='sheet'?'sheet':'backup');return r};
+  try{const d=await jsonp(ep+'?action=read');if(!d||!d.ok)return done({state:'bad'});const hit=applySheet(d);return done(hit?{state:'ok',hit,lastSync:d.lastSync}:{state:'empty',lastSync:d.lastSync})}catch(e){return done({state:'fail'})}}
 function start(){
   units=[...INITIAL_UNITS].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));
   units.forEach((r,i)=>rankOf.set(r,i+1));
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
+  dataSrc=sheetEndpoint()?'loading':'backup';
   render();
-  loadFromSheet().then(x=>{if(x.state==='ok')render()});
+  loadFromSheet().then(()=>render());
+  const tick=()=>{if(!document.hidden)loadFromSheet().then(x=>{if(x.state==='ok')render()})};
+  setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
   const h=location.hash.slice(1);page(['overview','units','import'].includes(h)?h:'overview',true);
 }
 function totals(){return units.reduce((a,r)=>{['members','pending','unfiled','declared','paid','paidCount','due','exempt','noRecord','approved'].forEach(k=>a[k]+=v(r,k));return a},{members:0,pending:0,unfiled:0,declared:0,paid:0,paidCount:0,due:0,exempt:0,noRecord:0,approved:0})}
@@ -865,8 +869,8 @@ function render(){
   const t=totals(),rate=t.due?t.paidCount/t.due:0;
   const active=units.filter(r=>v(r,'members')>0),done=units.filter(r=>cls(r)==='complete').length;
 
-  $('#lede').textContent='Dữ liệu giới hạn ở 26 đơn vị được đánh dấu đỏ trong bảng tính nguồn.';
-  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>${dataStamp}</b><small>Dữ liệu cập nhật</small></div>`;
+  $('#lede').textContent=dataSrc==='sheet'?'Số liệu đồng bộ trực tiếp từ Google Sheet, chỉ lấy 26 đơn vị trực thuộc.':dataSrc==='loading'?'Đang tải số liệu từ Google Sheet…':'Chưa đọc được Google Sheet, đang hiển thị số liệu lưu sẵn ngày '+dataStamp+'.';
+  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>${dataSrc==='loading'?'…':dataStamp}</b><small>${dataSrc==='sheet'?'Google Sheet cập nhật':'Dữ liệu cập nhật'}</small></div>`;
   renderDonut(t,rate,active);
 
   $('#stats').innerHTML=[
