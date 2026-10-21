@@ -675,6 +675,16 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .cr-o{display:inline;font-size:12.5px;color:var(--muted)}
 .cr-o::before{content:' · '}
 @media(max-width:700px){.livebar .wrap{gap:8px}.credit{justify-content:flex-start}.cr-t{line-height:1.5}}
+
+/* thu gọn đầu trang, banner, thẻ số liệu bằng mép các bảng bên dưới */
+@media(min-width:701px){
+  .bar,.hero,.strip{width:calc(100% - 56px);max-width:calc(var(--wrap) - 56px);margin-left:auto;margin-right:auto}
+  .bar{border-radius:0 0 12px 12px}
+  .bar .wrap,.hero .wrap{max-width:none;padding-left:20px;padding-right:20px}
+  .hero{border-radius:12px;margin-top:14px}
+  .strip{background:none;border-bottom:0}
+  .strip .wrap{max-width:none;padding-left:0;padding-right:0}
+}
 </style>
 </head>
 <body>
