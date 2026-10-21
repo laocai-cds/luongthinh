@@ -47,7 +47,7 @@ button,input,select{font:inherit;color:inherit}
 .seal img{width:100%;height:100%;object-fit:cover;display:block}
 .brand b{padding:4px 0 2px;font:800 18px/1.25 var(--display);letter-spacing:.04em;text-transform:uppercase;display:block;white-space:nowrap;
   background:linear-gradient(100deg,#b98a1d 0%,#f7de98 18%,#e3b23c 36%,#fff6c9 50%,#e3b23c 64%,#b98a1d 82%,#f7de98 100%);background-size:220% 100%;
-  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#e3b23c;filter:drop-shadow(0 1px 0 #3a060b99);animation:goldsheen 4s linear infinite}
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#e3b23c;filter:drop-shadow(0 1px 0 #3a060b99)}
 @keyframes goldsheen{from{background-position:0 0}to{background-position:-220% 0}}
 @media not all{/* hiệu ứng luôn bật: máy dùng chế độ giảm chuyển động của Windows vẫn thấy biểu đồ chạy */.brand b{animation:none}}
 .brand small{font-size:12px;color:#ffffffa6;letter-spacing:.02em}
@@ -635,6 +635,8 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .aipanel .plot::after{display:none}
 .aipanel .col,.col .cb,.cb::after,.play .cb::after{animation:none!important;transition:none!important}
 .col:hover .cb{transform:none;filter:none}
+
+.seal img{display:block;width:100%;height:100%;object-fit:contain}
 </style>
 </head>
 <body>
@@ -642,7 +644,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 <header class="bar">
   <div class="wrap">
     <div class="brand">
-      <div class="seal"><div class="flagwave" role="img" aria-label="Cờ Đảng"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i><i style="--i:9"></i><i style="--i:10"></i><i style="--i:11"></i><i style="--i:12"></i><i style="--i:13"></i></div></div>
+      <div class="seal"><img src="logo.png" alt="Cờ Đảng" width="40" height="40" decoding="async"></div>
       <div><b>Đảng bộ xã Lương Thịnh</b></div>
     </div>
     <nav class="tabs" aria-label="Chuyên mục">
