@@ -471,6 +471,32 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .flagwave i{flex:1 0 auto;display:block;margin-right:-.3px;background:url(logo.png) no-repeat;background-size:1400% 100%;background-position:calc(var(--i)*100%/13) 0;transform-origin:50% 50%;animation:flagfly 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.13s);will-change:transform}
 @keyframes flagfly{0%,100%{transform:translateY(-1.6px) skewY(-6deg)}50%{transform:translateY(1.6px) skewY(6deg)}}
 @media(prefers-reduced-motion:reduce){.flagwave i{animation:none}}
+/* ===== trang nhập dữ liệu ===== */
+.imp{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}
+.impmain{display:grid;gap:20px;min-width:0}
+.step .ph{align-items:center}
+.sn{display:inline-grid;place-items:center;width:26px;height:26px;margin-right:10px;border-radius:50%;background:linear-gradient(145deg,var(--lac-2),var(--lac-d));color:#fff;font:700 13px var(--body);vertical-align:2px}
+.chipst{font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--gray-bg);color:var(--gray);white-space:nowrap}
+.chipst.ok{background:#d3ecdc;color:#14633a}.chipst.bad{background:#f4d3d3;color:#9a1c24}.chipst.wait{background:#fbe7b4;color:#8a5200}
+.fieldmsg{font-size:12.5px;margin-top:6px;min-height:0;color:var(--muted);overflow-wrap:anywhere}
+.fieldmsg.bad{color:#9a1c24;font-weight:600}.fieldmsg.ok{color:#14633a;font-weight:600}
+.tokrow{display:flex;gap:8px}.tokrow .input{flex:1;min-width:0}
+.btnrow,.sendrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.sendrow .btn{padding:11px 16px;text-decoration:none;display:inline-flex;align-items:center}
+.sendrow #syncBtn{flex:1;min-width:200px}
+.preview{max-height:360px}
+.preview table{min-width:max-content;font-size:12px;width:auto}
+.preview th{position:sticky;top:0;background:#f1f3ef;white-space:nowrap;z-index:1;font-weight:700;color:var(--ink)}
+.preview td{white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+.preview tbody tr:nth-child(even){background:#fafbf8}
+.note summary{cursor:pointer;font-weight:700}
+.note ol{margin:8px 0 0;padding-left:20px}.note li{margin:4px 0}
+.note.warn{background:#fdecec;color:#7a1d22}
+.state.ok{background:#e4f3ea;border-color:#b6dcc4;color:#14633a}.state.bad{background:#fbe5e5;border-color:#f0bcbc;color:#9a1c24}
+@media(max-width:900px){.imp{grid-template-columns:1fr}.step.pad{padding:14px 12px}}
+[hidden]{display:none!important}
+/* thanh đầu trang rộng hơn để không cắt tab */
+.bar .wrap{max-width:1440px}.tabs{flex-shrink:0}.tab{flex:none}
 @media(prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
   }
@@ -600,32 +626,47 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 
 <section class="page" id="import" aria-label="Nhập dữ liệu">
   <div class="wrap">
-    <div class="pagehead"><h1>Nhập Excel và đồng bộ Google Sheet</h1><p>Tải tệp lên, kiểm tra bản xem trước rồi gửi dữ liệu sang trang tính.</p></div>
+    <div class="pagehead"><h1>Nhập Excel và đồng bộ Google Sheet</h1><p>Làm lần lượt 3 bước: kết nối, chọn tệp, gửi dữ liệu.</p></div>
     <div class="imp">
-      <div class="panel pad">
-        <div class="ph"><h2>1. Chọn tệp Excel</h2></div>
-        <p class="hint" style="margin-top:-8px">Hỗ trợ .xlsx, .xls, .csv. Tệp được đọc ngay trong trình duyệt.</p>
-        <div class="drop" id="drop">
-          <h3>Kéo thả tệp vào đây</h3>
-          <p>hoặc chọn tệp từ thiết bị của bạn</p>
-          <button class="btn solid" id="chooseBtn">Chọn tệp Excel</button>
-          <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+      <div class="impmain">
+        <div class="panel pad step">
+          <div class="ph"><h2><span class="sn">1</span>Chọn tệp Excel</h2><small>.xlsx, .xls, .csv</small></div>
+          <div class="drop" id="drop">
+            <h3>Kéo thả tệp vào đây</h3>
+            <p>hoặc chọn tệp từ thiết bị của bạn</p>
+            <button class="btn solid" id="chooseBtn" type="button">Chọn tệp Excel</button>
+            <input type="file" id="file" accept=".xlsx,.xls,.csv" hidden>
+          </div>
+          <div id="fileinfo" class="hint" style="margin-top:12px"></div>
+          <div id="preview" class="preview" hidden></div>
         </div>
-        <div id="fileinfo" class="hint" style="margin-top:12px"></div>
-        <div id="preview" class="preview" hidden></div>
+        <div class="panel pad step">
+          <div class="ph"><h2><span class="sn">3</span>Gửi lên Google Sheet</h2></div>
+          <div class="state" id="syncState" role="status">Chưa chọn tệp Excel.</div>
+          <div class="sendrow">
+            <button class="btn solid" id="syncBtn" type="button" disabled>Đồng bộ lên Google Sheet</button>
+            <a class="btn" id="openSheet" href="#" target="_blank" rel="noopener" hidden>Mở Google Sheet để kiểm tra</a>
+          </div>
+          <p class="hint" style="margin:12px 0 0">Trình duyệt không đọc được phản hồi của Apps Script, nên sau khi gửi hãy mở Google Sheet kiểm tra trước khi gửi lại.</p>
+        </div>
       </div>
-      <div class="panel pad">
-        <div class="ph"><h2>2. Kết nối Google Sheet</h2></div>
-        <label class="f" for="endpoint" style="margin-top:0">URL Apps Script Web App</label>
-        <input class="input" id="endpoint" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off">
-        <label class="f" for="syncToken">Mã đồng bộ (lấy từ kết quả chạy setupSheet)</label>
-        <input class="input" id="syncToken" type="password" autocomplete="off" placeholder="Mã bí mật được tạo cho dự án">
-        <button class="btn" id="saveEndpoint" style="margin-top:12px">Lưu cấu hình trên thiết bị</button>
-        <div class="note"><b>Thiết lập một lần:</b> Trong Apps Script, chạy hàm <code>setupSheet()</code> và cho phép tạo bảng tính. Lấy <code>spreadsheetUrl</code> và <code>syncToken</code> trong kết quả chạy hàm. Triển khai Web App với người dùng được giới hạn theo chính sách đơn vị, rồi dán URL và mã đồng bộ vào đây. Dữ liệu sẽ thay thế nội dung tab “Dữ liệu nhập” trong bảng tính đó.</div>
-        <div class="note">Web App chạy với quyền chủ sở hữu. Hạn chế người được phép truy cập; không chia sẻ URL hoặc mã đồng bộ công khai. Chỉ tải dữ liệu sau khi xác nhận đúng bảng tính đích.</div>
-        <div class="state" id="syncState" role="status">Chưa chọn tệp Excel.</div>
-        <button class="btn solid" id="syncBtn" disabled style="margin-top:14px;width:100%;padding:11px">Đồng bộ lên Google Sheet</button>
-        <p class="hint" style="margin:12px 0 0">Website bên ngoài không đọc được phản hồi của Apps Script. Sau khi gửi, hãy kiểm tra Google Sheet trước khi thử lại.</p>
+      <div class="panel pad step">
+        <div class="ph"><h2><span class="sn">2</span>Kết nối Google Sheet</h2><span class="chipst" id="epStatus">Chưa cấu hình</span></div>
+        <label class="f" for="endpoint" style="margin-top:0">URL Web App (kết thúc bằng /exec)</label>
+        <input class="input" id="endpoint" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="off" spellcheck="false">
+        <div class="fieldmsg" id="epMsg"></div>
+        <label class="f" for="syncToken">Mã đồng bộ (syncToken)</label>
+        <div class="tokrow"><input class="input" id="syncToken" type="password" autocomplete="off" placeholder="Mã bí mật được tạo bởi setupSheet()"><button class="btn" id="showTok" type="button" aria-label="Hiện mã">Hiện</button></div>
+        <label class="f" for="sheetUrl">Link Google Sheet đích (không bắt buộc)</label>
+        <input class="input" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." autocomplete="off" spellcheck="false">
+        <div class="btnrow"><button class="btn" id="saveEndpoint" type="button">Lưu cấu hình</button><button class="btn" id="testBtn" type="button">Kiểm tra kết nối</button></div>
+        <details class="note"><summary>Cách lấy URL Web App</summary>
+          <ol><li>Mở dự án Apps Script, chạy <code>setupSheet()</code> một lần và cho phép quyền.</li>
+          <li>Bấm <b>Triển khai → Tùy chọn triển khai mới → Ứng dụng web</b>. Chạy với tư cách <b>Tôi</b>, người có quyền truy cập: <b>Bất kỳ ai</b>.</li>
+          <li>Sao chép <b>URL ứng dụng web</b> (dạng <code>https://script.google.com/macros/s/…/exec</code>) và dán vào ô trên. Không dùng link trang soạn thảo (<code>…/edit</code>).</li>
+          <li>Mã đồng bộ lấy trong kết quả chạy <code>setupSheet()</code>. Dữ liệu gửi lên sẽ thay thế nội dung trang tính đích.</li></ol>
+        </details>
+        <div class="note warn">Không chia sẻ URL hoặc mã đồng bộ công khai. Chỉ gửi dữ liệu sau khi xác nhận đúng bảng tính đích.</div>
       </div>
     </div>
   </div>
@@ -881,234 +922,77 @@ function readExcel(file){
       const p=$('#preview');p.hidden=false;
       p.innerHTML=`<table><thead><tr>${pendingHeaders.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${pendingRows.slice(0,6).map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table><div class="hint" style="padding:8px 10px">${pendingRows.length>6?'Đang xem 6 dòng đầu. ':''}Dữ liệu trong tệp chỉ được gửi khi bạn chọn đồng bộ.</div>`;
       $('#syncBtn').disabled=!pendingRows.length;
-      $('#syncState').textContent=`Đã đọc ${pendingRows.length} dòng. Kiểm tra bản xem trước trước khi gửi.`;
+      const hasName=pendingHeaders.some(h=>String(h).trim()===KEYS.name);
+      if(!pendingRows.length)syncMsg('Tệp không có dòng dữ liệu.','bad');
+      else if(!hasName)syncMsg(`Đã đọc ${pendingRows.length} dòng nhưng không thấy cột “${KEYS.name}”. Hãy dùng đúng tệp xuất từ hệ thống đảng phí.`,'bad');
+      else syncMsg(`Đã đọc ${pendingRows.length} dòng, cột đúng định dạng. Kiểm tra bản xem trước rồi sang bước 3.`,'ok');
     }catch(err){toast('Không đọc được tệp. Hãy chọn tệp .xlsx, .xls hoặc .csv.')}
   };
   reader.readAsArrayBuffer(file);
 }
-$('#saveEndpoint').onclick=()=>{try{localStorage.setItem('lt_endpoint',$('#endpoint').value.trim());localStorage.setItem('lt_token',$('#syncToken').value.trim())}catch(e){}toast('Đã lưu URL và mã đồng bộ trên thiết bị này.')};
+// ---- Kết nối Google Sheet ----
+function normEndpoint(raw){
+  raw=String(raw||'').trim();if(!raw)return{err:'Chưa nhập URL Web App.'};
+  if(/^AKfy[\w-]{20,}$/.test(raw))return{url:'https://script.google.com/macros/s/'+raw+'/exec',note:'Đã tự ghép thành URL đầy đủ từ mã triển khai.'};
+  let u;try{u=new URL(raw)}catch(e){return{err:'Đây chưa phải URL. Cần dạng https://script.google.com/macros/s/…/exec'}}
+  if(u.hostname==='script.google.com'&&/\/(home\/projects|d\/)/.test(u.pathname)||/\/edit(\/|$)/.test(u.pathname))return{err:'Đây là link trang soạn thảo Apps Script, không phải Web App. Vào Triển khai → Ứng dụng web và sao chép “URL ứng dụng web” kết thúc bằng /exec.'};
+  const m=u.pathname.match(/\/macros\/s\/([\w-]+)\/(exec|dev)$/);
+  if(!m||!/(^|\.)google(usercontent)?\.com$/.test(u.hostname))return{err:'URL cần có dạng https://script.google.com/macros/s/…/exec'};
+  if(m[2]==='dev')return{err:'URL kết thúc bằng /dev chỉ dùng để thử trong tài khoản chủ. Hãy dùng URL /exec của bản triển khai.'};
+  return{url:u.origin+u.pathname};
+}
+function epMsg(t,c){const e=$('#epMsg');e.textContent=t||'';e.className='fieldmsg'+(c?' '+c:'')}
+function epChip(t,c){const e=$('#epStatus');e.textContent=t;e.className='chipst'+(c?' '+c:'')}
+function checkEndpoint(){
+  const raw=$('#endpoint').value,tok=$('#syncToken').value.trim();
+  if(!raw.trim()){epChip('Chưa cấu hình');epMsg('');return null}
+  const r=normEndpoint(raw);
+  if(r.err){epChip('URL chưa đúng','bad');epMsg(r.err,'bad');return null}
+  epChip(tok?'Đã cấu hình':'Thiếu mã đồng bộ',tok?'ok':'wait');epMsg(r.note||'','ok');return r.url;
+}
+function showSheetLink(){const u=($('#sheetUrl').value||'').trim(),a=$('#openSheet');if(/^https:\/\/docs\.google\.com\/spreadsheets\//.test(u)){a.href=u;a.hidden=false}else a.hidden=true}
+['#endpoint','#syncToken'].forEach(i=>$(i).addEventListener('input',checkEndpoint));
+$('#sheetUrl').addEventListener('input',showSheetLink);
+$('#showTok').onclick=()=>{const t=$('#syncToken');const h=t.type==='password';t.type=h?'text':'password';$('#showTok').textContent=h?'Ẩn':'Hiện'};
+try{$('#sheetUrl').value=localStorage.getItem('lt_sheet')||''}catch(e){}
+checkEndpoint();showSheetLink();
+$('#saveEndpoint').onclick=()=>{
+  const url=checkEndpoint();
+  if($('#endpoint').value.trim()&&!url){toast('URL chưa đúng, xem hướng dẫn dưới ô nhập.');return}
+  if(url)$('#endpoint').value=url;
+  try{localStorage.setItem('lt_endpoint',$('#endpoint').value.trim());localStorage.setItem('lt_token',$('#syncToken').value.trim());localStorage.setItem('lt_sheet',$('#sheetUrl').value.trim())}catch(e){}
+  showSheetLink();checkEndpoint();toast('Đã lưu cấu hình trên thiết bị này.');
+};
+// Kiểm tra kết nối: gọi JSONP (không gửi mã đồng bộ). Script cũ có thể không hỗ trợ nên chỉ báo mức độ chắc chắn.
+$('#testBtn').onclick=()=>{
+  const url=checkEndpoint();if(!url){toast('Nhập URL Web App đúng dạng trước.');return}
+  epChip('Đang kiểm tra…','wait');epMsg('');
+  const cb='__lt_ping_'+Date.now(),sc=document.createElement('script');let done=false;
+  const fin=(chip,cls,msg,mc)=>{if(done)return;done=true;clearTimeout(tm);delete window[cb];sc.remove();epChip(chip,cls);epMsg(msg,mc)};
+  const tm=setTimeout(()=>fin('Chưa xác nhận','wait','Không nhận được phản hồi sau 10 giây. Kiểm tra Web App đã triển khai với quyền “Bất kỳ ai” và URL đúng.','bad'),10000);
+  window[cb]=p=>fin('Kết nối tốt','ok','Web App phản hồi. Có thể gửi dữ liệu.','ok');
+  sc.onerror=()=>fin('Chưa xác nhận','wait','Không tải được Web App. Kiểm tra URL /exec, quyền truy cập “Bất kỳ ai” và đã triển khai lại sau khi sửa mã.','bad');
+  sc.src=url+'?action=ping&callback='+encodeURIComponent(cb)+'&t='+Date.now();document.head.appendChild(sc);
+};
+function syncMsg(t,c){const e=$('#syncState');e.textContent=t;e.className='state'+(c?' '+c:'')}
 // Apps Script ContentService không cho website ngoài đọc phản hồi: gửi text/plain (no-cors) rồi nhắc kiểm tra tab đích.
 $('#syncBtn').onclick=async()=>{
-  const ep=$('#endpoint').value.trim(),token=$('#syncToken').value.trim();
-  if(!ep||!token){toast('Nhập URL Web App và mã đồng bộ trước khi gửi.');return}
-  if(!confirm(`Gửi ${pendingRows.length} dòng Excel tới Google Sheet tại URL Apps Script đã cấu hình?`))return;
-  const b=$('#syncBtn');b.disabled=true;b.textContent='Đang gửi...';$('#syncState').textContent='Đang gửi dữ liệu tới Apps Script...';
+  const url=checkEndpoint(),token=$('#syncToken').value.trim();
+  if(!url){syncMsg('URL Web App chưa đúng hoặc chưa nhập. Xem bước 2.','bad');toast('Kiểm tra lại URL Web App.');return}
+  if(!token){syncMsg('Chưa nhập mã đồng bộ (bước 2).','bad');return}
+  if(!pendingRows.length){syncMsg('Chưa có dữ liệu từ tệp Excel.','bad');return}
+  if(!confirm(`Gửi ${pendingRows.length} dòng Excel tới Google Sheet?\nDữ liệu sẽ thay thế nội dung trang tính đích.`))return;
+  const b=$('#syncBtn');b.disabled=true;b.textContent='Đang gửi…';syncMsg('Đang gửi dữ liệu tới Apps Script…');
   try{
-    await fetch(ep,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:pendingRows,token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
-    $('#syncState').textContent=`Đã gửi yêu cầu đồng bộ ${pendingRows.length} dòng. Website bên ngoài không đọc được phản hồi Apps Script. Hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi thử lại.`;
-    toast('Đã gửi. Kiểm tra tab Dữ liệu nhập trong Google Sheet.');
+    await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:pendingRows,token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
+    syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra mã đồng bộ và quyền triển khai.`,'ok');
+    toast('Đã gửi. Hãy kiểm tra Google Sheet.');showSheetLink();
   }catch(e){
-    $('#syncState').textContent='Không gửi được dữ liệu. Kiểm tra URL Web App và quyền truy cập. Nếu chưa chắc yêu cầu đã đến nơi, hãy xem Google Sheet trước khi thử lại.';
-    toast('Không gửi được yêu cầu đồng bộ.');
-  }finally{b.disabled=false;b.textContent='Đồng bộ lên Google Sheet'}
+    syncMsg('Không gửi được yêu cầu (lỗi mạng hoặc bị chặn). Kiểm tra kết nối mạng và URL Web App rồi thử lại.','bad');toast('Không gửi được yêu cầu đồng bộ.');
+  }finally{b.disabled=!pendingRows.length;b.textContent='Đồng bộ lên Google Sheet'}
 };
-/* ===== TẠO BÁO CÁO: xem trước / In PDF / Excel / Word ===== */
-const RPT_UNIT='ĐẢNG BỘ XÃ LƯƠNG THỊNH',RPT_PLACE='Lương Thịnh';
-const rptUnitName=r=>nm(r);
-function rptPlain(n){return String(Math.round(n*1000)/10).replace('.',',')+'%'}
-function rptDownload(blob,name,w){w=w&&!w.closed?w:window;const d=w.document,U=w.URL||URL;
-  try{if(w.navigator&&w.navigator.msSaveOrOpenBlob){w.navigator.msSaveOrOpenBlob(blob,name);return}}catch(e){}
-  const url=U.createObjectURL(blob),a=d.createElement('a');a.href=url;a.download=name;a.rel='noopener';a.style.display='none';d.body.appendChild(a);a.click();
-  setTimeout(()=>{a.remove();try{U.revokeObjectURL(url)}catch(e){}},60000)}
-function buildReportModel(){
-  const now=new Date(),p2=n=>String(n).padStart(2,'0'),t=totals();
-  const rows=units.map((r,i)=>({rank:i+1,name:nm(r),short:short(r),members:v(r,'members'),exempt:v(r,'exempt'),moved:v(r,'moved'),due:v(r,'due'),dn:v(r,'paidCount'),pending:v(r,'pending'),approved:v(r,'approved'),noRecord:v(r,'noRecord'),decl:v(r,'declared'),paid:v(r,'paid'),r:v(r,'progress'),st:status(r)[0],done:cls(r)==='complete'}));
-  const rate=t.due>0?Math.min(1,t.paidCount/t.due):0;
-  return{units:rows.length,rows,t,rate,month:'tháng '+(now.getMonth()+1)+'/'+now.getFullYear(),
-    dateLine:`${RPT_PLACE}, ngày ${p2(now.getDate())} tháng ${p2(now.getMonth()+1)} năm ${now.getFullYear()}`,
-    stamp:`${p2(now.getHours())}:${p2(now.getMinutes())} ngày ${p2(now.getDate())}/${p2(now.getMonth()+1)}/${now.getFullYear()}`,
-    fileStamp:`${now.getFullYear()}${p2(now.getMonth()+1)}${p2(now.getDate())}-${p2(now.getHours())}${p2(now.getMinutes())}`,
-    source:'bảng theo dõi thu nộp đảng phí trên môi trường điện tử, 26 đơn vị trực thuộc',
-    top:rows.slice(0,3),done:rows.filter(x=>x.done),partial:rows.filter(x=>!x.done&&x.dn>0),empty:rows.filter(x=>x.dn<=0),
-    low:rows.filter(x=>!x.done&&x.due>0&&x.r<.5).sort((a,b)=>a.r-b.r||b.noRecord-a.noRecord)};
-}
-const rptNames=(l,max)=>{const n=l.map(x=>x.short);return n.length>max?n.slice(0,max).join(', ')+' … và '+(n.length-max)+' đơn vị khác':n.join(', ')};
-/* Cấu trúc báo cáo dùng chung cho xem trước, Word và Excel */
-function rptBlocks(m){
-  const t=m.t,B=[],P=(text,b)=>B.push({k:'p',text,b}),H=text=>B.push({k:'h',text}),C=text=>B.push({k:'cap',text});
-  H('I. TÌNH HÌNH CHUNG');
-  P(`Theo số liệu thu nộp đảng phí trên môi trường điện tử, Đảng bộ xã Lương Thịnh có ${num(m.units)} đảng bộ, chi bộ trực thuộc với tổng số ${num(t.members)} đảng viên; số đảng viên thuộc diện phải nộp đảng phí (đã trừ miễn giảm, chuyển sinh hoạt tạm thời) là ${num(t.due)} đồng chí.`);
-  P(`Đến nay có ${num(t.paidCount)} đảng viên đã được duyệt hồ sơ và đã nộp đảng phí, đạt ${rptPlain(m.rate)} số đảng viên phải nộp; tổng số tiền đã nộp ${num(t.paid)} đồng/${num(t.declared)} đồng theo hồ sơ đã kê khai. Còn ${num(t.pending)} hồ sơ chưa duyệt, ${num(t.approved)} đảng viên đã duyệt nhưng chưa nộp và ${num(t.noRecord)} đảng viên chưa có hồ sơ.`);
-  P(`Phân theo kết quả: ${num(m.done.length)} đơn vị hoàn thành (100% đảng viên phải nộp đã nộp); ${num(m.partial.length)} đơn vị đang thu; ${num(m.empty.length)} đơn vị chưa có đảng viên nộp đảng phí.`);
-  C('Bảng 1. Một số chỉ tiêu chính');
-  B.push({k:'tb',head:['TT','Chỉ tiêu','Số liệu'],rows:[[1,'Số đảng bộ, chi bộ trực thuộc',num(m.units)],[2,'Tổng số đảng viên',num(t.members)],[3,'Đảng viên miễn giảm',num(t.exempt)],[4,'Đảng viên phải nộp đảng phí',num(t.due)],[5,'Đảng viên đã nộp đảng phí',num(t.paidCount)],[6,'Tỷ lệ đảng viên đã nộp',rptPlain(m.rate)],[7,'Hồ sơ chưa duyệt',num(t.pending)],[8,'Đã duyệt, chưa nộp',num(t.approved)],[9,'Chưa có hồ sơ',num(t.noRecord)],[10,'Tổng tiền theo hồ sơ đã kê khai (đ)',num(t.declared)],[11,'Tổng tiền đã nộp (đ)',num(t.paid)]],widths:[700,5471,2900],center:[0,2]});
-  H('II. ĐƠN VỊ DẪN ĐẦU');
-  P(`${num(m.top.length)} đơn vị có tỷ lệ đảng viên đã nộp đảng phí cao nhất: ${m.top.map(x=>x.name+' ('+rptPlain(x.r)+')').join('; ')}. Đây là những đơn vị đã chủ động hướng dẫn đảng viên kê khai, duyệt hồ sơ và nộp đảng phí kịp thời.`,'Biểu dương: ');
-  C('Bảng 2. Ba đơn vị dẫn đầu');
-  B.push({k:'tb',head:['Hạng','Đơn vị','ĐV phải nộp','ĐV đã nộp','Tỷ lệ','Tiền đã nộp (đ)'],rows:m.top.map((x,i)=>[i+1,x.name,num(x.due),num(x.dn),rptPlain(x.r),num(x.paid)]),widths:[700,3571,1150,1150,1000,1500],center:[0,2,3,4]});
-  if(m.done.length>3)P(`Ngoài ra còn ${num(m.done.length-3)} đơn vị khác cũng đã hoàn thành: ${rptNames(m.done.filter(x=>!m.top.includes(x)),40)}.`);
-  H('III. ĐƠN VỊ CẦN ĐÔN ĐỐC');
-  if(m.low.length){
-    P(`${num(m.low.length)} đơn vị có tỷ lệ đảng viên đã nộp dưới 50%: ${rptNames(m.low,40)}${m.empty.length?`; trong đó ${num(m.empty.length)} đơn vị chưa có đảng viên nộp: ${rptNames(m.empty,40)}`:''}.`,'Cần đôn đốc: ');
-    C('Bảng 3. Đơn vị cần đôn đốc (tỷ lệ dưới 50%)');
-    B.push({k:'tb',head:['TT','Đơn vị','ĐV phải nộp','ĐV đã nộp','Chưa duyệt','Chưa có hồ sơ','Tỷ lệ'],rows:m.low.map((x,i)=>[i+1,x.name,num(x.due),num(x.dn),num(x.pending),num(x.noRecord),rptPlain(x.r)]),widths:[600,3271,1100,1100,1000,1100,900],center:[0,2,3,4,5,6]});
-  }else P('Tất cả các đơn vị có tỷ lệ đảng viên đã nộp từ 50% trở lên.');
-  H('IV. ĐỀ XUẤT, KIẾN NGHỊ');
-  P(`Đề nghị các đảng bộ, chi bộ trực thuộc khẩn trương rà soát, hướng dẫn ${num(t.noRecord)} đảng viên chưa có hồ sơ kê khai, duyệt ${num(t.pending)} hồ sơ đang chờ${t.approved>0?` và đôn đốc ${num(t.approved)} đảng viên đã duyệt nộp đảng phí`:' và đôn đốc đảng viên nộp đảng phí'} trên môi trường điện tử ngay trong ${m.month}.`);
-  if(m.empty.length)P(`Đối với ${num(m.empty.length)} đơn vị chưa có đảng viên nộp đảng phí, đề nghị bí thư cấp ủy trực tiếp chỉ đạo, báo cáo kết quả về Đảng ủy xã.`);
-  B.push({k:'sign'});
-  B.push({k:'land'});
-  H(`Phụ lục. Thu nộp đảng phí ${m.month} theo từng đơn vị — tỷ lệ đảng viên đã nộp ${rptPlain(m.rate)}`);
-  B.push({k:'tb',full:1,head:['Hạng','Đơn vị','Tổng ĐV','Miễn giảm','Phải nộp','Đã nộp','Chưa duyệt','Chưa có hồ sơ','Tiền kê khai (đ)','Tiền đã nộp (đ)','Tỷ lệ','Trạng thái'],
-    rows:[...m.rows.map(x=>[x.rank,x.name,num(x.members),num(x.exempt),num(x.due),num(x.dn),num(x.pending),num(x.noRecord),num(x.decl),num(x.paid),rptPlain(x.r),x.st]),['',`Tổng cộng (${num(m.units)} đơn vị)`,num(t.members),num(t.exempt),num(t.due),num(t.paidCount),num(t.pending),num(t.noRecord),num(t.declared),num(t.paid),rptPlain(m.rate),'']],
-    widths:[600,3500,900,900,900,900,1000,1100,1500,1500,900,1400],center:[0,2,3,4,5,6,7,10]});
-  return B;
-}
-function rptHTML(m){
-  const B=rptBlocks(m);let body='',land=false;
-  const T=b=>{const tw=b.widths.reduce((a,c)=>a+c,0);return `<table class="tb"><colgroup>${b.widths.map(w=>`<col style="width:${(w/tw*100).toFixed(2)}%">`).join('')}</colgroup><thead><tr>${b.head.map(h=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map((r,ri)=>`<tr${b.full&&ri===b.rows.length-1?' class="tot"':''}>${r.map((x,i)=>`<td${b.center.includes(i)?' class="c"':''}>${esc(x)}</td>`).join('')}</tr>`).join('')}</tbody></table><p class="sp"></p>`};
-  B.forEach(b=>{
-    if(b.k==='h')body+=`<h2>${esc(b.text)}</h2>`;
-    else if(b.k==='p')body+=`<p class="i">${b.b?`<b>${esc(b.b)}</b>`:''}${esc(b.text)}</p>`;
-    else if(b.k==='cap')body+=`<p class="cap">${esc(b.text)}</p>`;
-    else if(b.k==='tb')body+=T(b);
-    else if(b.k==='sign')body+=`<div class="sign"><div class="l"><u>Nơi nhận:</u><br><span>- Thường trực Đảng ủy xã (b/c);<br>- Các đảng bộ, chi bộ trực thuộc;<br>- Lưu.</span></div><div class="r"><b>NGƯỜI LẬP BÁO CÁO</b></div></div>`;
-    else if(b.k==='land')body+=`</section><section class="page land">`;
-  });
-  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Báo cáo thu nộp đảng phí - ${m.fileStamp}</title><style>
-*{box-sizing:border-box}html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-body{margin:0;background:#e9edf3;color:#000;font:13pt/1.32 "Times New Roman",Times,serif}
-.bar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 18px;background:linear-gradient(110deg,#6f1016,#b0222b 55%,#cf2f38);color:#fff;font:13px "Segoe UI",Arial,sans-serif;box-shadow:0 4px 18px rgba(0,0,0,.25)}
-.bar b{font-size:14px}.bar .sp{flex:1}.bar small{opacity:.85}
-.bar button{display:inline-flex;align-items:center;gap:7px;height:36px;padding:0 15px;border:0;border-radius:9px;font:700 12.5px "Segoe UI",Arial,sans-serif;cursor:pointer;transition:transform .15s,filter .15s}
-.bar button:hover{transform:translateY(-1px);filter:brightness(1.08)}
-.b-pdf{background:#fff;color:#8f0b12}.b-xls{background:#107c41;color:#fff}.b-doc{background:#185abd;color:#fff}
-.tip{width:100%;font-size:11px;opacity:.85}
-.page{width:210mm;min-height:297mm;margin:18px auto;padding:20mm 20mm 20mm 30mm;background:#fff;box-shadow:0 8px 30px rgba(20,30,50,.15)}
-.page.land{width:297mm;min-height:210mm;padding:15mm}
-p{margin:0 0 3pt;line-height:1.32}
-.hd{display:grid;grid-template-columns:3800fr 5271fr;text-align:center}
-.hd p{margin:0;text-align:center}.hd .b14{font-weight:700;font-size:12.5pt;white-space:nowrap}.hd .b15{font-weight:700;font-size:15pt}
-.hd .ln{width:201pt;margin:3pt auto 0;border-top:1px solid #000;height:9pt}
-.gap{height:24pt}
-.t1{margin:12pt 0 1pt;text-align:center;font-weight:700;font-size:15pt}
-.t2{margin:0 0 1pt;text-align:center;font-weight:700}
-.meta{margin:0 0 8pt;text-align:center;font-style:italic;font-size:11pt;color:#4a5566}
-h2{margin:8pt 0 4pt;font-size:13.5pt;font-weight:700;color:#8f0b12;break-after:avoid;page-break-after:avoid}
-.i{text-indent:1cm;text-align:justify}
-.cap{margin:4pt 0 3pt;font-weight:700;font-size:12pt;break-after:avoid;page-break-after:avoid}
-.tb{border-collapse:collapse;table-layout:fixed;width:100%;font-size:10pt;line-height:1.2}
-.tb th{background:#8f0b12;color:#fff;font-weight:700;font-size:9.5pt;padding:1pt 3pt;border:.5pt solid #b8c0cc;text-align:center;vertical-align:middle}
-.tb td{padding:1pt 3pt;border:.5pt solid #b8c0cc;vertical-align:middle;text-align:left}
-.tb tbody tr:nth-child(even) td{background:#f4f6fa}.tb tr.tot td{font-weight:700;background:#f6e3e4}
-.tb .c{text-align:center}
-.sp{margin:0 0 3pt;height:13pt}
-.sign{display:grid;grid-template-columns:1fr 1fr;margin-top:3pt}
-.sign .l u{font-size:14pt}.sign .l span{font-size:11pt}.sign .r{text-align:center}.sign .r b{display:block;margin-bottom:60px}
-@page{size:A4;margin:20mm 20mm 20mm 30mm}@page land{size:A4 landscape;margin:15mm}
-@media print{body{background:#fff}.bar{display:none}.page{width:auto;min-height:0;margin:0;padding:0;box-shadow:none}.page.land{page:land;width:auto;min-height:0;padding:0}.page+.page{break-before:page}.tb thead{display:table-header-group}.tb tr{break-inside:avoid}}
-@media screen and (max-width:900px){.page,.page.land{width:auto;margin:10px;padding:16px}.tb{font-size:8.5pt}.hd{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:6px}.hd .b14{white-space:normal;font-size:10.5pt}.hd .b15{font-size:10.5pt}.hd .ln{width:70%}.hd p{font-size:10.5pt}.bar{padding:8px 12px}.bar button{height:34px;padding:0 11px}.tb{display:block;overflow-x:auto;white-space:nowrap}}
-</style></head><body>
-<div class="bar"><b>📄 Báo cáo thu nộp đảng phí</b><small>Lập lúc ${m.stamp}</small><span class="sp"></span>
-<button class="b-pdf" id="rptPrint" type="button">🖨 In / Lưu PDF</button><button class="b-xls" id="rptXlsx" type="button">⬇ Xuất Excel</button><button class="b-doc" id="rptDocx" type="button">⬇ Xuất Word</button>
-<div class="tip">Khi in/lưu PDF: chọn khổ A4 và tắt mục “Đầu trang và chân trang” (Headers and footers) để không in ngày giờ, đường dẫn trình duyệt.</div></div>
-<section class="page">
-<div class="hd"><div><p class="b14">${RPT_UNIT}</p><p>*</p></div><div><p class="b15">ĐẢNG CỘNG SẢN VIỆT NAM</p><div class="ln"></div><p><i>${esc(m.dateLine)}</i></p></div></div>
-<div class="gap"></div>
-<p class="t1">BÁO CÁO</p><p class="t2">tình hình thu nộp đảng phí trên môi trường điện tử</p><p class="t2">-----</p><p class="meta">Nguồn số liệu: ${esc(m.source)}</p>
-${body}
-</section>
-</body></html>`;
-}
-function rptZip(files,mime){const enc=new TextEncoder(),crcT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})(),crc=b=>{let c=-1;for(let i=0;i<b.length;i++)c=crcT[(c^b[i])&255]^(c>>>8);return(c^-1)>>>0};
-  const nd=new Date(),dosT=(nd.getHours()<<11)|(nd.getMinutes()<<5)|(nd.getSeconds()>>1),dosD=((nd.getFullYear()-1980)<<9)|((nd.getMonth()+1)<<5)|nd.getDate();const parts=[],cent=[];let off=0;for(const [name,txt] of Object.entries(files)){const nb=enc.encode(name),d=enc.encode(txt),c=crc(d),l=new Uint8Array(30+nb.length+d.length),dv=new DataView(l.buffer);
-    dv.setUint32(0,0x04034b50,true);dv.setUint16(4,20,true);dv.setUint16(6,0x0800,true);dv.setUint16(10,dosT,true);dv.setUint16(12,dosD,true);dv.setUint32(14,c,true);dv.setUint32(18,d.length,true);dv.setUint32(22,d.length,true);dv.setUint16(26,nb.length,true);l.set(nb,30);l.set(d,30+nb.length);parts.push(l);
-    const h=new Uint8Array(46+nb.length),w=new DataView(h.buffer);w.setUint32(0,0x02014b50,true);w.setUint16(4,20,true);w.setUint16(6,20,true);w.setUint16(8,0x0800,true);w.setUint16(12,dosT,true);w.setUint16(14,dosD,true);w.setUint32(16,c,true);w.setUint32(20,d.length,true);w.setUint32(24,d.length,true);w.setUint16(28,nb.length,true);w.setUint32(42,off,true);h.set(nb,46);cent.push(h);off+=l.length}
-  const cs=cent.reduce((s,x)=>s+x.length,0),e=new Uint8Array(22),ev=new DataView(e.buffer);ev.setUint32(0,0x06054b50,true);ev.setUint16(8,cent.length,true);ev.setUint16(10,cent.length,true);ev.setUint32(12,cs,true);ev.setUint32(16,off,true);
-  return new Blob([...parts,...cent,e],{type:mime})}
-function exportReportDocx(m,w){
-  const X=s=>String(s??'').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g,' ').replace(/[\r\n\t]+/g,' ').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-  const run=(t,o={})=>`<w:r><w:rPr>${o.b?'<w:b/>':''}${o.i?'<w:i/>':''}${o.color?`<w:color w:val="${o.color}"/>`:''}<w:sz w:val="${o.sz||26}"/></w:rPr><w:t xml:space="preserve">${X(t)}</w:t></w:r>`;
-  const para=(runs,o={})=>`<w:p><w:pPr>${o.keep?'<w:keepNext/>':''}<w:spacing w:before="${o.before||0}" w:after="${o.after??60}" w:line="${o.line||288}" w:lineRule="auto"/>${o.ind?'<w:ind w:firstLine="567"/>':''}<w:jc w:val="${o.jc||'both'}"/>${o.sect||''}</w:pPr>${Array.isArray(runs)?runs.join(''):run(runs,o)}</w:p>`;
-  const cell=(t,wd,o={})=>`<w:tc><w:tcPr><w:tcW w:w="${wd}" w:type="dxa"/>${o.fill?`<w:shd w:val="clear" w:color="auto" w:fill="${o.fill}"/>`:''}<w:vAlign w:val="center"/></w:tcPr><w:p><w:pPr><w:spacing w:before="20" w:after="20"/><w:jc w:val="${o.jc||'left'}"/></w:pPr>${run(t,{b:o.b,color:o.color,sz:o.sz||20})}</w:p></w:tc>`;
-  const table=b=>{const bd='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(k=>`<w:${k} w:val="single" w:sz="4" w:color="B8C0CC"/>`).join('')+'</w:tblBorders>',wd=b.widths;
-    return `<w:tbl><w:tblPr><w:tblW w:w="${wd.reduce((a,c)=>a+c,0)}" w:type="dxa"/>${bd}<w:tblLayout w:type="fixed"/><w:tblCellMar><w:left w:w="60" w:type="dxa"/><w:right w:w="60" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>${wd.map(x=>`<w:gridCol w:w="${x}"/>`).join('')}</w:tblGrid>`+
-    `<w:tr><w:trPr><w:tblHeader/></w:trPr>${b.head.map((t,i)=>cell(t,wd[i],{b:true,fill:'8F0B12',color:'FFFFFF',jc:'center',sz:19})).join('')}</w:tr>`+
-    b.rows.map((r,ri)=>{const tot=b.full&&ri===b.rows.length-1;return `<w:tr><w:trPr><w:cantSplit/></w:trPr>${r.map((t,i)=>cell(t,wd[i],{jc:b.center.includes(i)?'center':'left',b:tot,fill:tot?'F6E3E4':ri%2?'F4F6FA':''})).join('')}</w:tr>`}).join('')+'</w:tbl>'+para('',{after:60})};
-  const portrait='<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1701" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr>';
-  const landscape='<w:sectPr><w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/><w:pgMar w:top="851" w:right="851" w:bottom="851" w:left="851" w:header="425" w:footer="425" w:gutter="0"/></w:sectPr>';
-  const nb='<w:tblBorders>'+['top','left','bottom','right','insideH','insideV'].map(k=>`<w:${k} w:val="nil"/>`).join('')+'</w:tblBorders>';
-  const hc=(lines,wd)=>`<w:tc><w:tcPr><w:tcW w:w="${wd}" w:type="dxa"/></w:tcPr>${lines.join('')}</w:tc>`,cp=(t,o)=>para([run(t,o)],{jc:'center',after:0});
-  let body=`<w:tbl><w:tblPr><w:tblW w:w="9071" w:type="dxa"/>${nb}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="3800"/><w:gridCol w:w="5271"/></w:tblGrid><w:tr>${hc([cp(RPT_UNIT,{b:true,sz:25}),cp('*',{})],3800)}${hc([cp('ĐẢNG CỘNG SẢN VIỆT NAM',{b:true,sz:30}),`<w:p><w:pPr><w:pBdr><w:top w:val="single" w:sz="6" w:space="1" w:color="000000"/></w:pBdr><w:spacing w:before="20" w:after="0" w:line="120" w:lineRule="exact"/><w:ind w:left="610" w:right="636"/><w:jc w:val="center"/></w:pPr></w:p>`,cp(m.dateLine,{i:true})],5271)}</w:tr></w:tbl>`+para('',{before:240,after:20});
-  body+=para([run('BÁO CÁO',{b:true,sz:30})],{jc:'center',before:240,after:20})+para([run('tình hình thu nộp đảng phí trên môi trường điện tử',{b:true,sz:26})],{jc:'center',after:20})+para([run('-----',{b:true})],{jc:'center',after:20})+para([run('Nguồn số liệu: '+m.source,{i:true,sz:22,color:'4A5566'})],{jc:'center',after:160});
-  rptBlocks(m).forEach(b=>{
-    if(b.k==='h')body+=para([run(b.text,{b:true,color:'8F0B12',sz:27})],{before:160,after:80,keep:true,jc:'left'});
-    else if(b.k==='p')body+=para(b.b?[run(b.b,{b:true}),run(b.text)]:[run(b.text)],{ind:true});
-    else if(b.k==='cap')body+=para([run(b.text,{b:true,sz:24})],{keep:true,before:80,jc:'left'});
-    else if(b.k==='tb')body+=table(b);
-    else if(b.k==='sign')body+=para('',{before:60})+`<w:tbl><w:tblPr><w:tblW w:w="9071" w:type="dxa"/>${nb}<w:tblLayout w:type="fixed"/></w:tblPr><w:tblGrid><w:gridCol w:w="4535"/><w:gridCol w:w="4536"/></w:tblGrid><w:tr>${hc([para([`<w:r><w:rPr><w:sz w:val="28"/><w:u w:val="single"/></w:rPr><w:t xml:space="preserve">Nơi nhận:</w:t></w:r>`],{jc:'left',after:0}),...['- Thường trực Đảng ủy xã (b/c);','- Các đảng bộ, chi bộ trực thuộc;','- Lưu.'].map(t=>para([run(t,{sz:22})],{jc:'left',after:0}))],4535)}${hc([cp('NGƯỜI LẬP BÁO CÁO',{b:true})],4536)}</w:tr></w:tbl>`;
-    else if(b.k==='land')body+=para('',{sect:portrait});
-  });
-  const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><w:body>${body}${landscape}</w:body></w:document>`;
-  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:eastAsia="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/><w:lang w:val="vi-VN"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="60"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style></w:styles>`;
-  const R='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-  const blob=rptZip({'[Content_Types].xml':R+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>',
-    '_rels/.rels':R+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>',
-    'word/_rels/document.xml.rels':R+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>',
-    'word/document.xml':doc,'word/styles.xml':styles},'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-  rptDownload(blob,'bao-cao-dang-phi-luong-thinh_'+m.fileStamp+'.docx',w);toast('Đã xuất báo cáo Word');
-}
-function exportReportXlsx(m,w){
-  const X=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'');
-  const col=n=>{let s='';n++;while(n){n--;s=String.fromCharCode(65+n%26)+s;n=Math.floor(n/26)}return s};
-  /* style: 0 thường,1 tiêu đề,2 phụ đề,3 header,4 chữ viền,5 số viền,6 % viền,7 đậm viền,8 ghi chú */
-  const sheetXml=sh=>{const rows=sh.rows.map((r,ri)=>`<row r="${ri+1}"${sh.heights&&sh.heights[ri]?` ht="${sh.heights[ri]}" customHeight="1"`:''}>`+r.map((c,ci)=>{if(c==null||c==='')return '';const o=typeof c==='object'?c:{v:c},ref=col(ci)+(ri+1),st=o.s??0;
-      return typeof o.v==='number'&&isFinite(o.v)?`<c r="${ref}" s="${st}"><v>${o.v}</v></c>`:`<c r="${ref}" s="${st}" t="inlineStr"><is><t xml:space="preserve">${X(o.v)}</t></is></c>`}).join('')+'</row>').join('');
-    const last=col(Math.max(...sh.rows.map(r=>r.length))-1);
-    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetPr><pageSetUpPr fitToPage="1"/></sheetPr><sheetViews><sheetView workbookViewId="0" showGridLines="0">${sh.freeze?`<pane ySplit="${sh.freeze}" topLeftCell="A${sh.freeze+1}" activePane="bottomLeft" state="frozen"/>`:''}</sheetView></sheetViews><cols>${sh.cols.map((x,i)=>`<col min="${i+1}" max="${i+1}" width="${x}" customWidth="1"/>`).join('')}</cols><sheetData>${rows}</sheetData>${sh.merges.length?`<mergeCells count="${sh.merges.length}">${sh.merges.map(x=>`<mergeCell ref="${x}"/>`).join('')}</mergeCells>`:''}<pageMargins left="0.4" right="0.4" top="0.5" bottom="0.5" header="0.3" footer="0.3"/><pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>`};
-  const bd='<border><left style="thin"><color rgb="FFC9D0DA"/></left><right style="thin"><color rgb="FFC9D0DA"/></right><top style="thin"><color rgb="FFC9D0DA"/></top><bottom style="thin"><color rgb="FFC9D0DA"/></bottom><diagonal/></border>';
-  const al=(h,wrap)=>`<alignment horizontal="${h}" vertical="center"${wrap?' wrapText="1"':''}/>`;
-  const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><numFmts count="1"><numFmt numFmtId="164" formatCode="0.0%"/></numFmts><fonts count="5"><font><sz val="11"/><name val="Times New Roman"/></font><font><b/><sz val="14"/><color rgb="FF8F0B12"/><name val="Times New Roman"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Times New Roman"/></font><font><b/><sz val="11"/><name val="Times New Roman"/></font><font><i/><sz val="10"/><color rgb="FF5A6575"/><name val="Times New Roman"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF8F0B12"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="2"><border><left/><right/><top/><bottom/><diagonal/></border>${bd}</borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="9">`+
-   `<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>`+
-   `<xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">${al('center',1)}</xf>`+
-   `<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">${al('center',1)}</xf>`+
-   `<xf numFmtId="0" fontId="2" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1">${al('center',1)}</xf>`+
-   `<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1">${al('left',1)}</xf>`+
-   `<xf numFmtId="3" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1">${al('center')}</xf>`+
-   `<xf numFmtId="164" fontId="0" fillId="0" borderId="1" xfId="0" applyNumberFormat="1" applyBorder="1" applyAlignment="1">${al('center')}</xf>`+
-   `<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1">${al('left',1)}</xf>`+
-   `<xf numFmtId="0" fontId="4" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1">${al('left',1)}</xf></cellXfs></styleSheet>`;
-  const T=v=>({v,s:4}),N=v=>({v:Number(v)||0,s:5}),P=v=>({v:Number(v)||0,s:6}),H=v=>({v,s:3}),B=v=>({v,s:7});
-  const sheet=(name,sub,head,rows,cols,extra)=>{const wd=head.length,L=col(wd-1);
-    const r=[[{v:'BÁO CÁO TÌNH HÌNH THU NỘP ĐẢNG PHÍ — '+RPT_UNIT,s:1}],[{v:sub,s:2}],[{v:'Lập lúc: '+m.stamp+' · Nguồn số liệu: '+m.source,s:8}],[],head.map(H),...rows];
-    if(extra)r.push([],...extra);
-    return{name,rows:r,cols,freeze:5,merges:[`A1:${L}1`,`A2:${L}2`,`A3:${L}3`],heights:{0:30,4:36}}};
-  const t=m.t,sheets=[
-    sheet('Tổng hợp',`Một số chỉ tiêu chính — ${m.month}`,['TT','Chỉ tiêu','Số liệu'],[
-      ['Số đảng bộ, chi bộ trực thuộc',N(m.units)],['Tổng số đảng viên',N(t.members)],['Đảng viên miễn giảm',N(t.exempt)],['Đảng viên phải nộp đảng phí',N(t.due)],['Đảng viên đã nộp đảng phí',N(t.paidCount)],['Tỷ lệ đảng viên đã nộp',P(m.rate)],['Hồ sơ chưa duyệt',N(t.pending)],['Đã duyệt, chưa nộp',N(t.approved)],['Chưa có hồ sơ',N(t.noRecord)],['Tổng tiền theo hồ sơ đã kê khai (đ)',N(t.declared)],['Tổng tiền đã nộp (đ)',N(t.paid)]
-    ].map((r,i)=>[N(i+1),B(r[0]),r[1]]),[6,44,20],rptBlocks(m).filter(b=>b.k==='p').map(b=>[{v:(b.b||'')+b.text,s:8}])),
-    sheet('Chi tiết đơn vị',`Thu nộp đảng phí ${m.month} theo từng đơn vị — tỷ lệ đảng viên đã nộp ${rptPlain(m.rate)}`,['Hạng','Đơn vị','Tổng ĐV','Miễn giảm','Phải nộp','Đã nộp','Chưa duyệt','Đã duyệt, chưa nộp','Chưa có hồ sơ','Tiền kê khai (đ)','Tiền đã nộp (đ)','Tỷ lệ ĐV đã nộp','Trạng thái'],
-      [...m.rows.map(x=>[N(x.rank),T(x.name),N(x.members),N(x.exempt),N(x.due),N(x.dn),N(x.pending),N(x.approved),N(x.noRecord),N(x.decl),N(x.paid),P(x.r),T(x.st)]),
-       [ '',B('Tổng cộng ('+m.units+' đơn vị)'),N(t.members),N(t.exempt),N(t.due),N(t.paidCount),N(t.pending),N(t.approved),N(t.noRecord),N(t.declared),N(t.paid),P(m.rate)]],
-      [7,42,10,10,10,10,11,13,13,16,16,13,16])];
-  const names=sheets.map(s=>X(s.name)),R='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
-  const files={'[Content_Types].xml':R+`<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${sheets.map((_,i)=>`<Override PartName="/xl/worksheets/sheet${i+1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join('')}</Types>`,
-    '_rels/.rels':R+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>',
-    'xl/workbook.xml':R+`<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>${names.map((n,i)=>`<sheet name="${n}" sheetId="${i+1}" r:id="rId${i+1}"/>`).join('')}</sheets></workbook>`,
-    'xl/_rels/workbook.xml.rels':R+`<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets.map((_,i)=>`<Relationship Id="rId${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i+1}.xml"/>`).join('')}<Relationship Id="rId${sheets.length+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
-    'xl/styles.xml':styles};
-  sheets.forEach((s,i)=>files[`xl/worksheets/sheet${i+1}.xml`]=sheetXml(s));
-  rptDownload(rptZip(files,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'),'bao-cao-dang-phi-luong-thinh_'+m.fileStamp+'.xlsx',w);toast('Đã xuất báo cáo Excel');
-}
-function buildReport(){
-  const m=buildReportModel();let win=null;
-  try{win=window.open('','_blank')}catch(e){}
-  if(win&&win.document){win.document.open();win.document.write(rptHTML(m));win.document.close();wireReport(win,m);return}
-  // Zalo/WebView chặn cửa sổ mới: hiện báo cáo ngay trong trang
-  const ov=document.createElement('div');ov.className='rptov';ov.innerHTML='<div class="rx"><span>Báo cáo thu nộp đảng phí</span><button type="button">✕ Đóng</button></div><iframe title="Báo cáo"></iframe>';
-  document.body.appendChild(ov);ov.querySelector('button').onclick=()=>ov.remove();
-  const fr=ov.querySelector('iframe');fr.onload=()=>wireReport(fr.contentWindow,m);fr.srcdoc=rptHTML(m);
-}
-function wireReport(win,m){
-  const d=win.document;d.getElementById('rptPrint').onclick=()=>win.print();
-  d.getElementById('rptXlsx').onclick=()=>{try{exportReportXlsx(m,win)}catch(e){console.error(e);win.alert('Không xuất được Excel: '+(e&&e.message||e))}};
-  d.getElementById('rptDocx').onclick=()=>{try{exportReportDocx(m,win)}catch(e){console.error(e);win.alert('Không xuất được Word: '+(e&&e.message||e))}};
-  try{win.focus()}catch(e){}
-}
-window.buildReportModel=buildReportModel;window.exportReportXlsx=exportReportXlsx;window.exportReportDocx=exportReportDocx;
-$('#reportBtn').onclick=buildReport;
 try{if(/zalo/i.test(navigator.userAgent)&&!sessionStorage.getItem('zalo_ok')){const zb=document.getElementById('zalobar');zb.classList.add('on');document.getElementById('zalook').onclick=()=>{zb.classList.remove('on');try{sessionStorage.setItem('zalo_ok','1')}catch(e){}}}}catch(e){}
-start();startLoop();
+start();startLoop();checkEndpoint();showSheetLink();
 </script>
 </body>
 </html>
