@@ -664,7 +664,6 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
     </nav>
     <div class="barright">
       <div class="livepill" id="livePill" hidden aria-label="Lượt truy cập"><span class="ldot"></span><b data-live="online">0</b><small>online</small><i></i><b data-live="total">0</b><small>lượt</small></div>
-      <button class="btn" id="recordBtn">＋<span class="lbl"> Ghi nhận thu</span></button>
       <button class="btn" id="reportBtn" title="Tạo báo cáo (In/PDF, Excel, Word)">📄<span class="lbl"> Tạo báo cáo</span></button>
       <button class="btn" id="exportBtn" title="Xuất báo cáo CSV">⇩<span class="lbl"> Xuất CSV</span></button>
       <button class="btn" id="refreshBtn" title="Làm mới số liệu">↻<span class="lbl"> Làm mới</span></button>
@@ -754,7 +753,6 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <div class="ph"><h2>Danh sách đơn vị</h2><small id="unitcount"></small></div>
         <div class="ctrls">
           <input class="search" id="search2" type="search" placeholder="Tìm tên đơn vị" aria-label="Tìm tên đơn vị">
-          <button class="btn solid" id="recordBtn3">Ghi nhận thu</button>
         </div>
       </div>
       <div class="tw"><table>
@@ -1167,7 +1165,7 @@ function openModal(){
   $('#modal').classList.add('on');setTimeout(()=>$('#amount').focus(),30);
 }
 const closeModal=()=>$('#modal').classList.remove('on');
-['recordBtn','recordBtn3'].forEach(id=>$('#'+id).onclick=openModal);
+['recordBtn','recordBtn3'].forEach(id=>{const e=$('#'+id);if(e)e.onclick=openModal});
 $('#cancelModal').onclick=closeModal;
 $('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
