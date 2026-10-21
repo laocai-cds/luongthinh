@@ -645,6 +645,8 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .brand b{font-size:15px;letter-spacing:.03em;background:none!important;-webkit-background-clip:border-box!important;background-clip:border-box!important;-webkit-text-fill-color:#ffd60a!important;color:#ffd60a!important;filter:none!important;text-shadow:0 0 10px #ffd60a99,0 1px 0 #3a060b}
 @media(max-width:900px){.brand b{font-size:13.5px}}
 @media(max-width:560px){.brand b{font-size:11.5px}}
+
+.cols{grid-template-columns:1fr!important}
 </style>
 </head>
 <body>
@@ -716,10 +718,6 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <div class="legend" id="splitlegend"></div>
         <p class="sub">Cần đôn đốc hồ sơ</p>
         <div id="chase"></div>
-      </div>
-      <div class="panel pad">
-        <div class="ph"><h2>Giao dịch ghi nhận trên máy này</h2></div>
-        <div id="txlist"></div>
       </div>
     </div>
 
@@ -1116,6 +1114,7 @@ function render(){
   }
 }
 function renderTx(){
+  if(!$('#txlist'))return;
   const last=[...payments].reverse().slice(0,5);
   $('#txlist').innerHTML=last.length?last.map(p=>`<div class="tx"><div>${esc(p.unit.replace(/^(Chi bộ|Đảng bộ)\s+/,''))}<small>${esc(p.receipt||'Không ghi chú')} · ${new Date(p.date).toLocaleDateString('vi-VN')}</small></div><b>${money(p.amount)}</b></div>`).join(''):'<div class="emptybox"><i>🧾</i><b>Chưa có giao dịch</b><span>Chọn “Ghi nhận thu” để thêm khoản thu đầu tiên.</span></div>';
 }
