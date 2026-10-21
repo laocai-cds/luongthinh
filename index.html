@@ -613,6 +613,9 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .mcol.sel{background:#c8282f0f;box-shadow:inset 0 0 0 1px #c8282f33}.mcol.sel em{color:var(--lac);font-weight:700}
 .mcol.sel i{background:linear-gradient(180deg,#f2c14b,#d99a06)}
 .mlab .sel{color:var(--lac);font-weight:700}
+
+#viewBanner{display:none;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 16px;margin:0 auto;background:#fff7dd;border-bottom:2px solid #e2a919;color:#6b4e00;font-size:13px}
+#viewBanner .btn{padding:6px 12px;font-size:12.5px;background:#fff}
 </style>
 </head>
 <body>
@@ -852,6 +855,16 @@ function jsonp(url,ms){return new Promise((res,rej)=>{const cb='__lt_'+Date.now(
   const fin=(e,v)=>{clearTimeout(tm);delete window[cb];sc.remove();e?rej(e):res(v)};const tm=setTimeout(()=>fin(new Error('timeout')),ms||12000);
   window[cb]=d=>{ok=true;fin(null,d)};sc.onerror=()=>fin(new Error('load'));sc.src=url+(url.includes('?')?'&':'?')+'callback='+cb+'&t='+Date.now();document.head.appendChild(sc)})}
 const nkey=x=>String(x||'').toLocaleLowerCase('vi').replace(/[^\p{L}\p{N}]+/gu,'');
+let liveUnits=[],viewKey=null,msnap={};try{msnap=JSON.parse(localStorage.getItem('lt_msnap')||'{}')||{}}catch(_){}
+const curKey=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')};
+const viewingPast=()=>!!(viewKey&&viewKey!==curKey()&&msnap[viewKey]);
+function applyView(){const src=viewingPast()?msnap[viewKey].rows:liveUnits;
+  units=[...src].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));rankOf=new Map();units.forEach((r,i)=>rankOf.set(r,i+1))}
+function renderBanner(){let b=$('#viewBanner');if(!b){b=document.createElement('div');b.id='viewBanner';const o=$('#overview');o.insertBefore(b,o.firstChild)}
+  if(!viewingPast()){b.style.display='none';return}
+  const [y,m]=viewKey.split('-'),t=new Date(msnap[viewKey].t||Date.now());
+  b.style.display='flex';b.innerHTML=`<span>Đang xem số liệu <b>tháng ${+m}/${y}</b> (ghi nhận lúc ${t.toLocaleString('vi-VN',{hour12:false})}). Tất cả bảng, biểu đồ và danh sách bên dưới theo tháng này.</span><button type="button" class="btn" id="viewBack">Xem số liệu mới nhất</button>`;
+  $('#viewBack').onclick=()=>{viewKey=null;selMonth=null;applyView();render()}}
 function applySheet(d){
   if(!d||!d.ok||!Array.isArray(d.headers)||!Array.isArray(d.rows))return 0;
   let H=d.headers.map(h=>String(h).trim()),R=d.rows;
@@ -860,7 +873,7 @@ function applySheet(d){
   const map=new Map();R.forEach(row=>{const o={};H.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));const k=nkey(o[KEYS.name]);if(k){if(!map.has(k))map.set(k,[]);map.get(k).push(o)}});
   let hit=0;const next=INITIAL_UNITS.map(u=>{const L=map.get(nkey(u[KEYS.name]));const o=L&&(L.find(x=>String(x[KEYS.stt]).trim()===String(u[KEYS.stt]).trim())||L[0]);if(o){hit++;return o}return u});
   if(hit<Math.ceil(INITIAL_UNITS.length*.8))return 0;
-  units=next.sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));rankOf=new Map();units.forEach((r,i)=>rankOf.set(r,i+1));
+  liveUnits=next;applyView();
   if(d.lastSync){const t=new Date(d.lastSync);if(!isNaN(t)){const p=n=>String(n).padStart(2,'0');dataStamp=`${p(t.getDate())}/${p(t.getMonth()+1)}/${t.getFullYear()} ${p(t.getHours())}:${p(t.getMinutes())}`}}
   return hit;
 }
@@ -869,7 +882,7 @@ async function loadFromSheet(){const ep=sheetEndpoint();if(!ep){dataSrc='backup'
   try{const d=await jsonp(ep+'?action=read');if(!d||!d.ok)return done({state:'bad'});const hit=applySheet(d);return done(hit?{state:'ok',hit,lastSync:d.lastSync}:{state:'empty',lastSync:d.lastSync})}catch(e){return done({state:'fail'})}}
 
 /* ===== Thu theo tháng ===== */
-const MONTH_TAB='Thu theo tháng';
+const MONTH_TAB='Thu theo tháng',SNAP_TAB='Dữ liệu theo tháng';
 let monthly={};try{monthly=JSON.parse(localStorage.getItem('lt_monthly')||'{}')||{}}catch(_){}
 const mkey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
 const mshort=n=>n>=1e6?(Math.round(n/1e5)/10).toLocaleString('vi-VN')+' tr':n>=1e3?Math.round(n/1e3).toLocaleString('vi-VN')+' k':String(n);
@@ -880,21 +893,24 @@ function monthlySeries(year){
     out.push({m,k,has:true,cum,first:prev===undefined,v:prev===undefined?cum:Math.max(0,cum-monthly[prev].cum)})}
   return out}
 let selMonth=null,selYear=null;
+function pickMonth(m){selMonth=m;const k=selYear+'-'+String(m).padStart(2,'0');
+  if(k===curKey()||msnap[k]){viewKey=k===curKey()?null:k;applyView();render()}
+  else{viewKey=null;applyView();render();toast('Chưa có số liệu chi tiết của tháng '+m+'/'+selYear+'. Hệ thống chỉ lưu từ tháng được đồng bộ.')}}
 function renderMonthly(){
   const el=$('#monthChart');if(!el)return;
   const now=new Date(),ck=mkey(now);
   const years=[...new Set([now.getFullYear(),...Object.keys(monthly).map(k=>+k.slice(0,4))])].sort((a,b)=>b-a);
   if(selYear==null||!years.includes(selYear))selYear=now.getFullYear();
   const y=selYear,S=monthlySeries(y);
-  if(selMonth==null)selMonth=(y===now.getFullYear()?now.getMonth()+1:12);
+  if(selMonth==null)selMonth=(viewKey&&+viewKey.slice(0,4)===y?+viewKey.slice(5):(y===now.getFullYear()?now.getMonth()+1:12));
   const sel=S.find(x=>x.m===selMonth)||S[0];
   const isCur=sel.k===ck;
   $('#monthYear').innerHTML=`<select id="monthYearSel" aria-label="Chọn năm">${years.map(v=>`<option value="${v}"${v===y?' selected':''}>Năm ${v}</option>`).join('')}</select><select id="monthSel" aria-label="Chọn tháng">${S.map(x=>`<option value="${x.m}"${x.m===selMonth?' selected':''}>Tháng ${x.m}</option>`).join('')}</select>`;
-  $('#monthYearSel').onchange=e=>{selYear=+e.target.value;selMonth=null;renderMonthly()};
-  $('#monthSel').onchange=e=>{selMonth=+e.target.value;renderMonthly()};
+  $('#monthYearSel').onchange=e=>{selYear=+e.target.value;selMonth=null;viewKey=null;applyView();render()};
+  $('#monthSel').onchange=e=>pickMonth(+e.target.value);
   const mx=Math.max(1,...S.map(x=>x.v));
   el.innerHTML=S.map(x=>`<button type="button" class="mcol${x.m===selMonth?' sel':''}${x.k===ck?' cur':''}${x.has?'':' none'}" data-m="${x.m}" title="Tháng ${x.m}: ${x.has?money(x.v):'chưa có số liệu'}"><em>${x.has?mshort(x.v):''}</em><i style="height:${x.has?Math.max(3,x.v/mx*118):3}px"></i></button>`).join('');
-  el.querySelectorAll('.mcol').forEach(b=>b.onclick=()=>{selMonth=+b.dataset.m;renderMonthly()});
+  el.querySelectorAll('.mcol').forEach(b=>b.onclick=()=>pickMonth(+b.dataset.m));
   let lab=$('#monthLab');if(!lab){lab=document.createElement('div');lab.id='monthLab';lab.className='mlab';el.after(lab)}
   lab.innerHTML=S.map(x=>`<span class="${x.m===selMonth?'sel':''}${x.k===ck?' cur':''}">T${x.m}</span>`).join('');
   const prev=[...S].filter(x=>x.m<sel.m&&x.has).pop();
@@ -908,8 +924,18 @@ async function syncMonthly(){
   const ep=sheetEndpoint();if(!ep)return;
   try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(MONTH_TAB),9000);
     if(d&&d.ok&&Array.isArray(d.rows))d.rows.forEach(r=>{const k=String(r[0]||'').trim(),c=pnum(r[1]);if(/^\d{4}-\d{2}$/.test(k)&&c>=0&&!(k in monthly))monthly[k]={cum:c}})}catch(_){}
+  try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(SNAP_TAB),12000);
+    if(d&&d.ok&&Array.isArray(d.headers)&&Array.isArray(d.rows)){const H=d.headers.slice(1).map(String);const g={};
+      d.rows.forEach(r=>{const k=String(r[0]||'').trim();if(!/^\d{4}-\d{2}$/.test(k))return;const o={};H.forEach((h,i)=>o[h]=r[i+1]==null?'':String(r[i+1]));(g[k]=g[k]||[]).push(o)});
+      Object.keys(g).forEach(k=>{if(!msnap[k]&&g[k].length>=Math.ceil(INITIAL_UNITS.length*.8))msnap[k]={t:Date.now(),rows:g[k]}});
+      try{localStorage.setItem('lt_msnap',JSON.stringify(msnap))}catch(_){}}}catch(_){}
   if(dataSrc!=='sheet')return renderMonthly();
   const ck=mkey(new Date()),cum=totals().paid;
+  const snapNow=JSON.stringify(liveUnits);
+  const snapChanged=!msnap[ck]||JSON.stringify(msnap[ck].rows)!==snapNow;
+  if(snapChanged){msnap[ck]={t:Date.now(),rows:JSON.parse(snapNow)};try{localStorage.setItem('lt_msnap',JSON.stringify(msnap))}catch(_){}
+    const H=Object.keys(liveUnits[0]||{});const rows=[];Object.keys(msnap).sort().forEach(k=>msnap[k].rows.forEach(r=>rows.push([k,...H.map(h=>r[h]==null?'':r[h])])));
+    try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:SNAP_TAB,headers:['Tháng',...H],rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-monthly-detail'})})}catch(_){}}
   if(!monthly[ck]||monthly[ck].cum!==cum){monthly[ck]={cum};
     try{localStorage.setItem('lt_monthly',JSON.stringify(monthly))}catch(_){}
     const rows=Object.keys(monthly).sort().map(k=>[k,monthly[k].cum,'Lúc '+new Date().toLocaleString('vi-VN',{hour12:false})]);
@@ -917,8 +943,7 @@ async function syncMonthly(){
   renderMonthly();
 }
 function start(){
-  units=[...INITIAL_UNITS].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));
-  units.forEach((r,i)=>rankOf.set(r,i+1));
+  liveUnits=[...INITIAL_UNITS];applyView();
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
   dataSrc=sheetEndpoint()?'loading':'backup';
   render();
@@ -994,7 +1019,7 @@ function render(){
 
   $('#lede').textContent=dataSrc==='sheet'?'Số liệu đồng bộ trực tiếp từ Google Sheet, chỉ lấy 26 đơn vị trực thuộc.':dataSrc==='loading'?'Đang tải số liệu từ Google Sheet…':'Chưa đọc được Google Sheet, đang hiển thị số liệu lưu sẵn ngày '+dataStamp+'.';
   $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>${dataSrc==='loading'?'…':dataStamp}</b><small>${dataSrc==='sheet'?'Google Sheet cập nhật':'Dữ liệu cập nhật'}</small></div>`;
-  renderDonut(t,rate,active);renderMonthly();
+  renderDonut(t,rate,active);renderMonthly();renderBanner();
 
   $('#stats').innerHTML=[
     ['Tổng số đảng viên',`<strong data-c="${t.members}" data-f="num">0</strong>`,`Tại ${units.length} đơn vị · ${num(t.exempt)} miễn giảm`],
@@ -1220,6 +1245,7 @@ function tableMatrix(stamp){
   return {headers,rows};
 }
 async function syncTable(silent){
+  if(viewingPast()){if(!silent)toast('Đang xem số liệu tháng cũ. Bấm “Xem số liệu mới nhất” trước khi đồng bộ.');return false}
   const ep=sheetEndpoint();if(!ep){if(!silent)toast('Chưa có địa chỉ Google Sheet. Vào mục Nhập dữ liệu để cấu hình.');return false}
   const b=$('#tableSyncBtn');if(b){b.disabled=true;b.textContent='Đang đồng bộ…'}
   const stamp='Lúc '+new Date().toLocaleString('vi-VN',{hour12:false});
