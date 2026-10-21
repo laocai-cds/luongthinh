@@ -251,6 +251,7 @@ td.amb{color:#a35f00;font-weight:700}td.red{color:var(--lac);font-weight:700}td.
 .chartwrap{display:grid;grid-template-columns:44px minmax(0,1fr)}
 .yax{height:240px;padding-top:30px;display:flex;flex-direction:column;justify-content:space-between;font-size:11.5px;line-height:1;color:var(--muted)}
 .cscroll{overflow-x:auto;padding-bottom:4px}
+.names:empty{display:none}
 .plot,.names{display:grid;gap:6px;min-width:calc(var(--n)*34px)}
 .plot{height:240px;padding-top:30px;border-bottom:1px solid var(--rule);background:linear-gradient(var(--rule-2) 1px,transparent 1px) 0 0/100% 50% repeat-y;background-origin:content-box}
 .col{height:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:4px 4px 0 0;cursor:default}
@@ -894,7 +895,7 @@ function render(){
   $('#colchart').style.gridTemplateColumns=$('#colnames').style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
   $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị nộp đủ`);
   $('#colchart').innerHTML=units.map((r,i)=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · ${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}"><div class="cb ${cls(r)}" data-h="${p*100}" style="--i:${i}"><i class="t3"></i><i class="s3"></i><em>${Math.round(p*100)}%</em></div></div>`}).join('');
-  $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(nm(r)))}</span></div>`).join('');
+  $('#colnames').innerHTML='';
   $('#chartlegend').innerHTML=[['Đã hoàn thành','#38d4ff'],['Đang thu','#7c9cff'],['Chưa phát sinh','#9fb3d9']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
 
   // split by status
