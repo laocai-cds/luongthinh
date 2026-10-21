@@ -519,6 +519,23 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
   th:first-child,td:first-child{padding-left:12px}
   th:last-child,td:last-child{padding-right:12px}
 }
+
+/* đang online + tổng truy cập */
+.ldot{width:9px;height:9px;border-radius:50%;background:#37d67a;box-shadow:0 0 0 0 #37d67a99;animation:lpulse 1.8s infinite;flex:none}
+@keyframes lpulse{0%{box-shadow:0 0 0 0 #37d67a99}70%{box-shadow:0 0 0 9px #37d67a00}100%{box-shadow:0 0 0 0 #37d67a00}}
+.livepill{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:#ffffff14;border:1px solid #ffffff2e;color:#fff;font-size:12.5px;white-space:nowrap}
+.livepill[hidden],.livebar[hidden]{display:none!important}
+.livepill b{font-weight:700;font-variant-numeric:tabular-nums}.livepill small{color:#ffffffb8;font-size:11.5px}
+.livepill i{width:1px;height:14px;background:#ffffff40;margin:0 4px}
+.livebar{padding:6px 0 0}
+.livebar .wrap{display:flex;gap:14px;flex-wrap:wrap}
+.lcard{flex:1 1 220px;display:flex;align-items:center;gap:14px;padding:14px 20px;border-radius:14px;color:#e8f1ff;border:1px solid #7fb4ff55;background:linear-gradient(135deg,#0d2a5a,#173e86 60%,#1a2f6b);box-shadow:0 6px 20px #0b1f4a33,inset 0 0 22px #5aa8ff1f}
+.lcard svg{color:#7fd0ff;flex:none}
+.lcard small{display:block;font-size:12px;color:#a9c9ff;letter-spacing:.02em}
+.lcard b{display:block;font:700 1.6rem/1.15 var(--body);font-variant-numeric:tabular-nums;color:#fff}
+@media(max-width:1180px){.livepill{display:none}}
+@media(max-width:700px){.livebar .wrap{gap:8px}.lcard{flex:1 1 140px;padding:10px 14px;gap:10px}.lcard b{font-size:1.25rem}}
+@media(prefers-reduced-motion:reduce){.ldot{animation:none}}
 </style>
 </head>
 <body>
@@ -535,6 +552,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
       <button class="tab" data-page="import">Nhập dữ liệu</button>
     </nav>
     <div class="barright">
+      <div class="livepill" id="livePill" hidden aria-label="Lượt truy cập"><span class="ldot"></span><b data-live="online">0</b><small>online</small><i></i><b data-live="total">0</b><small>lượt</small></div>
       <button class="btn" id="recordBtn">＋<span class="lbl"> Ghi nhận thu</span></button>
       <button class="btn" id="reportBtn" title="Tạo báo cáo (In/PDF, Excel, Word)">📄<span class="lbl"> Tạo báo cáo</span></button>
       <button class="btn" id="exportBtn" title="Xuất báo cáo CSV">⇩<span class="lbl"> Xuất CSV</span></button>
@@ -692,6 +710,10 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 </section>
 </main>
 
+<section class="livebar" id="liveBar" hidden aria-label="Thống kê truy cập"><div class="wrap">
+  <div class="lcard"><span class="ldot"></span><div><small>Đang online</small><b data-live="online">0</b></div></div>
+  <div class="lcard"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12s3.5-6.5 9-6.5S21 12 21 12s-3.5 6.5-9 6.5S3 12 3 12z"/><circle cx="12" cy="12" r="2.8"/></svg><div><small>Tổng truy cập</small><b data-live="total">0</b></div></div>
+</div></section>
 <footer class="foot"><div class="wrap">Đảng bộ xã Lương Thịnh · Hệ thống theo dõi thu nộp đảng phí</div></footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1043,6 +1065,26 @@ $('#syncBtn').onclick=async()=>{
 };
 try{if(/zalo/i.test(navigator.userAgent)&&!sessionStorage.getItem('zalo_ok')){const zb=document.getElementById('zalobar');zb.classList.add('on');document.getElementById('zalook').onclick=()=>{zb.classList.remove('on');try{sessionStorage.setItem('zalo_ok','1')}catch(e){}}}}catch(e){}
 start();startLoop();checkEndpoint();showSheetLink();
+
+/* ===== Đang online & Tổng truy cập (Firebase Realtime Database) ===== */
+const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luongthinh-63494.firebaseapp.com",projectId:"luongthinh-63494",appId:"1:448226831934:web:1b9d4fb293fb86816a2b6f",databaseURL:"https://luongthinh-63494-default-rtdb.firebaseio.com"};
+(function liveStats(){
+  const set=(k,n)=>document.querySelectorAll('[data-live="'+k+'"]').forEach(e=>{e.textContent=nf.format(n)});
+  const show=()=>{const a=document.getElementById('liveBar'),b=document.getElementById('livePill');if(a)a.hidden=false;if(b)b.hidden=false};
+  const load=u=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
+  const base='https://www.gstatic.com/firebasejs/10.12.2/';
+  load(base+'firebase-app-compat.js').then(()=>load(base+'firebase-database-compat.js')).then(()=>{
+    firebase.initializeApp(FB_CFG);const db=firebase.database();
+    let sid='';try{sid=sessionStorage.getItem('lt_sid')||'';if(!sid){sid=Math.random().toString(36).slice(2,10)+Date.now().toString(36);sessionStorage.setItem('lt_sid',sid)}}catch(_){sid=Math.random().toString(36).slice(2,10)}
+    const me=db.ref('presence/'+sid);
+    db.ref('.info/connected').on('value',s=>{if(s.val()===true){me.onDisconnect().remove().then(()=>me.set(true))}});
+    db.ref('presence').on('value',s=>{set('online',Math.max(1,s.numChildren()));show()},()=>{});
+    const vr=db.ref('stats/visits');
+    let counted=false;try{counted=sessionStorage.getItem('lt_counted')==='1'}catch(_){}
+    if(!counted){vr.transaction(n=>(n||0)+1,(err,ok)=>{if(!err&&ok){try{sessionStorage.setItem('lt_counted','1')}catch(_){}}})}
+    vr.on('value',s=>{set('total',s.val()||0);show()},()=>{});
+  }).catch(()=>{});
+})();
 </script>
 </body>
 </html>
