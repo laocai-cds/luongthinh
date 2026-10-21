@@ -548,6 +548,23 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .logtb td{padding:7px 10px;border-bottom:1px solid var(--rule-2);white-space:nowrap}
 .logtb td.logempty{white-space:normal;color:var(--muted);text-align:center;padding:18px}
 .logtb .ok{color:#14633a;font-weight:700}.logtb .bad{color:#b4232c;font-weight:700}
+
+/* thẻ số liệu nhiều màu */
+.strip{background:linear-gradient(180deg,#f3f6fb,#eef2f7);border-bottom:1px solid var(--rule)}
+.strip .wrap{gap:14px;padding-top:16px;padding-bottom:16px}
+.stat,.stat:first-child{position:relative;overflow:hidden;border:1px solid transparent;border-radius:16px;padding:16px 14px 16px 72px;min-height:98px;box-shadow:0 6px 18px -8px var(--kc)}
+.stat::before{content:'';position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--k1),var(--k2))}
+.stat .ico{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:21px;font-style:normal;background:#fff;border:2px solid var(--k1);box-shadow:0 6px 14px -4px var(--kc)}
+.stat span{color:#44515f;font-weight:600}
+.stat strong{white-space:nowrap;font-size:clamp(1.15rem,1.75vw,1.6rem);background:linear-gradient(90deg,var(--k2),var(--k1));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-bottom:2px}
+.stat small{color:#4d5a67}
+.stat.k1{--k1:#2f6bff;--k2:#00b4ff;--kc:#2f6bff66;background:linear-gradient(135deg,#e6efff,#f4f9ff);border-color:#cfe0ff}
+.stat.k2{--k1:#ff9d00;--k2:#ffcc33;--kc:#ff9d0066;background:linear-gradient(135deg,#fff1d6,#fffaf0);border-color:#ffe2a8}
+.stat.k3{--k1:#12a150;--k2:#2fd47a;--kc:#12a15066;background:linear-gradient(135deg,#dff6e8,#f3fcf7);border-color:#b8ebcf}
+.stat.k4{--k1:#e0263a;--k2:#ff6a3d;--kc:#e0263a66;background:linear-gradient(135deg,#fde4e6,#fff4f1);border-color:#f9c2c8}
+.stat.k2 strong{background:linear-gradient(90deg,#d97800,#f2a900);-webkit-background-clip:text;background-clip:text}
+@media(max-width:960px){.stat:nth-child(n+3){border-top:1px solid transparent}.stat:nth-child(3){padding-left:74px}}
+@media(max-width:560px){.strip .wrap{gap:8px}.stat,.stat:first-child,.stat:nth-child(3){padding:12px 10px 12px 52px;min-height:84px}.stat .ico{left:9px;width:34px;height:34px;font-size:16px;border-radius:11px}.stat strong{font-size:1.1rem}}
 </style>
 </head>
 <body>
@@ -883,7 +900,7 @@ function render(){
     ['Tổng tiền đã kê khai',`<strong data-c="${t.declared}" data-f="money">0</strong>`,'Theo hồ sơ đã khai báo'],
     ['Đã thu trong kỳ',`<strong data-c="${t.paid}" data-f="money">0</strong>`,`<b>${pct(rate)}</b> đảng viên đã nộp (${t.paidCount}/${t.due})`],
     ['Hồ sơ cần xử lý',`<strong data-c="${t.pending+t.noRecord+t.approved}" data-f="num">0</strong>`,`${num(t.pending)} chưa duyệt · ${num(t.noRecord)} chưa có hồ sơ`]
-  ].map(([a,b,c])=>`<div class="stat"><span>${a}</span>${b}<small>${c}</small></div>`).join('');
+  ].map(([a,b,c],i)=>`<div class="stat k${i+1}"><i class="ico" aria-hidden="true">${['👥','💰','✅','📋'][i]}</i><span>${a}</span>${b}<small>${c}</small></div>`).join('');
 
   // top 3
   const lead=units.filter(r=>v(r,'paidCount')>0).slice(0,3);
