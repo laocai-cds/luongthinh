@@ -712,15 +712,35 @@ const short=r=>nm(r).replace(/^(Chi bộ|Đảng bộ)\s+/,'');
 const cls=r=>v(r,'due')>0&&v(r,'paidCount')>=v(r,'due')?'complete':v(r,'paidCount')>0?'partial':'empty';
 function status(r){const c=cls(r);if(c==='complete')return['Đã hoàn thành','done'];if(c==='partial')return['Đang thu','partial'];if(v(r,'members')>0)return['Chưa phát sinh','empty'];return['Chưa cập nhật','empty']}
 
-let units=[],rankOf=new Map(),pendingRows=[],pendingHeaders=[];
+let units=[],rankOf=new Map(),pendingRows=[],pendingHeaders=[],dataStamp='19/10/2026';
 let payments=[];try{payments=JSON.parse(localStorage.getItem('lt_payments')||'[]')}catch(e){}
 const state={filter:'all',sort:{k:'rank',dir:1},played:false};
 
+// ---- Đọc số liệu từ Google Sheet (Apps Script doGet?action=read) ----
+const SHEET_EP_DEFAULT='';// dán URL Web App /exec ở đây để mọi người mở trang đều đọc từ Google Sheet
+function sheetEndpoint(){let e='';try{e=localStorage.getItem('lt_endpoint')||''}catch(_){}const r=normEndpoint(e||SHEET_EP_DEFAULT);return r.url||null}
+function jsonp(url,ms){return new Promise((res,rej)=>{const cb='__lt_'+Date.now()+Math.random().toString(36).slice(2),sc=document.createElement('script');let ok=false;
+  const fin=(e,v)=>{clearTimeout(tm);delete window[cb];sc.remove();e?rej(e):res(v)};const tm=setTimeout(()=>fin(new Error('timeout')),ms||12000);
+  window[cb]=d=>{ok=true;fin(null,d)};sc.onerror=()=>fin(new Error('load'));sc.src=url+(url.includes('?')?'&':'?')+'callback='+cb+'&t='+Date.now();document.head.appendChild(sc)})}
+const nkey=x=>String(x||'').trim().toLocaleLowerCase('vi').replace(/\s+/g,' ');
+function applySheet(d){
+  if(!d||!d.ok||!Array.isArray(d.headers)||!Array.isArray(d.rows))return 0;
+  const ni=d.headers.findIndex(h=>String(h).trim()===KEYS.name);if(ni<0)return 0;
+  const map=new Map();d.rows.forEach(row=>{const o={};d.headers.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));if(nkey(o[KEYS.name]))map.set(nkey(o[KEYS.name]),o)});
+  let hit=0;const next=INITIAL_UNITS.map(u=>{const o=map.get(nkey(u[KEYS.name]));if(o){hit++;return o}return u});
+  if(hit<Math.ceil(INITIAL_UNITS.length*.8))return 0;
+  units=next.sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));rankOf=new Map();units.forEach((r,i)=>rankOf.set(r,i+1));
+  if(d.lastSync){const t=new Date(d.lastSync);if(!isNaN(t)){const p=n=>String(n).padStart(2,'0');dataStamp=`${p(t.getDate())}/${p(t.getMonth()+1)}/${t.getFullYear()} ${p(t.getHours())}:${p(t.getMinutes())}`}}
+  return hit;
+}
+async function loadFromSheet(){const ep=sheetEndpoint();if(!ep)return{state:'noep'};
+  try{const d=await jsonp(ep+'?action=read');if(!d||!d.ok)return{state:'bad'};const hit=applySheet(d);return hit?{state:'ok',hit,lastSync:d.lastSync}:{state:'empty',lastSync:d.lastSync}}catch(e){return{state:'fail'}}}
 function start(){
   units=[...INITIAL_UNITS].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));
   units.forEach((r,i)=>rankOf.set(r,i+1));
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
   render();
+  loadFromSheet().then(x=>{if(x.state==='ok')render()});
   const h=location.hash.slice(1);page(['overview','units','import'].includes(h)?h:'overview',true);
 }
 function totals(){return units.reduce((a,r)=>{['members','pending','unfiled','declared','paid','paidCount','due','exempt','noRecord','approved'].forEach(k=>a[k]+=v(r,k));return a},{members:0,pending:0,unfiled:0,declared:0,paid:0,paidCount:0,due:0,exempt:0,noRecord:0,approved:0})}
@@ -789,7 +809,7 @@ function render(){
   const active=units.filter(r=>v(r,'members')>0),done=units.filter(r=>cls(r)==='complete').length;
 
   $('#lede').textContent='Dữ liệu giới hạn ở 26 đơn vị được đánh dấu đỏ trong bảng tính nguồn.';
-  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>19/10/2026</b><small>Dữ liệu cập nhật</small></div>`;
+  $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>${dataStamp}</b><small>Dữ liệu cập nhật</small></div>`;
   renderDonut(t,rate,active);
 
   $('#stats').innerHTML=[
@@ -906,7 +926,8 @@ $('#exportBtn').onclick=()=>{
   const csv='﻿'+rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='theo-doi-dang-phi-luong-thinh.csv';a.click();URL.revokeObjectURL(a.href);
 };
-$('#refreshBtn').onclick=()=>{render();toast('Đã làm mới số liệu đang hiển thị.')};
+$('#refreshBtn').onclick=async()=>{const x=await loadFromSheet();render();
+  toast(x.state==='ok'?'Đã cập nhật số liệu từ Google Sheet.':x.state==='noep'?'Đã làm mới. Chưa cấu hình Google Sheet để tải số liệu.':x.state==='empty'?'Google Sheet chưa có dữ liệu khớp 26 đơn vị.':'Không đọc được Google Sheet, đang hiển thị số liệu có sẵn.')};
 
 /* import */
 $('#chooseBtn').onclick=()=>$('#file').click();
@@ -989,7 +1010,13 @@ $('#syncBtn').onclick=async()=>{
   if(!confirm(`Gửi ${pendingRows.length} dòng Excel tới Google Sheet?\nDữ liệu sẽ thay thế nội dung trang tính đích.`))return;
   const b=$('#syncBtn');b.disabled=true;b.textContent='Đang gửi…';syncMsg('Đang gửi dữ liệu tới Apps Script…');
   try{
+    let before=null;try{const d0=await jsonp(url+'?action=read',8000);before=d0&&d0.ok?(d0.lastSync||''):null}catch(_){}
     await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:normRows(),token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
+    if(before!==null){ // script có hỗ trợ đọc: xác nhận thật bằng thời điểm đồng bộ mới
+      syncMsg('Đã gửi, đang chờ Google Sheet xác nhận…');
+      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);render();
+        syncMsg(`Đã đồng bộ ${pendingRows.length} dòng lên Google Sheet${hit?` và cập nhật bảng điều khiển (${hit}/${INITIAL_UNITS.length} đơn vị khớp)`:' (chưa khớp đủ 26 đơn vị với bảng điều khiển)'}.`,hit?'ok':'bad');toast('Đồng bộ thành công.');showSheetLink();return}}catch(_){}}
+      syncMsg('Đã gửi nhưng chưa thấy Google Sheet cập nhật. Kiểm tra mã đồng bộ (nếu có) và quyền Web App, rồi thử lại.','bad');return}
     syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra URL Web App và quyền truy cập “Bất kỳ ai”.`,'ok');
     toast('Đã gửi. Hãy kiểm tra Google Sheet.');showSheetLink();
   }catch(e){
