@@ -867,7 +867,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <label class="f" for="endpoint" style="margin-top:0">URL Web App (kết thúc bằng /exec)</label>
         <input class="input" id="endpoint" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="off" spellcheck="false">
         <div class="fieldmsg" id="epMsg"></div>
-        <label class="f" for="syncToken">Mã đồng bộ (không bắt buộc)</label>
+        <label class="f" for="syncToken">Mã đồng bộ (bắt buộc)</label>
         <div class="tokrow"><input class="input" id="syncToken" type="password" autocomplete="off" placeholder="Mã bí mật được tạo bởi setupSheet()"><button class="btn" id="showTok" type="button" aria-label="Hiện mã">Hiện</button></div>
         <label class="f" for="sheetUrl">Link Google Sheet đích (không bắt buộc)</label>
         <input class="input" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." autocomplete="off" spellcheck="false">
@@ -895,7 +895,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 <div class="back" id="ntModal" role="dialog" aria-modal="true" aria-labelledby="ntTitle">
   <div class="modal ntm">
     <h3 id="ntTitle">Cài đặt thông báo</h3>
-    <p>Nội dung chạy trên dải thông báo ở đầu trang. Khi có mã đồng bộ, thông báo được lưu lên Google Sheet và hiện ở mọi máy.</p>
+    <p>Nội dung chạy trên dải thông báo ở đầu trang. Cần mã đồng bộ để lưu; thông báo được lưu lên Google Sheet và hiện ở mọi máy.</p>
     <label class="f" for="ntInput">Nội dung</label>
     <textarea class="input" id="ntInput" rows="3" maxlength="400" placeholder="Ví dụ: Đề nghị các chi bộ hoàn thành nộp đảng phí tháng 10 trước ngày 25."></textarea>
     <div class="ntrow">
@@ -906,7 +906,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
     <label class="f">Xem trước</label>
     <div class="ntprev"><span id="ntPrev"></span></div>
     <label class="f" for="ntToken">Mã đồng bộ</label>
-    <input class="input" id="ntToken" type="password" autocomplete="off" placeholder="Để trống nếu chỉ lưu trên máy này">
+    <input class="input" id="ntToken" type="password" autocomplete="off" placeholder="Nhập mã đồng bộ để lưu">
     <p class="fieldmsg" id="ntMsg" role="status"></p>
     <div class="macts"><button class="btn" id="ntCancel" type="button">Hủy</button><button class="btn solid" id="ntSave" type="button">Lưu thông báo</button></div>
   </div>
@@ -1354,12 +1354,13 @@ $('#ntModal').addEventListener('click',e=>{if(e.target.id==='ntModal')ntClose()}
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#ntModal').classList.contains('on'))ntClose()});
 ['#ntInput','#ntColor','#ntSize'].forEach(i=>$(i).addEventListener('input',ntPrev));
 $('#ntSave').onclick=()=>{const msg=$('#ntInput').value.trim();if(!msg){$('#ntMsg').textContent='Nhập nội dung thông báo.';$('#ntMsg').className='fieldmsg bad';return}
-  ntCfg={msg,color:$('#ntColor').value,size:$('#ntSize').value,speed:$('#ntSpeed').value};ntStore();ntApply();
   const ep=sheetEndpoint(),tk=$('#ntToken').value.trim();
-  if(ep&&tk){try{localStorage.setItem('lt_token',tk)}catch(_){}
+  if(!tk){$('#ntMsg').textContent='Nhập mã đồng bộ để lưu thông báo.';$('#ntMsg').className='fieldmsg bad';$('#ntToken').focus();return}
+  ntCfg={msg,color:$('#ntColor').value,size:$('#ntSize').value,speed:$('#ntSpeed').value};ntStore();ntApply();
+  if(ep){try{localStorage.setItem('lt_token',tk)}catch(_){}
     try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:NT_TAB,headers:['Nội dung','Màu chữ','Cỡ chữ','Tốc độ','Cập nhật'],rows:[[msg,ntCfg.color,ntCfg.size,ntCfg.speed,new Date().toLocaleString('vi-VN',{hour12:false})]],token:tk,source:'website-notice'})})}catch(_){}
     toast('Đã lưu thông báo và gửi lên Google Sheet.')}
-  else toast('Đã lưu thông báo trên máy này. Nhập mã đồng bộ để hiện ở mọi máy.');
+  else toast('Chưa cấu hình URL Web App nên thông báo chỉ lưu trên máy này.');
   ntClose()};
 ntApply();setTimeout(ntLoad,1500);
 $('#reportBtn').onclick=openReportDialog;
@@ -1450,6 +1451,7 @@ function syncMsg(t,c){const e=$('#syncState');e.textContent=t;e.className='state
 $('#syncBtn').onclick=async()=>{
   const url=checkEndpoint(),token=$('#syncToken').value.trim();
   if(!url){syncMsg('URL Web App chưa đúng hoặc chưa nhập. Xem bước 2.','bad');toast('Kiểm tra lại URL Web App.');return}
+  if(!token){syncMsg('Nhập mã đồng bộ ở bước 2 trước khi gửi.','bad');toast('Cần nhập mã đồng bộ.');return}
   if(!pendingRows.length){syncMsg('Chưa có dữ liệu từ tệp Excel.','bad');return}
   const mk=($('#syncMonth')&&$('#syncMonth').value)||curKey();
   if(mk!==curKey()){
