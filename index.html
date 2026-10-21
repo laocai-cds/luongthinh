@@ -688,6 +688,23 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 
 /* tiêu đề banner: chữ có chân, trang trọng */
 .hero h1{font:700 clamp(1.5rem,2.5vw,2rem)/1.2 'Noto Serif',Georgia,'Times New Roman',serif;letter-spacing:0;text-shadow:0 2px 12px #0a1f4a88}
+
+/* dải thông báo chạy */
+.notice{display:flex;align-items:stretch;height:38px;width:calc(100% - 56px);max-width:calc(var(--wrap) - 56px);margin:12px auto 0;background:#fff;border:1px solid #dbe5f3;border-radius:10px;overflow:hidden;box-shadow:0 2px 8px -4px #12335c33}
+.nt-badge{flex:none;display:flex;align-items:center;gap:7px;padding:0 20px 0 14px;background:linear-gradient(115deg,var(--lac-d),var(--lac));color:#fff;font:700 12.5px var(--body);clip-path:polygon(0 0,100% 0,calc(100% - 12px) 100%,0 100%);white-space:nowrap}
+.nt-badge svg{color:var(--gold)}
+.nt-track{position:relative;flex:1;min-width:0;overflow:hidden;display:flex;align-items:center;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,transparent,#000 24px,#000 calc(100% - 24px),transparent)}
+.nt-text{display:inline-block;white-space:nowrap;font:600 13.5px var(--body);color:#12335c;padding-left:100%;will-change:transform;animation:ntRun var(--nt-d,30s) linear infinite}
+.nt-track:hover .nt-text{animation-play-state:paused}
+@keyframes ntRun{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+.nt-set{flex:none;width:40px;display:grid;place-items:center;border:0;border-left:1px solid #e6edf7;background:#f6f9fd;color:#4a6285;cursor:pointer}
+.nt-set:hover{background:#eaf1fb;color:#12335c}.nt-set:focus-visible{outline:2px solid #1f5fae;outline-offset:-2px}
+@media(prefers-reduced-motion:reduce){.nt-text{animation:none;padding-left:14px;white-space:normal}.notice{height:auto;min-height:38px}}
+@media(max-width:700px){.notice{width:calc(100% - 24px);height:34px;margin-top:8px}.nt-badge span{display:none}.nt-badge{padding:0 16px 0 12px}}
+.ntm{width:min(520px,100%)}.ntm textarea{resize:vertical;font:inherit;min-height:74px}
+.ntrow{display:grid;grid-template-columns:90px 1fr 1fr;gap:10px}.ntcolor{padding:3px;height:40px}
+.ntprev{border:1px dashed #c9d6ea;border-radius:8px;background:#f6f9fd;overflow:hidden;padding:9px 12px;white-space:nowrap;text-overflow:ellipsis}
+.ntprev span{font-weight:600}
 </style>
 </head>
 <body>
@@ -710,6 +727,12 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
     </div>
   </div>
 </header>
+
+<section class="notice" id="notice" aria-label="Thông báo">
+  <div class="nt-badge"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg><span>Thông báo</span></div>
+  <div class="nt-track" id="ntTrack"><span class="nt-text" id="ntText"></span></div>
+  <button class="nt-set" id="ntSet" type="button" title="Cài đặt thông báo" aria-label="Cài đặt thông báo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</section>
 
 <main>
 <section class="page on" id="overview" aria-label="Tổng quan">
@@ -870,6 +893,25 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 <footer class="foot"><div class="wrap"><div class="credit"><span class="cr-ic" aria-hidden="true">★</span><div class="cr-t"><span class="cr-k">Thiết kế và phát triển</span><b>Đào Đức Toàn</b><span class="cr-o">Văn phòng Đảng ủy xã Lương Thịnh</span></div></div></div></footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="back" id="ntModal" role="dialog" aria-modal="true" aria-labelledby="ntTitle">
+  <div class="modal ntm">
+    <h3 id="ntTitle">Cài đặt thông báo</h3>
+    <p>Nội dung chạy trên dải thông báo ở đầu trang. Khi có mã đồng bộ, thông báo được lưu lên Google Sheet và hiện ở mọi máy.</p>
+    <label class="f" for="ntInput">Nội dung</label>
+    <textarea class="input" id="ntInput" rows="3" maxlength="400" placeholder="Ví dụ: Đề nghị các chi bộ hoàn thành nộp đảng phí tháng 10 trước ngày 25."></textarea>
+    <div class="ntrow">
+      <div><label class="f" for="ntColor">Màu chữ</label><input class="input ntcolor" id="ntColor" type="color" value="#12335c"></div>
+      <div><label class="f" for="ntSize">Cỡ chữ</label><select class="input" id="ntSize"><option value="12">Nhỏ</option><option value="13.5" selected>Vừa</option><option value="15">Lớn</option></select></div>
+      <div><label class="f" for="ntSpeed">Tốc độ</label><select class="input" id="ntSpeed"><option value="60">Chậm</option><option value="90" selected>Vừa</option><option value="140">Nhanh</option></select></div>
+    </div>
+    <label class="f">Xem trước</label>
+    <div class="ntprev"><span id="ntPrev"></span></div>
+    <label class="f" for="ntToken">Mã đồng bộ</label>
+    <input class="input" id="ntToken" type="password" autocomplete="off" placeholder="Để trống nếu chỉ lưu trên máy này">
+    <p class="fieldmsg" id="ntMsg" role="status"></p>
+    <div class="macts"><button class="btn" id="ntCancel" type="button">Hủy</button><button class="btn solid" id="ntSave" type="button">Lưu thông báo</button></div>
+  </div>
+</div>
 <div class="back" id="modal" role="dialog" aria-modal="true" aria-labelledby="mtitle">
   <div class="modal">
     <h3 id="mtitle">Ghi nhận thu nộp</h3>
@@ -1293,6 +1335,34 @@ function openReportDialog(){
     else{const ov=document.createElement('div');ov.className='rptov';ov.innerHTML='<div class="rx"><span>Xem trước báo cáo</span><span><button type="button" id="rptPrint">In / Lưu PDF</button> <button type="button" id="rptX">Đóng</button></span></div><iframe title="Báo cáo"></iframe>';document.body.appendChild(ov);
       const fr=ov.querySelector('iframe');fr.srcdoc=html;$('#rptX').onclick=()=>ov.remove();$('#rptPrint').onclick=()=>{try{fr.contentWindow.focus();fr.contentWindow.print()}catch(_){toast('Không in được từ khung xem trước.')}}}
     d.remove()})}
+
+/* ===== Thông báo chạy ===== */
+const NT_TAB='Thông báo',NT_DEF={msg:'Đề nghị các chi bộ, đảng bộ cơ sở nộp đảng phí đầy đủ, đúng hạn hằng tháng.',color:'#12335c',size:'13.5',speed:'90'};
+let ntCfg={...NT_DEF};try{Object.assign(ntCfg,JSON.parse(localStorage.getItem('lt_notice')||'{}'))}catch(_){}
+function ntApply(){const t=$('#ntText');if(!t)return;t.textContent=ntCfg.msg||NT_DEF.msg;t.style.color=ntCfg.color;t.style.fontSize=ntCfg.size+'px';
+  const w=$('#ntTrack').clientWidth||800;requestAnimationFrame(()=>{const len=t.scrollWidth+w;t.parentNode.style.setProperty('--nt-d',Math.max(12,len/(+ntCfg.speed||90))+'s');t.style.setProperty('--nt-d',Math.max(12,len/(+ntCfg.speed||90))+'s')})}
+function ntStore(){try{localStorage.setItem('lt_notice',JSON.stringify(ntCfg))}catch(_){}}
+async function ntLoad(){const ep=sheetEndpoint();if(!ep)return;
+  try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(NT_TAB),9000);
+    const r=d&&d.ok&&Array.isArray(d.rows)&&d.rows[0];
+    if(r&&String(r[0]||'').trim()&&!(Array.isArray(d.headers)&&d.headers.length>5)){ntCfg={msg:String(r[0]).trim(),color:/^#[0-9a-f]{6}$/i.test(r[1])?r[1]:NT_DEF.color,size:['12','13.5','15'].includes(String(r[2]))?String(r[2]):NT_DEF.size,speed:['60','90','140'].includes(String(r[3]))?String(r[3]):NT_DEF.speed};ntStore();ntApply()}}catch(_){}}
+function ntPrev(){const p=$('#ntPrev');p.textContent=$('#ntInput').value.trim()||NT_DEF.msg;p.style.color=$('#ntColor').value;p.style.fontSize=$('#ntSize').value+'px'}
+function ntOpen(){$('#ntInput').value=ntCfg.msg;$('#ntColor').value=ntCfg.color;$('#ntSize').value=ntCfg.size;$('#ntSpeed').value=ntCfg.speed;
+  try{$('#ntToken').value=localStorage.getItem('lt_token')||''}catch(_){}$('#ntMsg').textContent='';$('#ntMsg').className='fieldmsg';ntPrev();$('#ntModal').classList.add('on');$('#ntInput').focus()}
+function ntClose(){$('#ntModal').classList.remove('on')}
+$('#ntSet').onclick=ntOpen;$('#ntCancel').onclick=ntClose;
+$('#ntModal').addEventListener('click',e=>{if(e.target.id==='ntModal')ntClose()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#ntModal').classList.contains('on'))ntClose()});
+['#ntInput','#ntColor','#ntSize'].forEach(i=>$(i).addEventListener('input',ntPrev));
+$('#ntSave').onclick=()=>{const msg=$('#ntInput').value.trim();if(!msg){$('#ntMsg').textContent='Nhập nội dung thông báo.';$('#ntMsg').className='fieldmsg bad';return}
+  ntCfg={msg,color:$('#ntColor').value,size:$('#ntSize').value,speed:$('#ntSpeed').value};ntStore();ntApply();
+  const ep=sheetEndpoint(),tk=$('#ntToken').value.trim();
+  if(ep&&tk){try{localStorage.setItem('lt_token',tk)}catch(_){}
+    try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:NT_TAB,headers:['Nội dung','Màu chữ','Cỡ chữ','Tốc độ','Cập nhật'],rows:[[msg,ntCfg.color,ntCfg.size,ntCfg.speed,new Date().toLocaleString('vi-VN',{hour12:false})]],token:tk,source:'website-notice'})})}catch(_){}
+    toast('Đã lưu thông báo và gửi lên Google Sheet.')}
+  else toast('Đã lưu thông báo trên máy này. Nhập mã đồng bộ để hiện ở mọi máy.');
+  ntClose()};
+ntApply();setTimeout(ntLoad,1500);
 $('#reportBtn').onclick=openReportDialog;
 $('#exportBtn').onclick=()=>{
   const rows=[['Đơn vị','Tổng đảng viên','Miễn giảm','Phải nộp','Đã nộp (đảng viên)','Chưa duyệt','Chưa có hồ sơ','Tổng kê khai','Tiền đã nộp','Tỷ lệ đảng viên đã nộp'],...units.map(r=>[nm(r),v(r,'members'),v(r,'exempt'),v(r,'due'),v(r,'paidCount'),v(r,'pending'),v(r,'noRecord'),v(r,'declared'),v(r,'paid'),v(r,'progress')])];
