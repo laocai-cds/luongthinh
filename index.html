@@ -1336,7 +1336,7 @@ function openReportDialog(){
     d.remove()})}
 
 /* ===== Thông báo chạy ===== */
-const NT_CLOUD=false,NT_TAB='Thông báo',NT_DEF={msg:'Đề nghị các chi bộ, đảng bộ cơ sở nộp đảng phí đầy đủ, đúng hạn hằng tháng.',color:'#12335c',size:'13.5',speed:'90'};
+const NT_CLOUD=true,NT_TAB='Thông báo',NT_DEF={msg:'Đề nghị các chi bộ, đảng bộ cơ sở nộp đảng phí đầy đủ, đúng hạn hằng tháng.',color:'#12335c',size:'13.5',speed:'90'};
 let ntCfg={...NT_DEF};try{Object.assign(ntCfg,JSON.parse(localStorage.getItem('lt_notice')||'{}'))}catch(_){}
 function ntApply(){const t=$('#ntText');if(!t)return;t.textContent=ntCfg.msg||NT_DEF.msg;t.style.color=ntCfg.color;t.style.fontSize=ntCfg.size+'px';
   const w=$('#ntTrack').clientWidth||800;requestAnimationFrame(()=>{const len=t.scrollWidth+w;t.parentNode.style.setProperty('--nt-d',Math.max(12,len/(+ntCfg.speed||90))+'s');t.style.setProperty('--nt-d',Math.max(12,len/(+ntCfg.speed||90))+'s')})}
