@@ -787,8 +787,8 @@ function applySheet(d){
   let H=d.headers.map(h=>String(h).trim()),R=d.rows;
   if(R.length&&R.some(c=>/\(1\)/.test(String(c)))){const sub=R[0];H=H.map((h,i)=>{const t=String(sub[i]==null?'':sub[i]).trim();return t||h});R=R.slice(1)}
   const ni=H.findIndex(h=>h===KEYS.name);if(ni<0)return 0;
-  const map=new Map();R.forEach(row=>{const o={};H.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));if(nkey(o[KEYS.name]))map.set(nkey(o[KEYS.name]),o)});
-  let hit=0;const next=INITIAL_UNITS.map(u=>{const o=map.get(nkey(u[KEYS.name]));if(o){hit++;return o}return u});
+  const map=new Map();R.forEach(row=>{const o={};H.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));const k=nkey(o[KEYS.name]);if(k){if(!map.has(k))map.set(k,[]);map.get(k).push(o)}});
+  let hit=0;const next=INITIAL_UNITS.map(u=>{const L=map.get(nkey(u[KEYS.name]));const o=L&&(L.find(x=>String(x[KEYS.stt]).trim()===String(u[KEYS.stt]).trim())||L[0]);if(o){hit++;return o}return u});
   if(hit<Math.ceil(INITIAL_UNITS.length*.8))return 0;
   units=next.sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));rankOf=new Map();units.forEach((r,i)=>rankOf.set(r,i+1));
   if(d.lastSync){const t=new Date(d.lastSync);if(!isNaN(t)){const p=n=>String(n).padStart(2,'0');dataStamp=`${p(t.getDate())}/${p(t.getMonth()+1)}/${t.getFullYear()} ${p(t.getHours())}:${p(t.getMinutes())}`}}
