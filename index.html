@@ -536,6 +536,9 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 @media(max-width:1180px){.livepill{display:none}}
 @media(max-width:700px){.livebar .wrap{gap:8px}.lcard{flex:1 1 140px;padding:10px 14px;gap:10px}.lcard b{font-size:1.25rem}}
 @media(prefers-reduced-motion:reduce){.ldot{animation:none}}
+
+.chip.tsync{background:var(--lac);border-color:var(--lac);color:#fff;font-weight:600}
+.chip.tsync:hover{background:var(--lac-2)}.chip.tsync:disabled{opacity:.6;cursor:wait}
 </style>
 </head>
 <body>
@@ -621,6 +624,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
           <button class="chip" data-filter="all" aria-pressed="true">Tất cả</button>
           <button class="chip" data-filter="has" aria-pressed="false">Có phát sinh</button>
           <button class="chip" data-filter="need" aria-pressed="false">Còn cần theo dõi</button>
+          <button class="chip tsync" id="tableSyncBtn" type="button" title="Gửi bảng này lên tab “Bảng đơn vị” trong Google Sheet">⇪ Đồng bộ Google Sheet</button>
         </div>
       </div>
       <div class="tw"><table>
@@ -1054,7 +1058,7 @@ $('#syncBtn').onclick=async()=>{
     await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:normRows(),token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
     if(before!==null){ // script có hỗ trợ đọc: xác nhận thật bằng thời điểm đồng bộ mới
       syncMsg('Đã gửi, đang chờ Google Sheet xác nhận…');
-      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);render();
+      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);render();if(hit)setTimeout(()=>syncTable(true),400);
         syncMsg(`Đã đồng bộ ${pendingRows.length} dòng lên Google Sheet${hit?` và cập nhật bảng điều khiển (${hit}/${INITIAL_UNITS.length} đơn vị khớp)`:' (chưa khớp đủ 26 đơn vị với bảng điều khiển)'}.`,hit?'ok':'bad');toast('Đồng bộ thành công.');showSheetLink();return}}catch(_){}}
       syncMsg('Đã gửi nhưng chưa thấy Google Sheet cập nhật. Kiểm tra mã đồng bộ (nếu có) và quyền Web App, rồi thử lại.','bad');return}
     syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra URL Web App và quyền truy cập “Bất kỳ ai”.`,'ok');
@@ -1065,6 +1069,30 @@ $('#syncBtn').onclick=async()=>{
 };
 try{if(/zalo/i.test(navigator.userAgent)&&!sessionStorage.getItem('zalo_ok')){const zb=document.getElementById('zalobar');zb.classList.add('on');document.getElementById('zalook').onclick=()=>{zb.classList.remove('on');try{sessionStorage.setItem('zalo_ok','1')}catch(e){}}}}catch(e){}
 start();startLoop();checkEndpoint();showSheetLink();
+
+
+/* ===== Đồng bộ bảng "Tình hình các đơn vị" lên tab "Bảng đơn vị" ===== */
+const TABLE_TAB='Bảng đơn vị';
+function tableMatrix(stamp){
+  const headers=['Hạng','Đơn vị','Tổng đảng viên','Đảng viên đã nộp','Đảng viên cần nộp','Chưa duyệt','Chưa có hồ sơ','Đã kê khai (đ)','Đã nộp (đ)','Tiến độ (%)','Trạng thái','Cập nhật lúc'];
+  const rows=units.map((r,i)=>[rankOf.get(r)||i+1,nm(r),v(r,'members'),v(r,'paidCount'),v(r,'due'),v(r,'pending'),v(r,'noRecord'),v(r,'declared'),v(r,'paid'),Math.round(v(r,'progress')*1000)/10,status(r)[0],stamp]);
+  return {headers,rows};
+}
+async function syncTable(silent){
+  const ep=sheetEndpoint();if(!ep){if(!silent)toast('Chưa có địa chỉ Google Sheet. Vào mục Nhập dữ liệu để cấu hình.');return false}
+  const b=$('#tableSyncBtn');if(b){b.disabled=true;b.textContent='Đang đồng bộ…'}
+  const stamp=new Date().toLocaleString('vi-VN',{hour12:false});
+  try{
+    const m=tableMatrix(stamp);
+    await fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:TABLE_TAB,headers:m.headers,rows:m.rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-luong-thinh-bang',sentAt:new Date().toISOString()})});
+    for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));
+      try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(TABLE_TAB),8000);
+        if(d&&d.ok&&d.rows&&d.rows.length&&String(d.rows[0][d.rows[0].length-1])===stamp){if(!silent)toast(`Đã đồng bộ bảng ${m.rows.length} đơn vị lên Google Sheet (tab “${TABLE_TAB}”).`);return true}}catch(_){}}
+    if(!silent)toast('Đã gửi bảng nhưng chưa thấy Google Sheet cập nhật. Kiểm tra script đã triển khai bản mới chưa.');return false;
+  }catch(e){if(!silent)toast('Không gửi được bảng lên Google Sheet.');return false}
+  finally{if(b){b.disabled=false;b.textContent='⇪ Đồng bộ Google Sheet'}}
+}
+$('#tableSyncBtn').onclick=()=>syncTable(false);
 
 /* ===== Đang online & Tổng truy cập (Firebase Realtime Database) ===== */
 const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luongthinh-63494.firebaseapp.com",projectId:"luongthinh-63494",appId:"1:448226831934:web:1b9d4fb293fb86816a2b6f",databaseURL:"https://luongthinh-63494-default-rtdb.firebaseio.com"};
