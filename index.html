@@ -21,8 +21,8 @@
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap"></noscript>
 <style>
 :root{
   --lac:#b0222b;--lac-d:#6f1016;--lac-2:#cf2f38;--gold:#e3b23c;--gold-d:#b98a1d;
@@ -629,6 +629,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .cr-k{font:700 11.5px var(--body);letter-spacing:.04em;color:var(--gold-d);text-transform:uppercase}
 .cr-t b{font:800 1.15rem/1.25 var(--display);color:var(--lac-d)}.cr-o{font-size:13px;color:var(--ink)}
 @media(max-width:560px){.credit{padding:14px}}
+
 </style>
 </head>
 <body>
@@ -967,21 +968,27 @@ async function syncMonthly(){
   {const live=sigOf(liveUnits),cur=curKey();Object.keys(msnap).forEach(k=>{if(k!==cur&&sigOf(msnap[k].rows)===live){delete msnap[k];delete monthly[k];purged++}});
    const lc=totals().paid;(remote||[]).forEach(r=>{const k=String(r[0]||'').trim(),c=pnum(r[1]);if(/^\d{4}-\d{2}$/.test(k)&&c>=0&&!(k in monthly)){if(k!==cur&&c===lc&&!msnap[k]){purged++;return}monthly[k]={cum:c}}});
    if(purged)saveMonthly()}
-  const ck0=mkey(new Date()),yr=new Date().getFullYear(),want=[];for(let m=1;m<=12;m++){const k=yr+'-'+String(m).padStart(2,'0');if(k!==ck0&&!msnap[k]&&k<ck0)want.push(k)}
-  Promise.all(want.map(loadMonthTab)).then(r=>{if(r.some(Boolean))renderMonthly()});
+  {const cur0=curKey();let tried={};try{tried=JSON.parse(localStorage.getItem('lt_mtried')||'{}')||{}}catch(_){}
+   const now=Date.now(),want=Object.keys(monthly).filter(k=>k!==cur0&&!msnap[k]&&k<cur0&&!(tried[k]&&now-tried[k]<864e5));
+   if(want.length)Promise.all(want.map(async k=>{const ok=await loadMonthTab(k);if(!ok){tried[k]=Date.now();try{localStorage.setItem('lt_mtried',JSON.stringify(tried))}catch(_){}}return ok})).then(r=>{if(r.some(Boolean))renderMonthly()})}
   const ck=mkey(new Date()),cum=totals().paid;
   const snapNow=JSON.stringify(liveUnits);
   const changed=!msnap[ck]||JSON.stringify(msnap[ck].rows)!==snapNow||!monthly[ck]||monthly[ck].cum!==cum;
   if(changed){msnap[ck]={t:Date.now(),rows:JSON.parse(snapNow)};monthly[ck]={cum};saveMonthly();pushMonthly(ep,ck)}else if(purged)pushMonthly(ep,null)
   renderMonthly();
 }
+
+/* tạm dừng hiệu ứng khi khối không nằm trong màn hình (giảm CPU/pin) */
+try{const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggle('nanim',!e.isIntersecting)),{rootMargin:'80px'});
+  }catch(_){}
+document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('nanim',document.hidden));
 function start(){
   liveUnits=[...INITIAL_UNITS];applyView();fillSyncMonth();
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
   dataSrc=sheetEndpoint()?'loading':'backup';
   render();
   loadFromSheet().then(()=>{render();syncMonthly()});
-  const tick=()=>{if(!document.hidden)loadFromSheet().then(x=>{if(x.state==='ok')render()})};
+  const tick=()=>{if(document.hidden)return;const before=sigOf(liveUnits);loadFromSheet().then(x=>{if(x.state==='ok'&&sigOf(liveUnits)!==before)render()})};
   setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
   const h=location.hash.slice(1);page(['overview','units','import'].includes(h)?h:'overview',true);
 }
@@ -1256,10 +1263,12 @@ const drop=$('#drop');
 drop.ondragover=e=>{e.preventDefault();drop.classList.add('over')};
 drop.ondragleave=()=>drop.classList.remove('over');
 drop.ondrop=e=>{e.preventDefault();drop.classList.remove('over');if(e.dataTransfer.files[0])readExcel(e.dataTransfer.files[0])};
+let __xl=null;function loadXLSX(){if(window.XLSX)return Promise.resolve();return __xl||(__xl=new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=res;sc.onerror=()=>{__xl=null;rej(new Error('xlsx'))};document.head.appendChild(sc)}))}
 function readExcel(file){
   const reader=new FileReader();
-  reader.onload=e=>{
+  reader.onload=async e=>{
     try{
+      await loadXLSX();
       const wb=XLSX.read(e.target.result,{type:'array'}),ws=wb.Sheets[wb.SheetNames[0]],data=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
       pendingHeaders=data[0]||[];pendingRows=data.slice(1).filter(r=>r.some(c=>String(c).trim()));
       $('#fileinfo').textContent=`${file.name} · ${pendingRows.length} dòng dữ liệu · Trang tính: ${wb.SheetNames[0]}`;
@@ -1403,7 +1412,7 @@ const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luong
   const show=()=>{const a=document.getElementById('liveBar'),b=document.getElementById('livePill');if(a)a.hidden=false;if(b)b.hidden=false};
   const load=u=>new Promise((res,rej)=>{const s=document.createElement('script');s.src=u;s.onload=res;s.onerror=rej;document.head.appendChild(s)});
   const base='https://www.gstatic.com/firebasejs/10.12.2/';
-  load(base+'firebase-app-compat.js').then(()=>load(base+'firebase-database-compat.js')).then(()=>{
+  const go=()=>load(base+'firebase-app-compat.js').then(()=>load(base+'firebase-database-compat.js')).then(()=>{
     firebase.initializeApp(FB_CFG);const db=firebase.database();
     let sid='';try{sid=sessionStorage.getItem('lt_sid')||'';if(!sid){sid=Math.random().toString(36).slice(2,10)+Date.now().toString(36);sessionStorage.setItem('lt_sid',sid)}}catch(_){sid=Math.random().toString(36).slice(2,10)}
     const me=db.ref('presence/'+sid),vr=db.ref('stats/visits'),pr=db.ref('presence');
@@ -1419,6 +1428,7 @@ const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luong
     if(!counted){vr.transaction(n=>(n||0)+1,(err,committed)=>{if(!err&&committed){try{sessionStorage.setItem('lt_counted','1')}catch(_){}startVisits()}})}
     else{vr.get().then(()=>startVisits()).catch(()=>{})}
   }).catch(()=>{});
+  if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:3000});else setTimeout(go,1500);
 })();
 </script>
 </body>
