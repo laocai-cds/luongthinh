@@ -765,6 +765,9 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <div class="panel pad step">
           <div class="ph"><h2><span class="sn">3</span>Gửi lên Google Sheet</h2></div>
           <div class="state" id="syncState" role="status">Chưa chọn tệp Excel.</div>
+          <label class="f" for="syncMonth" style="margin-top:12px;display:block">Số liệu thuộc tháng</label>
+          <select class="input" id="syncMonth" style="max-width:220px"></select>
+          <p class="hint" style="margin:6px 0 12px">Mặc định là tháng hiện tại. Chọn tháng cũ để bổ sung số liệu lịch sử, không ghi đè số liệu mới nhất.</p>
           <div class="sendrow">
             <button class="btn solid" id="syncBtn" type="button" disabled>Đồng bộ lên Google Sheet</button>
             <a class="btn" id="openSheet" href="#" target="_blank" rel="noopener" hidden>Mở Google Sheet để kiểm tra</a>
@@ -865,14 +868,16 @@ function renderBanner(){let b=$('#viewBanner');if(!b){b=document.createElement('
   const [y,m]=viewKey.split('-'),t=new Date(msnap[viewKey].t||Date.now());
   b.style.display='flex';b.innerHTML=`<span>Đang xem số liệu <b>tháng ${+m}/${y}</b> (ghi nhận lúc ${t.toLocaleString('vi-VN',{hour12:false})}). Tất cả bảng, biểu đồ và danh sách bên dưới theo tháng này.</span><button type="button" class="btn" id="viewBack">Xem số liệu mới nhất</button>`;
   $('#viewBack').onclick=()=>{viewKey=null;selMonth=null;applyView();render()}}
-function applySheet(d){
-  if(!d||!d.ok||!Array.isArray(d.headers)||!Array.isArray(d.rows))return 0;
-  let H=d.headers.map(h=>String(h).trim()),R=d.rows;
-  if(R.length&&R.some(c=>/\(1\)/.test(String(c)))){const sub=R[0];H=H.map((h,i)=>{const t=String(sub[i]==null?'':sub[i]).trim();return t||h});R=R.slice(1)}
-  const ni=H.findIndex(h=>h===KEYS.name);if(ni<0)return 0;
+function matchUnits(headers,rows){
+  let H=headers.map(h=>String(h).trim()),R=rows;
+  if(R.length&&R.some(c=>/\(1\)/.test(String(c)))){const sub=R[0];while(H.length<sub.length)H.push('');H=H.map((h,i)=>{const t=String(sub[i]==null?'':sub[i]).trim();return t||h});R=R.slice(1)}
+  const ni=H.findIndex(h=>h===KEYS.name);if(ni<0)return null;
   const map=new Map();R.forEach(row=>{const o={};H.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));const k=nkey(o[KEYS.name]);if(k){if(!map.has(k))map.set(k,[]);map.get(k).push(o)}});
   let hit=0;const next=INITIAL_UNITS.map(u=>{const L=map.get(nkey(u[KEYS.name]));const o=L&&(L.find(x=>String(x[KEYS.stt]).trim()===String(u[KEYS.stt]).trim())||L[0]);if(o){hit++;return o}return u});
-  if(hit<Math.ceil(INITIAL_UNITS.length*.8))return 0;
+  return hit<Math.ceil(INITIAL_UNITS.length*.8)?null:{next,hit}}
+function applySheet(d){
+  if(!d||!d.ok||!Array.isArray(d.headers)||!Array.isArray(d.rows))return 0;
+  const M=matchUnits(d.headers,d.rows);if(!M)return 0;const next=M.next,hit=M.hit;
   liveUnits=next;applyView();
   if(d.lastSync){const t=new Date(d.lastSync);if(!isNaN(t)){const p=n=>String(n).padStart(2,'0');dataStamp=`${p(t.getDate())}/${p(t.getMonth()+1)}/${t.getFullYear()} ${p(t.getHours())}:${p(t.getMinutes())}`}}
   return hit;
@@ -920,6 +925,15 @@ function renderMonthly(){
   const n=Object.keys(monthly).length;
   $('#monthNote').textContent=n<=1?'Hệ thống bắt đầu ghi nhận từ tháng này; từ các tháng sau, số thu mỗi tháng = số lũy kế đã nộp − số lũy kế cuối tháng trước.':'Chọn tháng ở góc phải hoặc bấm vào cột. Số thu mỗi tháng = lũy kế đã nộp − lũy kế cuối tháng trước (tab “'+MONTH_TAB+'” trong Google Sheet).';
 }
+function fillSyncMonth(){const el=$('#syncMonth');if(!el)return;const now=new Date();let h='';for(let i=0;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1),k=mkey(d);h+=`<option value="${k}">Tháng ${d.getMonth()+1}/${d.getFullYear()}${i===0?' (hiện tại)':''}</option>`}el.innerHTML=h}
+function pushMonthly(ep){
+  const tk=($('#syncToken')&&$('#syncToken').value.trim())||'';
+  const H=Object.keys(INITIAL_UNITS[0]||{});const rows=[];Object.keys(msnap).sort().forEach(k=>msnap[k].rows.forEach(r=>rows.push([k,...H.map(h=>r[h]==null?'':r[h])])));
+  const post=b=>{try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(b)})}catch(_){}};
+  post({tab:SNAP_TAB,headers:['Tháng',...H],rows,token:tk,source:'website-monthly-detail'});
+  const stamp='Lúc '+new Date().toLocaleString('vi-VN',{hour12:false});
+  post({tab:MONTH_TAB,headers:['Tháng','Lũy kế đã nộp (₫)','Ghi nhận'],rows:Object.keys(monthly).sort().map(k=>[k,monthly[k].cum,stamp]),token:tk,source:'website-monthly'})}
+function saveMonthly(){try{localStorage.setItem('lt_msnap',JSON.stringify(msnap));localStorage.setItem('lt_monthly',JSON.stringify(monthly))}catch(_){}}
 async function syncMonthly(){
   const ep=sheetEndpoint();if(!ep)return;
   try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(MONTH_TAB),9000);
@@ -932,18 +946,12 @@ async function syncMonthly(){
   if(dataSrc!=='sheet')return renderMonthly();
   const ck=mkey(new Date()),cum=totals().paid;
   const snapNow=JSON.stringify(liveUnits);
-  const snapChanged=!msnap[ck]||JSON.stringify(msnap[ck].rows)!==snapNow;
-  if(snapChanged){msnap[ck]={t:Date.now(),rows:JSON.parse(snapNow)};try{localStorage.setItem('lt_msnap',JSON.stringify(msnap))}catch(_){}
-    const H=Object.keys(liveUnits[0]||{});const rows=[];Object.keys(msnap).sort().forEach(k=>msnap[k].rows.forEach(r=>rows.push([k,...H.map(h=>r[h]==null?'':r[h])])));
-    try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:SNAP_TAB,headers:['Tháng',...H],rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-monthly-detail'})})}catch(_){}}
-  if(!monthly[ck]||monthly[ck].cum!==cum){monthly[ck]={cum};
-    try{localStorage.setItem('lt_monthly',JSON.stringify(monthly))}catch(_){}
-    const rows=Object.keys(monthly).sort().map(k=>[k,monthly[k].cum,'Lúc '+new Date().toLocaleString('vi-VN',{hour12:false})]);
-    try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:MONTH_TAB,headers:['Tháng','Lũy kế đã nộp (₫)','Ghi nhận'],rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-monthly'})})}catch(_){}}
+  const changed=!msnap[ck]||JSON.stringify(msnap[ck].rows)!==snapNow||!monthly[ck]||monthly[ck].cum!==cum;
+  if(changed){msnap[ck]={t:Date.now(),rows:JSON.parse(snapNow)};monthly[ck]={cum};saveMonthly();pushMonthly(ep)}
   renderMonthly();
 }
 function start(){
-  liveUnits=[...INITIAL_UNITS];applyView();
+  liveUnits=[...INITIAL_UNITS];applyView();fillSyncMonth();
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
   dataSrc=sheetEndpoint()?'loading':'backup';
   render();
@@ -1210,21 +1218,28 @@ $('#testBtn').onclick=async()=>{
   }
 };
 // Script Apps Script yêu cầu mọi dòng đúng bằng số cột tiêu đề: cắt/đệm cho khớp và ép về chuỗi/số đơn giản
-function normRows(){const w=pendingHeaders.length;return pendingRows.map(r=>{const o=[];for(let i=0;i<w;i++){const c=r[i];o.push(c==null?'':(typeof c==='number'||typeof c==='string'?c:String(c)))}return o})}
+function normRows(){const w=Math.max(pendingHeaders.length,...pendingRows.map(r=>r.length));return pendingRows.map(r=>{const o=[];for(let i=0;i<w;i++){const c=r[i];o.push(c==null?'':(typeof c==='number'||typeof c==='string'?c:String(c)))}return o})}
 function syncMsg(t,c){const e=$('#syncState');e.textContent=t;e.className='state'+(c?' '+c:'')}
 // Apps Script ContentService không cho website ngoài đọc phản hồi: gửi text/plain (no-cors) rồi nhắc kiểm tra tab đích.
 $('#syncBtn').onclick=async()=>{
   const url=checkEndpoint(),token=$('#syncToken').value.trim();
   if(!url){syncMsg('URL Web App chưa đúng hoặc chưa nhập. Xem bước 2.','bad');toast('Kiểm tra lại URL Web App.');return}
   if(!pendingRows.length){syncMsg('Chưa có dữ liệu từ tệp Excel.','bad');return}
-  if(!confirm(`Gửi ${pendingRows.length} dòng Excel tới Google Sheet?\nDữ liệu sẽ thay thế nội dung trang tính đích.`))return;
+  const mk=($('#syncMonth')&&$('#syncMonth').value)||curKey();
+  if(mk!==curKey()){
+    const M=matchUnits(pendingHeaders,normRows());if(!M){syncMsg('Tệp không khớp đủ 26 đơn vị nên không lưu vào tháng cũ.','bad');return}
+    if(!confirm(`Lưu số liệu ${pendingRows.length} dòng vào tháng ${mk.slice(5)}/${mk.slice(0,4)}?\nSố liệu mới nhất không bị thay đổi.`))return;
+    msnap[mk]={t:Date.now(),rows:M.next};monthly[mk]={cum:M.next.reduce((a,r)=>a+v(r,'paid'),0)};saveMonthly();
+    const ep0=sheetEndpoint();if(ep0)pushMonthly(ep0);render();
+    syncMsg(`Đã lưu số liệu vào tháng ${mk.slice(5)}/${mk.slice(0,4)}. Bấm vào cột tháng đó ở Tổng quan để xem.`,'ok');toast('Đã lưu số liệu tháng '+mk.slice(5)+'/'+mk.slice(0,4));return}
+  if(!confirm(`Gửi ${pendingRows.length} dòng Excel tới Google Sheet (tháng hiện tại)?\nDữ liệu sẽ thay thế nội dung trang tính đích.`))return;
   const b=$('#syncBtn');b.disabled=true;b.textContent='Đang gửi…';syncMsg('Đang gửi dữ liệu tới Apps Script…');
   try{
     let before=null;try{const d0=await jsonp(url+'?action=read',8000);before=d0&&d0.ok?(d0.lastSync||''):null}catch(_){}
-    await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:normRows(),token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
+    await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:(()=>{const w=Math.max(pendingHeaders.length,...pendingRows.map(r=>r.length)),h=[...pendingHeaders];while(h.length<w)h.push('');return h})(),rows:normRows(),token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
     if(before!==null){ // script có hỗ trợ đọc: xác nhận thật bằng thời điểm đồng bộ mới
       syncMsg('Đã gửi, đang chờ Google Sheet xác nhận…');
-      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);render();setTimeout(loadLog,800);if(hit)setTimeout(()=>syncTable(true).then(()=>loadLog()),400);
+      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);if(hit)dataSrc='sheet';render();if(hit)syncMonthly();setTimeout(loadLog,800);if(hit)setTimeout(()=>syncTable(true).then(()=>loadLog()),400);
         syncMsg(`Đã đồng bộ ${pendingRows.length} dòng lên Google Sheet${hit?` và cập nhật bảng điều khiển (${hit}/${INITIAL_UNITS.length} đơn vị khớp)`:' (chưa khớp đủ 26 đơn vị với bảng điều khiển)'}.`,hit?'ok':'bad');toast('Đồng bộ thành công.');showSheetLink();return}}catch(_){}}
       syncMsg('Đã gửi nhưng chưa thấy Google Sheet cập nhật. Kiểm tra mã đồng bộ (nếu có) và quyền Web App, rồi thử lại.','bad');return}
     syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra URL Web App và quyền truy cập “Bất kỳ ai”.`,'ok');
