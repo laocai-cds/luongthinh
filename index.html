@@ -164,17 +164,30 @@ button,input,select{font:inherit;color:inherit}
 .track i.risk{background:var(--lac-2)}
 
 /* status split */
-.split{display:flex;height:12px;border-radius:12px;overflow:hidden;gap:2px;margin-bottom:12px}
+.split{display:flex;height:10px;border-radius:10px;overflow:hidden;gap:2px;margin-bottom:12px}
 .split i{display:block;min-width:4px}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin-bottom:22px}
 .legend span:before{content:'';display:inline-block;width:9px;height:9px;border-radius:3px;background:var(--c);margin-right:6px}
 .legend b{color:var(--ink)}
-.sub{font:600 13px var(--body);margin:0 0 12px;color:var(--ink)}
-.chase{display:flex;justify-content:space-between;gap:10px;font-size:13px;padding:9px 0;border-top:1px solid var(--rule-2)}
-.chase:first-of-type{border-top:0}
-.chase em{font-style:normal;color:var(--lac);font-weight:600;white-space:nowrap}
+#splitlegend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+#splitlegend span{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:10px;background:color-mix(in srgb,var(--c) 11%,#fff);border:1px solid color-mix(in srgb,var(--c) 28%,#fff);border-left:3px solid var(--c);font-size:12px}
+#splitlegend span:before{display:none}
+#splitlegend b{font:800 1.35rem/1.1 var(--display);color:var(--c)}
+#splitlegend em{font-style:normal;color:var(--muted)}
+.sub{font:700 12.5px var(--body);margin:0 0 6px;color:var(--ink);padding-top:12px;border-top:1px solid var(--rule-2)}
+.chase{display:grid;grid-template-columns:22px minmax(0,1fr) auto;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--rule-2);font-size:13px}
+.sub+#chase .chase:first-child{border-top:0}
+.chase .rk{font:700 11px/22px var(--body);text-align:center;width:22px;height:22px;border-radius:50%;background:#f3e6e6;color:var(--lac);font-style:normal}
+.chase .cm{min-width:0}.chase .cm span{display:block;line-height:1.3}
+.chase .bar2{height:3px;border-radius:3px;background:#f0e9e9;margin-top:5px;overflow:hidden}
+.chase .bar2 i{display:block;height:100%;background:linear-gradient(90deg,#e0868b,var(--lac));border-radius:3px}
+.chase .cc{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;max-width:230px}
+.chase u{text-decoration:none;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.chase u.c1{background:#fbe6e7;color:#a41f27}.chase u.c2{background:#fdf0d2;color:#8a6208}.chase u.c3{background:#e3eefc;color:#1d4f9a}
 .tx{font-size:13px;padding:9px 0;border-top:1px solid var(--rule-2);display:flex;justify-content:space-between;gap:12px}
 .tx small{display:block;color:var(--muted)}
+.emptybox{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:4px;padding:34px 16px;border:1px dashed var(--rule);border-radius:12px;background:#faf9f6;color:var(--muted);font-size:12.5px}
+.emptybox i{font-style:normal;font-size:1.8rem;opacity:.7}.emptybox b{color:var(--ink);font-size:14px}
 .empty{color:var(--muted);font-size:13px;margin:0}
 
 /* tables */
@@ -929,11 +942,12 @@ function render(){
   active.forEach(r=>{const s=status(r)[0];const g=groups.find(x=>x.l===s);if(g)g.n++});
   $('#split').setAttribute('aria-label',groups.map(g=>`${g.n} ${g.l.toLowerCase()}`).join(', '));
   $('#split').innerHTML=groups.filter(g=>g.n).map(g=>`<i style="flex:${g.n};background:${g.c}" title="${g.l}: ${g.n}"></i>`).join('');
-  $('#splitlegend').innerHTML=groups.map(g=>`<span style="--c:${g.c}">${g.l} <b>${g.n}</b></span>`).join('');
+  $('#splitlegend').innerHTML=groups.map(g=>`<span style="--c:${g.c}"><b>${g.n}</b><em>${g.l}</em></span>`).join('');
 
   const need=r=>v(r,'noRecord')+v(r,'pending')+v(r,'approved');
   const chase=[...units].filter(r=>need(r)>0).sort((a,b)=>need(b)-need(a)).slice(0,6);
-  $('#chase').innerHTML=chase.length?chase.map(r=>{const bits=[];if(v(r,'noRecord'))bits.push(v(r,'noRecord')+' chưa có hồ sơ');if(v(r,'pending'))bits.push(v(r,'pending')+' chưa duyệt');if(v(r,'approved'))bits.push(v(r,'approved')+' chưa nộp');return `<div class="chase"><span>${esc(nm(r))}</span><em>${bits.join(' · ')}</em></div>`}).join(''):'<p class="empty">Không còn hồ sơ tồn đọng.</p>';
+  const mx=Math.max(1,...chase.map(need));
+  $('#chase').innerHTML=chase.length?chase.map((r,i)=>{const bits=[];if(v(r,'noRecord'))bits.push(`<u class="c1">${v(r,'noRecord')} chưa có hồ sơ</u>`);if(v(r,'pending'))bits.push(`<u class="c2">${v(r,'pending')} chưa duyệt</u>`);if(v(r,'approved'))bits.push(`<u class="c3">${v(r,'approved')} chưa nộp</u>`);return `<div class="chase"><i class="rk">${i+1}</i><div class="cm"><span>${esc(nm(r))}</span><div class="bar2"><i style="width:${Math.max(6,need(r)/mx*100)}%"></i></div></div><div class="cc">${bits.join('')}</div></div>`}).join(''):'<p class="empty">Không còn hồ sơ tồn đọng.</p>';
 
   renderTx();fillTables();
   $('#totalunits').textContent=`${units.length} đơn vị · Tiến độ = đảng viên đã nộp / (tổng đảng viên − miễn giảm − chuyển sinh hoạt tạm thời)`;
@@ -948,7 +962,7 @@ function render(){
 }
 function renderTx(){
   const last=[...payments].reverse().slice(0,5);
-  $('#txlist').innerHTML=last.length?last.map(p=>`<div class="tx"><div>${esc(p.unit.replace(/^(Chi bộ|Đảng bộ)\s+/,''))}<small>${esc(p.receipt||'Không ghi chú')} · ${new Date(p.date).toLocaleDateString('vi-VN')}</small></div><b>${money(p.amount)}</b></div>`).join(''):'<p class="empty">Chưa có giao dịch. Chọn “Ghi nhận thu” để thêm.</p>';
+  $('#txlist').innerHTML=last.length?last.map(p=>`<div class="tx"><div>${esc(p.unit.replace(/^(Chi bộ|Đảng bộ)\s+/,''))}<small>${esc(p.receipt||'Không ghi chú')} · ${new Date(p.date).toLocaleDateString('vi-VN')}</small></div><b>${money(p.amount)}</b></div>`).join(''):'<div class="emptybox"><i>🧾</i><b>Chưa có giao dịch</b><span>Chọn “Ghi nhận thu” để thêm khoản thu đầu tiên.</span></div>';
 }
 
 function sorted(list){
