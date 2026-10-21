@@ -539,6 +539,14 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 
 .chip.tsync{background:var(--lac);border-color:var(--lac);color:#fff;font-weight:600}
 .chip.tsync:hover{background:var(--lac-2)}.chip.tsync:disabled{opacity:.6;cursor:wait}
+
+.logwrap{overflow-x:auto;margin-top:6px}
+.logtb{width:100%;min-width:0!important;border-collapse:collapse;font-size:13px}
+.logtb th{background:#f4f6f2!important;color:var(--ink)!important;font-size:12px;padding:7px 10px;border-radius:0!important;text-align:left}
+.logtb th.n,.logtb td.n{text-align:right}
+.logtb td{padding:7px 10px;border-bottom:1px solid var(--rule-2);white-space:nowrap}
+.logtb td.logempty{white-space:normal;color:var(--muted);text-align:center;padding:18px}
+.logtb .ok{color:#14633a;font-weight:700}.logtb .bad{color:#b4232c;font-weight:700}
 </style>
 </head>
 <body>
@@ -689,6 +697,11 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
             <a class="btn" id="openSheet" href="#" target="_blank" rel="noopener" hidden>Mở Google Sheet để kiểm tra</a>
           </div>
           <p class="hint" style="margin:12px 0 0">Trình duyệt không đọc được phản hồi của Apps Script, nên sau khi gửi hãy mở Google Sheet kiểm tra trước khi gửi lại.</p>
+        </div>
+        <div class="panel pad step" id="logPanel">
+          <div class="ph"><h2>Nhật ký đồng bộ</h2><button class="btn" id="logReload" type="button">↻ Tải lại</button></div>
+          <div class="logwrap"><table class="logtb"><thead><tr><th>Thời gian</th><th>Nội dung</th><th class="n">Số dòng</th><th>Kết quả</th></tr></thead><tbody id="logBody"><tr><td colspan="4" class="logempty">Đang tải nhật ký…</td></tr></tbody></table></div>
+          <p class="hint" style="margin:10px 0 0">Hiển thị 20 lần đồng bộ gần nhất, lưu trong tab “Nhật ký đồng bộ” của Google Sheet.</p>
         </div>
       </div>
       <div class="panel pad step">
@@ -1058,7 +1071,7 @@ $('#syncBtn').onclick=async()=>{
     await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:normRows(),token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
     if(before!==null){ // script có hỗ trợ đọc: xác nhận thật bằng thời điểm đồng bộ mới
       syncMsg('Đã gửi, đang chờ Google Sheet xác nhận…');
-      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);render();if(hit)setTimeout(()=>syncTable(true),400);
+      for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));try{const d=await jsonp(url+'?action=read',8000);if(d&&d.ok&&(d.lastSync||'')!==before){const hit=applySheet(d);render();setTimeout(loadLog,800);if(hit)setTimeout(()=>syncTable(true).then(()=>loadLog()),400);
         syncMsg(`Đã đồng bộ ${pendingRows.length} dòng lên Google Sheet${hit?` và cập nhật bảng điều khiển (${hit}/${INITIAL_UNITS.length} đơn vị khớp)`:' (chưa khớp đủ 26 đơn vị với bảng điều khiển)'}.`,hit?'ok':'bad');toast('Đồng bộ thành công.');showSheetLink();return}}catch(_){}}
       syncMsg('Đã gửi nhưng chưa thấy Google Sheet cập nhật. Kiểm tra mã đồng bộ (nếu có) và quyền Web App, rồi thử lại.','bad');return}
     syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra URL Web App và quyền truy cập “Bất kỳ ai”.`,'ok');
@@ -1087,12 +1100,30 @@ async function syncTable(silent){
     await fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:TABLE_TAB,headers:m.headers,rows:m.rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-luong-thinh-bang',sentAt:new Date().toISOString()})});
     for(let i=0;i<6;i++){await new Promise(r=>setTimeout(r,2500));
       try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(TABLE_TAB),8000);
-        if(d&&d.ok&&d.rows&&d.rows.length&&String(d.rows[0][d.rows[0].length-1])===stamp){if(!silent)toast(`Đã đồng bộ bảng ${m.rows.length} đơn vị lên Google Sheet (tab “${TABLE_TAB}”).`);return true}}catch(_){}}
+        if(d&&d.ok&&d.rows&&d.rows.length&&String(d.rows[0][d.rows[0].length-1])===stamp){loadLog();if(!silent)toast(`Đã đồng bộ bảng ${m.rows.length} đơn vị lên Google Sheet (tab “${TABLE_TAB}”).`);return true}}catch(_){}}
     if(!silent)toast('Đã gửi bảng nhưng chưa thấy Google Sheet cập nhật. Kiểm tra script đã triển khai bản mới chưa.');return false;
   }catch(e){if(!silent)toast('Không gửi được bảng lên Google Sheet.');return false}
   finally{if(b){b.disabled=false;b.textContent='⇪ Đồng bộ Google Sheet'}}
 }
 $('#tableSyncBtn').onclick=()=>syncTable(false);
+
+
+/* ===== Nhật ký đồng bộ (đọc từ tab "Nhật ký đồng bộ") ===== */
+async function loadLog(){
+  const body=$('#logBody');if(!body)return;const ep=sheetEndpoint();
+  const msg=t=>{body.innerHTML=`<tr><td colspan="4" class="logempty">${esc(t)}</td></tr>`};
+  if(!ep){msg('Chưa cấu hình địa chỉ Google Sheet.');return}
+  try{
+    const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent('Nhật ký đồng bộ'),10000);
+    if(!d||!d.ok){msg('Chưa đọc được nhật ký. Hãy triển khai bản mới của script.');return}
+    const rows=(d.rows||[]).filter(r=>r&&r[0]).slice(-20).reverse();
+    if(!rows.length){msg('Chưa có lần đồng bộ nào được ghi.');return}
+    body.innerHTML=rows.map(r=>{const ok=r[3]==='Thành công';return `<tr><td>${esc(r[0])}</td><td>${esc(r[1]||'—')}</td><td class="n">${esc(r[2])}</td><td class="${ok?'ok':'bad'}" title="${esc(r[5]||'')}">${ok?'✓ Thành công':'✕ '+esc(r[5]||'Thất bại')}</td></tr>`}).join('');
+  }catch(_){msg('Không tải được nhật ký (lỗi mạng).')}
+}
+$('#logReload').onclick=loadLog;
+document.querySelectorAll('[data-page="import"]').forEach(b=>b.addEventListener('click',()=>setTimeout(loadLog,200)));
+if(location.hash==='#import')loadLog();
 
 /* ===== Đang online & Tổng truy cập (Firebase Realtime Database) ===== */
 const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luongthinh-63494.firebaseapp.com",projectId:"luongthinh-63494",appId:"1:448226831934:web:1b9d4fb293fb86816a2b6f",databaseURL:"https://luongthinh-63494-default-rtdb.firebaseio.com"};
