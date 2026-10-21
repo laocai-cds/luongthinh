@@ -1101,7 +1101,7 @@ function render(){
   const t=totals(),rate=t.due?t.paidCount/t.due:0;
   const active=units.filter(r=>v(r,'members')>0),done=units.filter(r=>cls(r)==='complete').length;
 
-  $('#lede').textContent=dataSrc==='sheet'?'Số liệu đồng bộ trực tiếp từ Google Sheet, chỉ lấy 26 đơn vị trực thuộc.':dataSrc==='loading'?'Đang tải số liệu từ Google Sheet…':'Chưa đọc được Google Sheet, đang hiển thị số liệu lưu sẵn ngày '+dataStamp+'.';
+  $('#lede').textContent=dataSrc==='sheet'?'':dataSrc==='loading'?'Đang tải số liệu từ Google Sheet…':'Chưa đọc được Google Sheet, đang hiển thị số liệu lưu sẵn ngày '+dataStamp+'.';
   $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>${dataSrc==='loading'?'…':dataStamp}</b><small>${dataSrc==='sheet'?'Google Sheet cập nhật':'Dữ liệu cập nhật'}</small></div>`;
   renderDonut(t,rate,active);renderMonthly();renderBanner();
 
