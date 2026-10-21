@@ -722,11 +722,13 @@ function sheetEndpoint(){let e='';try{e=localStorage.getItem('lt_endpoint')||''}
 function jsonp(url,ms){return new Promise((res,rej)=>{const cb='__lt_'+Date.now()+Math.random().toString(36).slice(2),sc=document.createElement('script');let ok=false;
   const fin=(e,v)=>{clearTimeout(tm);delete window[cb];sc.remove();e?rej(e):res(v)};const tm=setTimeout(()=>fin(new Error('timeout')),ms||12000);
   window[cb]=d=>{ok=true;fin(null,d)};sc.onerror=()=>fin(new Error('load'));sc.src=url+(url.includes('?')?'&':'?')+'callback='+cb+'&t='+Date.now();document.head.appendChild(sc)})}
-const nkey=x=>String(x||'').trim().toLocaleLowerCase('vi').replace(/\s+/g,' ');
+const nkey=x=>String(x||'').toLocaleLowerCase('vi').replace(/[^\p{L}\p{N}]+/gu,'');
 function applySheet(d){
   if(!d||!d.ok||!Array.isArray(d.headers)||!Array.isArray(d.rows))return 0;
-  const ni=d.headers.findIndex(h=>String(h).trim()===KEYS.name);if(ni<0)return 0;
-  const map=new Map();d.rows.forEach(row=>{const o={};d.headers.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));if(nkey(o[KEYS.name]))map.set(nkey(o[KEYS.name]),o)});
+  let H=d.headers.map(h=>String(h).trim()),R=d.rows;
+  if(R.length&&R.some(c=>/\(1\)/.test(String(c)))){const sub=R[0];H=H.map((h,i)=>{const t=String(sub[i]==null?'':sub[i]).trim();return t||h});R=R.slice(1)}
+  const ni=H.findIndex(h=>h===KEYS.name);if(ni<0)return 0;
+  const map=new Map();R.forEach(row=>{const o={};H.forEach((h,i)=>o[String(h).trim()]=row[i]==null?'':String(row[i]));if(nkey(o[KEYS.name]))map.set(nkey(o[KEYS.name]),o)});
   let hit=0;const next=INITIAL_UNITS.map(u=>{const o=map.get(nkey(u[KEYS.name]));if(o){hit++;return o}return u});
   if(hit<Math.ceil(INITIAL_UNITS.length*.8))return 0;
   units=next.sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));rankOf=new Map();units.forEach((r,i)=>rankOf.set(r,i+1));
