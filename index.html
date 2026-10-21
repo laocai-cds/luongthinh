@@ -934,24 +934,29 @@ function pushMonthly(ep,k){
   if(k&&msnap[k]){const H=Object.keys(msnap[k].rows[0]||{});post({tab:monthTab(k),headers:H,rows:msnap[k].rows.map(r=>H.map(h=>r[h]==null?'':r[h])),token:tk,source:'website-month-sheet'})}
   const stamp='Lúc '+new Date().toLocaleString('vi-VN',{hour12:false});
   post({tab:MONTH_TAB,headers:['Tháng','Lũy kế đã nộp (₫)','Ghi nhận'],rows:Object.keys(monthly).sort().map(k=>[k,monthly[k].cum,stamp]),token:tk,source:'website-monthly'})}
+const sigOf=rows=>rows.map(r=>[v(r,'members'),v(r,'paidCount'),v(r,'paid')].join(',')).join(';');
 async function loadMonthTab(k){const ep=sheetEndpoint();if(!ep||msnap[k])return !!msnap[k];
   try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(monthTab(k)),9000);
     if(d&&d.ok&&Array.isArray(d.headers)&&Array.isArray(d.rows)){const M=matchUnits(d.headers,d.rows);
-      if(M){msnap[k]={t:d.lastSync?new Date(d.lastSync).getTime()||Date.now():Date.now(),rows:M.next};
+      if(M&&(k===curKey()||sigOf(M.next)!==sigOf(liveUnits))){msnap[k]={t:d.lastSync?new Date(d.lastSync).getTime()||Date.now():Date.now(),rows:M.next};
         monthly[k]={cum:M.next.reduce((a,r)=>a+v(r,'paid'),0)};saveMonthly();return true}}}catch(_){}
   return false}
 function saveMonthly(){try{localStorage.setItem('lt_msnap',JSON.stringify(msnap));localStorage.setItem('lt_monthly',JSON.stringify(monthly))}catch(_){}}
 async function syncMonthly(){
   const ep=sheetEndpoint();if(!ep)return;
-  try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(MONTH_TAB),9000);
-    if(d&&d.ok&&Array.isArray(d.rows))d.rows.forEach(r=>{const k=String(r[0]||'').trim(),c=pnum(r[1]);if(/^\d{4}-\d{2}$/.test(k)&&c>=0&&!(k in monthly))monthly[k]={cum:c}})}catch(_){}
+  let remote=null;
+  try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(MONTH_TAB),9000);if(d&&d.ok&&Array.isArray(d.rows))remote=d.rows}catch(_){}
+  if(dataSrc!=='sheet'){(remote||[]).forEach(r=>{const k=String(r[0]||'').trim(),c=pnum(r[1]);if(/^\d{4}-\d{2}$/.test(k)&&c>=0&&!(k in monthly))monthly[k]={cum:c}});return renderMonthly()}
+  let purged=0;
+  {const live=sigOf(liveUnits),cur=curKey();Object.keys(msnap).forEach(k=>{if(k!==cur&&sigOf(msnap[k].rows)===live){delete msnap[k];delete monthly[k];purged++}});
+   const lc=totals().paid;(remote||[]).forEach(r=>{const k=String(r[0]||'').trim(),c=pnum(r[1]);if(/^\d{4}-\d{2}$/.test(k)&&c>=0&&!(k in monthly)){if(k!==cur&&c===lc&&!msnap[k]){purged++;return}monthly[k]={cum:c}}});
+   if(purged)saveMonthly()}
   const ck0=mkey(new Date()),yr=new Date().getFullYear(),want=[];for(let m=1;m<=12;m++){const k=yr+'-'+String(m).padStart(2,'0');if(k!==ck0&&!msnap[k]&&k<ck0)want.push(k)}
   Promise.all(want.map(loadMonthTab)).then(r=>{if(r.some(Boolean))renderMonthly()});
-  if(dataSrc!=='sheet')return renderMonthly();
   const ck=mkey(new Date()),cum=totals().paid;
   const snapNow=JSON.stringify(liveUnits);
   const changed=!msnap[ck]||JSON.stringify(msnap[ck].rows)!==snapNow||!monthly[ck]||monthly[ck].cum!==cum;
-  if(changed){msnap[ck]={t:Date.now(),rows:JSON.parse(snapNow)};monthly[ck]={cum};saveMonthly();pushMonthly(ep,ck)}
+  if(changed){msnap[ck]={t:Date.now(),rows:JSON.parse(snapNow)};monthly[ck]={cum};saveMonthly();pushMonthly(ep,ck)}else if(purged)pushMonthly(ep,null)
   renderMonthly();
 }
 function start(){
