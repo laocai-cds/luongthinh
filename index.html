@@ -658,7 +658,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <label class="f" for="endpoint" style="margin-top:0">URL Web App (kết thúc bằng /exec)</label>
         <input class="input" id="endpoint" placeholder="https://script.google.com/macros/s/.../exec" autocomplete="off" autocapitalize="off" spellcheck="false">
         <div class="fieldmsg" id="epMsg"></div>
-        <label class="f" for="syncToken">Mã đồng bộ (syncToken)</label>
+        <label class="f" for="syncToken">Mã đồng bộ (không bắt buộc)</label>
         <div class="tokrow"><input class="input" id="syncToken" type="password" autocomplete="off" placeholder="Mã bí mật được tạo bởi setupSheet()"><button class="btn" id="showTok" type="button" aria-label="Hiện mã">Hiện</button></div>
         <label class="f" for="sheetUrl">Link Google Sheet đích (không bắt buộc)</label>
         <input class="input" id="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/..." autocomplete="off" spellcheck="false">
@@ -951,7 +951,7 @@ function checkEndpoint(){
   if(!raw.trim()){epChip('Chưa cấu hình');epMsg('');return null}
   const r=normEndpoint(raw);
   if(r.err){epChip('URL chưa đúng','bad');epMsg(r.err,'bad');return null}
-  epChip(tok?'Đã cấu hình':'Thiếu mã đồng bộ',tok?'ok':'wait');epMsg(r.note||'','ok');return r.url;
+  epChip('Đã cấu hình','ok');epMsg(r.note||'','ok');return r.url;
 }
 function showSheetLink(){const u=($('#sheetUrl').value||'').trim(),a=$('#openSheet');if(/^https:\/\/docs\.google\.com\/spreadsheets\//.test(u)){a.href=u;a.hidden=false}else a.hidden=true}
 ['#endpoint','#syncToken'].forEach(i=>$(i).addEventListener('input',checkEndpoint));
@@ -967,28 +967,30 @@ $('#saveEndpoint').onclick=()=>{
   showSheetLink();checkEndpoint();toast('Đã lưu cấu hình trên thiết bị này.');
 };
 // Kiểm tra kết nối: gọi JSONP (không gửi mã đồng bộ). Script cũ có thể không hỗ trợ nên chỉ báo mức độ chắc chắn.
-$('#testBtn').onclick=()=>{
+$('#testBtn').onclick=async()=>{
   const url=checkEndpoint();if(!url){toast('Nhập URL Web App đúng dạng trước.');return}
   epChip('Đang kiểm tra…','wait');epMsg('');
-  const cb='__lt_ping_'+Date.now(),sc=document.createElement('script');let done=false;
-  const fin=(chip,cls,msg,mc)=>{if(done)return;done=true;clearTimeout(tm);delete window[cb];sc.remove();epChip(chip,cls);epMsg(msg,mc)};
-  const tm=setTimeout(()=>fin('Chưa xác nhận','wait','Không nhận được phản hồi sau 10 giây. Kiểm tra Web App đã triển khai với quyền “Bất kỳ ai” và URL đúng.','bad'),10000);
-  window[cb]=p=>fin('Kết nối tốt','ok','Web App phản hồi. Có thể gửi dữ liệu.','ok');
-  sc.onerror=()=>fin('Chưa xác nhận','wait','Không tải được Web App. Kiểm tra URL /exec, quyền truy cập “Bất kỳ ai” và đã triển khai lại sau khi sửa mã.','bad');
-  sc.src=url+'?action=ping&callback='+encodeURIComponent(cb)+'&t='+Date.now();document.head.appendChild(sc);
+  const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),12000);
+  try{
+    await fetch(url+'?t='+Date.now(),{mode:'no-cors',signal:ctl.signal});
+    clearTimeout(tm);epChip('Truy cập được','ok');epMsg('Địa chỉ Web App phản hồi. Chưa thể xác nhận quyền ghi, hãy thử gửi và kiểm tra Google Sheet.','ok');
+  }catch(e){
+    clearTimeout(tm);epChip('Không truy cập được','bad');epMsg('Không kết nối được tới Web App. Kiểm tra URL /exec, quyền truy cập “Bất kỳ ai” và mạng.','bad');
+  }
 };
+// Script Apps Script yêu cầu mọi dòng đúng bằng số cột tiêu đề: cắt/đệm cho khớp và ép về chuỗi/số đơn giản
+function normRows(){const w=pendingHeaders.length;return pendingRows.map(r=>{const o=[];for(let i=0;i<w;i++){const c=r[i];o.push(c==null?'':(typeof c==='number'||typeof c==='string'?c:String(c)))}return o})}
 function syncMsg(t,c){const e=$('#syncState');e.textContent=t;e.className='state'+(c?' '+c:'')}
 // Apps Script ContentService không cho website ngoài đọc phản hồi: gửi text/plain (no-cors) rồi nhắc kiểm tra tab đích.
 $('#syncBtn').onclick=async()=>{
   const url=checkEndpoint(),token=$('#syncToken').value.trim();
   if(!url){syncMsg('URL Web App chưa đúng hoặc chưa nhập. Xem bước 2.','bad');toast('Kiểm tra lại URL Web App.');return}
-  if(!token){syncMsg('Chưa nhập mã đồng bộ (bước 2).','bad');return}
   if(!pendingRows.length){syncMsg('Chưa có dữ liệu từ tệp Excel.','bad');return}
   if(!confirm(`Gửi ${pendingRows.length} dòng Excel tới Google Sheet?\nDữ liệu sẽ thay thế nội dung trang tính đích.`))return;
   const b=$('#syncBtn');b.disabled=true;b.textContent='Đang gửi…';syncMsg('Đang gửi dữ liệu tới Apps Script…');
   try{
-    await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:pendingRows,token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
-    syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra mã đồng bộ và quyền triển khai.`,'ok');
+    await fetch(url,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({headers:pendingHeaders,rows:normRows(),token,source:'website-luong-thinh',sentAt:new Date().toISOString()})});
+    syncMsg(`Đã gửi ${pendingRows.length} dòng. Trình duyệt không đọc được kết quả, hãy mở Google Sheet và kiểm tra tab “Dữ liệu nhập” trước khi gửi lại. Nếu không thấy dữ liệu mới, kiểm tra URL Web App và quyền truy cập “Bất kỳ ai”.`,'ok');
     toast('Đã gửi. Hãy kiểm tra Google Sheet.');showSheetLink();
   }catch(e){
     syncMsg('Không gửi được yêu cầu (lỗi mạng hoặc bị chặn). Kiểm tra kết nối mạng và URL Web App rồi thử lại.','bad');toast('Không gửi được yêu cầu đồng bộ.');
