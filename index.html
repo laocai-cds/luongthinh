@@ -678,10 +678,6 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <h1>Hệ thống theo dõi thu nộp đảng phí</h1>
         <p class="lede" id="lede">Tình hình thu nộp tại các chi bộ, đảng bộ trực thuộc Đảng bộ xã Lương Thịnh.</p>
         <div class="heroline" id="heroline"></div>
-        <div class="heroact">
-          <button class="btn gold" id="recordBtn2">Ghi nhận thu</button>
-          <button class="btn ghost-light" data-goto="import">Nhập từ Excel</button>
-        </div>
       </div>
       <aside class="dpanel" aria-label="Biểu đồ tròn tình hình thu">
         <div class="dhead"><b>Tình hình thu toàn Đảng bộ</b><small>Vòng ngoài là đảng viên, vòng trong là đơn vị</small></div>
@@ -1172,7 +1168,7 @@ function openModal(){
   $('#modal').classList.add('on');setTimeout(()=>$('#amount').focus(),30);
 }
 const closeModal=()=>$('#modal').classList.remove('on');
-['recordBtn','recordBtn2','recordBtn3'].forEach(id=>$('#'+id).onclick=openModal);
+['recordBtn','recordBtn3'].forEach(id=>$('#'+id).onclick=openModal);
 $('#cancelModal').onclick=closeModal;
 $('#modal').onclick=e=>{if(e.target.id==='modal')closeModal()};
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
