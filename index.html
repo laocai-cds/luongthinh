@@ -630,6 +630,11 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .cr-t b{font:800 1.15rem/1.25 var(--display);color:var(--lac-d)}.cr-o{font-size:13px;color:var(--ink)}
 @media(max-width:560px){.credit{padding:14px}}
 
+
+/* cột thống kê: không hiệu ứng chuyển động */
+.aipanel .plot::after{display:none}
+.aipanel .col,.col .cb,.cb::after,.play .cb::after{animation:none!important;transition:none!important}
+.col:hover .cb{transform:none;filter:none}
 </style>
 </head>
 <body>
@@ -1050,7 +1055,7 @@ function growDonut(){
 let lastRate=0,loopTimer=null;
 // Biểu đồ tròn quay liên tục bằng CSS; biểu đồ cột mọc lại mỗi 2 giây khi đang xem tab Tổng quan
 function startLoop(){
-  clearInterval(loopTimer);if(REDUCED)return;
+  clearInterval(loopTimer);return;
   loopTimer=setInterval(()=>{if(document.hidden||!$('#overview').classList.contains('on'))return;growBars('.chartwrap')},4000);
 }
 function render(){
