@@ -269,7 +269,7 @@ td.amb{color:#a35f00;font-weight:700}td.red{color:var(--lac);font-weight:700}td.
 .cb.partial{background:linear-gradient(180deg,#dcae3f,#b98a1d)}
 .cb.empty{background:#9aa3a1;min-height:3px}
 .nlab{display:flex;justify-content:center;padding-top:8px}
-.nlab span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;line-height:1.2;color:var(--ink);max-height:128px;overflow:hidden;white-space:nowrap}
+.nlab span{writing-mode:vertical-rl;transform:rotate(180deg);font-size:12px;line-height:1.2;color:var(--ink);max-height:330px;overflow:hidden;white-space:nowrap}
 @media(max-width:700px){
   .podium{grid-template-columns:1fr}
   .step.s1{order:-1}
@@ -340,7 +340,7 @@ label.f{display:block;font-size:13px;font-weight:600;margin:14px 0 6px}
   .cb{width:64%;max-width:none}
   .cb em{display:none}
   .cb .t3{height:4px}.cb .s3{width:4px}
-  .nlab span{font-size:9.5px;max-height:112px}
+  .nlab span{font-size:9.5px;max-height:260px}
   /* bảng đơn vị dạng thẻ */
   .tw table{min-width:0;display:block}
   .tw thead{display:none}
@@ -889,12 +889,12 @@ function render(){
   $('#podium').innerHTML=[1,0,2].filter(i=>lead[i]).map(i=>{const r=lead[i];return `<div class="step s${i+1}"><span class="no">${i+1}</span><b>${esc(nm(r))}</b><strong>${pct(v(r,'progress'))}</strong><small>${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}</small></div>`}).join('');
 
   // column chart: tiến độ từng đơn vị, theo hạng
-  const n=units.length,lab=s=>s.length>26?s.slice(0,25)+'…':s;
+  const n=units.length,lab=s=>s.length>64?s.slice(0,63)+'…':s;
   $('#colchart').style.setProperty('--n',n);$('#colnames').style.setProperty('--n',n);
   $('#colchart').style.gridTemplateColumns=$('#colnames').style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;
   $('#colchart').setAttribute('aria-label',`Biểu đồ cột tiến độ thu đảng phí của ${n} đơn vị, ${done} đơn vị nộp đủ`);
   $('#colchart').innerHTML=units.map((r,i)=>{const p=Math.max(0,Math.min(1,v(r,'progress')));return `<div class="col" title="${esc(nm(r))}: ${pct(v(r,'progress'))} · ${v(r,'paidCount')}/${v(r,'due')} đảng viên đã nộp · ${money(v(r,'paid'))}"><div class="cb ${cls(r)}" data-h="${p*100}" style="--i:${i}"><i class="t3"></i><i class="s3"></i><em>${Math.round(p*100)}%</em></div></div>`}).join('');
-  $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(short(r)))}</span></div>`).join('');
+  $('#colnames').innerHTML=units.map(r=>`<div class="nlab"><span>${esc(lab(nm(r)))}</span></div>`).join('');
   $('#chartlegend').innerHTML=[['Đã hoàn thành','#38d4ff'],['Đang thu','#7c9cff'],['Chưa phát sinh','#9fb3d9']].map(([l,c])=>`<span style="--c:${c}">${l}</span>`).join('');
 
   // split by status
@@ -906,7 +906,7 @@ function render(){
 
   const need=r=>v(r,'noRecord')+v(r,'pending')+v(r,'approved');
   const chase=[...units].filter(r=>need(r)>0).sort((a,b)=>need(b)-need(a)).slice(0,6);
-  $('#chase').innerHTML=chase.length?chase.map(r=>{const bits=[];if(v(r,'noRecord'))bits.push(v(r,'noRecord')+' chưa có hồ sơ');if(v(r,'pending'))bits.push(v(r,'pending')+' chưa duyệt');if(v(r,'approved'))bits.push(v(r,'approved')+' chưa nộp');return `<div class="chase"><span>${esc(short(r))}</span><em>${bits.join(' · ')}</em></div>`}).join(''):'<p class="empty">Không còn hồ sơ tồn đọng.</p>';
+  $('#chase').innerHTML=chase.length?chase.map(r=>{const bits=[];if(v(r,'noRecord'))bits.push(v(r,'noRecord')+' chưa có hồ sơ');if(v(r,'pending'))bits.push(v(r,'pending')+' chưa duyệt');if(v(r,'approved'))bits.push(v(r,'approved')+' chưa nộp');return `<div class="chase"><span>${esc(nm(r))}</span><em>${bits.join(' · ')}</em></div>`}).join(''):'<p class="empty">Không còn hồ sơ tồn đọng.</p>';
 
   renderTx();fillTables();
   $('#totalunits').textContent=`${units.length} đơn vị · Tiến độ = đảng viên đã nộp / (tổng đảng viên − miễn giảm − chuyển sinh hoạt tạm thời)`;
