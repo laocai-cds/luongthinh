@@ -906,7 +906,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
     <label class="f">Xem trước</label>
     <div class="ntprev"><span id="ntPrev"></span></div>
     <label class="f" for="ntToken">Mã đồng bộ</label>
-    <input class="input" id="ntToken" type="password" autocomplete="off" placeholder="Nhập mã đồng bộ để lưu">
+    <input class="input" id="ntToken" type="password" autocomplete="off" placeholder="Nhập mã đồng bộ mới được lưu">
     <p class="fieldmsg" id="ntMsg" role="status"></p>
     <div class="macts"><button class="btn" id="ntCancel" type="button">Hủy</button><button class="btn solid" id="ntSave" type="button">Lưu thông báo</button></div>
   </div>
@@ -1353,11 +1353,14 @@ $('#ntSet').onclick=ntOpen;$('#ntCancel').onclick=ntClose;
 $('#ntModal').addEventListener('click',e=>{if(e.target.id==='ntModal')ntClose()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#ntModal').classList.contains('on'))ntClose()});
 ['#ntInput','#ntColor','#ntSize'].forEach(i=>$(i).addEventListener('input',ntPrev));
-$('#ntSave').onclick=()=>{const msg=$('#ntInput').value.trim();if(!msg){$('#ntMsg').textContent='Nhập nội dung thông báo.';$('#ntMsg').className='fieldmsg bad';return}
+const NT_HASH='3569edcf2deaa6c8c4f18303f9221f16febfa8a231a0819fcf8dba7e83b6c2c1';
+async function ntOk(t){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(t));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')===NT_HASH}catch(_){return false}}
+$('#ntSave').onclick=async()=>{const msg=$('#ntInput').value.trim();if(!msg){$('#ntMsg').textContent='Nhập nội dung thông báo.';$('#ntMsg').className='fieldmsg bad';return}
   const ep=sheetEndpoint(),tk=$('#ntToken').value.trim();
-  if(NT_CLOUD&&!tk){$('#ntMsg').textContent='Nhập mã đồng bộ để lưu thông báo.';$('#ntMsg').className='fieldmsg bad';$('#ntToken').focus();return}
+  if(!tk||!(await ntOk(tk))){$('#ntMsg').textContent=tk?'Mã đồng bộ không đúng.':'Nhập mã đồng bộ để lưu thông báo.';$('#ntMsg').className='fieldmsg bad';$('#ntToken').focus();return}
   ntCfg={msg,color:$('#ntColor').value,size:$('#ntSize').value,speed:$('#ntSpeed').value};ntStore();ntApply();
-  if(NT_CLOUD&&ep){try{localStorage.setItem('lt_token',tk)}catch(_){}
+  try{localStorage.setItem('lt_token',tk)}catch(_){}
+  if(NT_CLOUD&&ep){
     try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:NT_TAB,headers:['Nội dung','Màu chữ','Cỡ chữ','Tốc độ','Cập nhật'],rows:[[msg,ntCfg.color,ntCfg.size,ntCfg.speed,new Date().toLocaleString('vi-VN',{hour12:false})]],token:tk,source:'website-notice'})})}catch(_){}
     toast('Đã lưu thông báo và gửi lên Google Sheet.')}
   else toast('Đã lưu thông báo trên máy này.');
