@@ -1151,6 +1151,82 @@ $('#savePayment').onclick=()=>{
 };
 
 /* export + refresh */
+
+/* ===== Tạo báo cáo ===== */
+function reportUnits(k){const src=(k&&k!==curKey()&&msnap[k])?msnap[k].rows:liveUnits;return [...src].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'))}
+function reportHTML(k){
+  const U=reportUnits(k),y=+k.slice(0,4),m=+k.slice(5);
+  const T=U.reduce((a,r)=>{['members','exempt','due','paidCount','pending','noRecord','approved','paid','declared'].forEach(x=>a[x]=(a[x]||0)+v(r,x));return a},{});
+  const done=U.filter(r=>cls(r)==='complete').length,doing=U.filter(r=>cls(r)==='partial').length,none=U.length-done-doing;
+  const rate=T.due?T.paidCount/T.due:0;
+  const S=monthlySeries(y),cur=S.find(x=>x.m===m);
+  const now=new Date().toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const need=U.filter(r=>v(r,'noRecord')+v(r,'pending')+v(r,'approved')>0).sort((a,b)=>(v(b,'noRecord')+v(b,'pending')+v(b,'approved'))-(v(a,'noRecord')+v(a,'pending')+v(a,'approved')));
+  const st=r=>({complete:'Hoàn thành',partial:'Đang thu',empty:'Chưa phát sinh'})[cls(r)];
+  return `<!doctype html><html lang="vi"><head><meta charset="utf-8"><title>Báo cáo thu nộp đảng phí tháng ${m}/${y}</title><style>
+@page{size:A4;margin:16mm 14mm}
+body{font:13px/1.45 "Times New Roman",serif;color:#111;background:#fff;margin:0;padding:18px}
+.hd{display:flex;justify-content:space-between;text-align:center;gap:20px}.hd div{flex:1}
+.hd b{display:block;text-transform:uppercase}
+h1{text-align:center;font-size:17px;margin:16px 0 2px;text-transform:uppercase}
+.sub{text-align:center;font-style:italic;margin-bottom:12px}
+h2{font-size:14px;margin:16px 0 6px}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #333;padding:4px 6px}
+th{background:#f1e3e3;text-align:center}td.n{text-align:right}td.c{text-align:center}
+.kpi td:first-child{width:62%}
+.sign{display:flex;justify-content:space-between;margin-top:26px;text-align:center}.sign div{flex:1}
+tr{page-break-inside:avoid}
+
+.rptdlg{position:fixed;top:0;right:0;bottom:0;left:0;z-index:90;background:#0008;display:flex;align-items:center;justify-content:center;padding:16px}
+.rptbox{background:#fff;border-radius:14px;padding:20px;width:min(380px,100%);box-shadow:0 20px 60px -20px #000a;display:flex;flex-direction:column;gap:8px}
+.rptbox h3{margin:0 0 4px;font:800 1.15rem var(--display)}
+.rptact{display:grid;gap:8px;margin:10px 0 2px}.rptact .btn{padding:10px 14px}
+.rptclose{align-self:flex-end;margin-top:4px}
+</style></head><body>
+<div class="hd"><div><b>Đảng bộ xã Lương Thịnh</b>Hệ thống theo dõi thu nộp đảng phí</div><div><b>Đảng Cộng sản Việt Nam</b>Lương Thịnh, ngày ${now}</div></div>
+<h1>Báo cáo tình hình thu nộp đảng phí</h1>
+<div class="sub">Tháng ${m} năm ${y} · ${U.length} đơn vị trực thuộc</div>
+<h2>I. Kết quả chung</h2>
+<table class="kpi"><tbody>
+<tr><td>Tổng số đảng viên</td><td class="n">${num(T.members)}</td></tr>
+<tr><td>Đảng viên được miễn giảm</td><td class="n">${num(T.exempt)}</td></tr>
+<tr><td>Đảng viên phải nộp</td><td class="n">${num(T.due)}</td></tr>
+<tr><td>Đảng viên đã nộp</td><td class="n">${num(T.paidCount)} (${pct(rate)})</td></tr>
+<tr><td>Tổng tiền đã nộp (lũy kế)</td><td class="n">${money(T.paid)}</td></tr>
+<tr><td>Số tiền thu trong tháng ${m}/${y}</td><td class="n">${cur&&cur.has?money(cur.v):'Chưa có số liệu'}</td></tr>
+<tr><td>Đơn vị hoàn thành / đang thu / chưa phát sinh</td><td class="n">${done} / ${doing} / ${none}</td></tr>
+<tr><td>Hồ sơ cần xử lý (chưa duyệt, chưa có hồ sơ, chưa nộp)</td><td class="n">${num(T.pending+T.noRecord+T.approved)}</td></tr>
+</tbody></table>
+<h2>II. Chi tiết theo đơn vị</h2>
+<table><thead><tr><th>STT</th><th>Đơn vị</th><th>Đảng viên</th><th>Phải nộp</th><th>Đã nộp</th><th>Số tiền (đ)</th><th>Tỷ lệ</th><th>Tình trạng</th></tr></thead><tbody>
+${U.map((r,i)=>`<tr><td class="c">${i+1}</td><td>${esc(nm(r))}</td><td class="n">${num(v(r,'members'))}</td><td class="n">${num(v(r,'due'))}</td><td class="n">${num(v(r,'paidCount'))}</td><td class="n">${num(v(r,'paid'))}</td><td class="n">${pct(v(r,'progress'))}</td><td class="c">${st(r)}</td></tr>`).join('')}
+<tr><th colspan="2">Cộng</th><th class="n">${num(T.members)}</th><th class="n">${num(T.due)}</th><th class="n">${num(T.paidCount)}</th><th class="n">${num(T.paid)}</th><th class="n">${pct(rate)}</th><th></th></tr>
+</tbody></table>
+<h2>III. Đơn vị cần đôn đốc</h2>
+${need.length?`<table><thead><tr><th>STT</th><th>Đơn vị</th><th>Chưa có hồ sơ</th><th>Chưa duyệt</th><th>Chưa nộp</th></tr></thead><tbody>${need.map((r,i)=>`<tr><td class="c">${i+1}</td><td>${esc(nm(r))}</td><td class="n">${num(v(r,'noRecord'))}</td><td class="n">${num(v(r,'pending'))}</td><td class="n">${num(v(r,'approved'))}</td></tr>`).join('')}</tbody></table>`:'<p>Không còn hồ sơ tồn đọng.</p>'}
+<h2>IV. Thu theo tháng năm ${y}</h2>
+<table><thead><tr><th>Tháng</th><th>Lũy kế đã nộp (đ)</th><th>Thu trong tháng (đ)</th></tr></thead><tbody>${S.filter(x=>x.has).map(x=>`<tr><td class="c">${x.m}</td><td class="n">${num(x.cum)}</td><td class="n">${num(x.v)}</td></tr>`).join('')||'<tr><td colspan="3" class="c">Chưa có số liệu</td></tr>'}</tbody></table>
+<div class="sign"><div></div><div><i>Người lập biểu</i><br><br><br><br></div><div><b>Bí thư / Chi ủy</b><br><i>(Ký, ghi rõ họ tên)</i><br><br><br></div></div>
+</body></html>`}
+function downloadFile(name,type,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['﻿',data],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+function openReportDialog(){
+  let d=$('#rptDlg');if(d)d.remove();
+  const keys=[...new Set([curKey(),...Object.keys(msnap)])].sort().reverse();
+  const def=viewingPast()?viewKey:curKey();
+  d=document.createElement('div');d.id='rptDlg';d.className='rptdlg';
+  d.innerHTML=`<div class="rptbox" role="dialog" aria-label="Tạo báo cáo"><h3>Tạo báo cáo</h3>
+  <label class="f" for="rptMonth">Kỳ báo cáo</label><select class="input" id="rptMonth">${keys.map(k=>`<option value="${k}"${k===def?' selected':''}>Tháng ${+k.slice(5)}/${k.slice(0,4)}${k===curKey()?' (hiện tại)':''}</option>`).join('')}</select>
+  <div class="rptact"><button class="btn solid" data-f="pdf" type="button">In / Lưu PDF</button><button class="btn" data-f="doc" type="button">Tải Word (.doc)</button><button class="btn" data-f="xls" type="button">Tải Excel (.xls)</button></div>
+  <button class="btn rptclose" type="button">Đóng</button></div>`;
+  document.body.appendChild(d);
+  d.onclick=e=>{if(e.target===d||e.target.classList.contains('rptclose'))d.remove()};
+  d.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const k=$('#rptMonth').value,f=b.dataset.f,html=reportHTML(k),base='bao-cao-dang-phi-luong-thinh-'+k;
+    if(f==='doc')downloadFile(base+'.doc','application/msword',html);
+    else if(f==='xls')downloadFile(base+'.xls','application/vnd.ms-excel',html);
+    else{const ov=document.createElement('div');ov.className='rptov';ov.innerHTML='<div class="rx"><span>Xem trước báo cáo</span><span><button type="button" id="rptPrint">In / Lưu PDF</button> <button type="button" id="rptX">Đóng</button></span></div><iframe title="Báo cáo"></iframe>';document.body.appendChild(ov);
+      const fr=ov.querySelector('iframe');fr.srcdoc=html;$('#rptX').onclick=()=>ov.remove();$('#rptPrint').onclick=()=>{try{fr.contentWindow.focus();fr.contentWindow.print()}catch(_){toast('Không in được từ khung xem trước.')}}}
+    if(f!=='pdf')d.remove()})}
+$('#reportBtn').onclick=openReportDialog;
 $('#exportBtn').onclick=()=>{
   const rows=[['Đơn vị','Tổng đảng viên','Miễn giảm','Phải nộp','Đã nộp (đảng viên)','Chưa duyệt','Chưa có hồ sơ','Tổng kê khai','Tiền đã nộp','Tỷ lệ đảng viên đã nộp'],...units.map(r=>[nm(r),v(r,'members'),v(r,'exempt'),v(r,'due'),v(r,'paidCount'),v(r,'pending'),v(r,'noRecord'),v(r,'declared'),v(r,'paid'),v(r,'progress')])];
   const csv='﻿'+rows.map(r=>r.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(',')).join('\r\n');
