@@ -606,6 +606,13 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .mlab .cur{color:#8a6208;font-weight:700}
 .mnote{margin:10px 0 0;font-size:12px;color:var(--muted)}
 @media(max-width:700px){.mkpi{grid-template-columns:1fr}.mchart{gap:3px;height:140px}.mcol em{display:none}.mcol.cur em{display:block}.mlab{gap:3px;font-size:10px}}
+
+.ph select{font:600 12.5px var(--body);padding:5px 8px;border:1px solid var(--rule);border-radius:8px;background:#fff;color:var(--ink);margin-left:6px;cursor:pointer}
+.mcol{background:none;border:0;padding:0;cursor:pointer;font:inherit;border-radius:8px}
+.mcol:hover i{filter:brightness(1.1)}.mcol:focus-visible{outline:2px solid var(--lac);outline-offset:2px}
+.mcol.sel{background:#c8282f0f;box-shadow:inset 0 0 0 1px #c8282f33}.mcol.sel em{color:var(--lac);font-weight:700}
+.mcol.sel i{background:linear-gradient(180deg,#f2c14b,#d99a06)}
+.mlab .sel{color:var(--lac);font-weight:700}
 </style>
 </head>
 <body>
@@ -872,20 +879,30 @@ function monthlySeries(year){
     const prev=keys.filter(x=>x<k).pop();const cum=monthly[k].cum;
     out.push({m,k,has:true,cum,first:prev===undefined,v:prev===undefined?cum:Math.max(0,cum-monthly[prev].cum)})}
   return out}
+let selMonth=null,selYear=null;
 function renderMonthly(){
   const el=$('#monthChart');if(!el)return;
-  const now=new Date(),y=now.getFullYear(),ck=mkey(now),S=monthlySeries(y);
-  $('#monthYear').textContent='Năm '+y+' · số tiền thu thêm trong từng tháng';
+  const now=new Date(),ck=mkey(now);
+  const years=[...new Set([now.getFullYear(),...Object.keys(monthly).map(k=>+k.slice(0,4))])].sort((a,b)=>b-a);
+  if(selYear==null||!years.includes(selYear))selYear=now.getFullYear();
+  const y=selYear,S=monthlySeries(y);
+  if(selMonth==null)selMonth=(y===now.getFullYear()?now.getMonth()+1:12);
+  const sel=S.find(x=>x.m===selMonth)||S[0];
+  const isCur=sel.k===ck;
+  $('#monthYear').innerHTML=`<select id="monthYearSel" aria-label="Chọn năm">${years.map(v=>`<option value="${v}"${v===y?' selected':''}>Năm ${v}</option>`).join('')}</select><select id="monthSel" aria-label="Chọn tháng">${S.map(x=>`<option value="${x.m}"${x.m===selMonth?' selected':''}>Tháng ${x.m}</option>`).join('')}</select>`;
+  $('#monthYearSel').onchange=e=>{selYear=+e.target.value;selMonth=null;renderMonthly()};
+  $('#monthSel').onchange=e=>{selMonth=+e.target.value;renderMonthly()};
   const mx=Math.max(1,...S.map(x=>x.v));
-  el.innerHTML=S.map(x=>`<div class="mcol${x.k===ck?' cur':''}${x.has?'':' none'}" title="Tháng ${x.m}: ${x.has?money(x.v):'chưa có số liệu'}"><em>${x.has?mshort(x.v):''}</em><i style="height:${x.has?Math.max(3,x.v/mx*118):3}px"></i></div>`).join('');
+  el.innerHTML=S.map(x=>`<button type="button" class="mcol${x.m===selMonth?' sel':''}${x.k===ck?' cur':''}${x.has?'':' none'}" data-m="${x.m}" title="Tháng ${x.m}: ${x.has?money(x.v):'chưa có số liệu'}"><em>${x.has?mshort(x.v):''}</em><i style="height:${x.has?Math.max(3,x.v/mx*118):3}px"></i></button>`).join('');
+  el.querySelectorAll('.mcol').forEach(b=>b.onclick=()=>{selMonth=+b.dataset.m;renderMonthly()});
   let lab=$('#monthLab');if(!lab){lab=document.createElement('div');lab.id='monthLab';lab.className='mlab';el.after(lab)}
-  lab.innerHTML=S.map(x=>`<span class="${x.k===ck?'cur':''}">T${x.m}</span>`).join('');
-  const cur=S.find(x=>x.k===ck),prev=S.find(x=>x.m===now.getMonth()&&x.has);
-  const ytd=S.reduce((a,x)=>a+x.v,0);
-  let cmp='—',cc='';if(cur&&cur.has&&prev&&prev.v>0){const d=(cur.v-prev.v)/prev.v*100;cmp=(d>=0?'▲ +':'▼ ')+d.toFixed(1).replace('.',',')+'%';cc=d>=0?'up':'dn'}
-  $('#monthKpi').innerHTML=`<div style="--c:#d99a06"><small>Thu trong tháng ${now.getMonth()+1}</small><b>${cur&&cur.has?money(cur.v):'—'}</b></div><div style="--c:#2f7d4f"><small>So với tháng trước</small><b class="${cc}">${cmp}</b></div><div style="--c:#c8282f"><small>Tổng thu năm ${y}</small><b>${money(ytd)}</b></div>`;
+  lab.innerHTML=S.map(x=>`<span class="${x.m===selMonth?'sel':''}${x.k===ck?' cur':''}">T${x.m}</span>`).join('');
+  const prev=[...S].filter(x=>x.m<sel.m&&x.has).pop();
+  const upto=S.filter(x=>x.m<=sel.m).reduce((a,x)=>a+x.v,0);
+  let cmp='—',cc='';if(sel.has&&prev&&prev.v>0){const d=(sel.v-prev.v)/prev.v*100;cmp=(d>=0?'▲ +':'▼ ')+d.toFixed(1).replace('.',',')+'%';cc=d>=0?'up':'dn'}
+  $('#monthKpi').innerHTML=`<div style="--c:#d99a06"><small>Thu trong tháng ${sel.m}/${y}</small><b>${sel.has?money(sel.v):'Chưa có số liệu'}</b></div><div style="--c:#2f7d4f"><small>So với tháng trước${prev?' (T'+prev.m+')':''}</small><b class="${cc}">${cmp}</b></div><div style="--c:#c8282f"><small>Lũy kế từ đầu năm đến hết T${sel.m}</small><b>${money(upto)}</b></div>`;
   const n=Object.keys(monthly).length;
-  $('#monthNote').textContent=n<=1?'Hệ thống bắt đầu ghi nhận từ tháng này; từ các tháng sau, số thu mỗi tháng = số lũy kế đã nộp − số lũy kế cuối tháng trước.':'Số thu mỗi tháng = số lũy kế đã nộp − số lũy kế cuối tháng trước, tự ghi mỗi khi đồng bộ số liệu (tab “'+MONTH_TAB+'” trong Google Sheet).';
+  $('#monthNote').textContent=n<=1?'Hệ thống bắt đầu ghi nhận từ tháng này; từ các tháng sau, số thu mỗi tháng = số lũy kế đã nộp − số lũy kế cuối tháng trước.':'Chọn tháng ở góc phải hoặc bấm vào cột. Số thu mỗi tháng = lũy kế đã nộp − lũy kế cuối tháng trước (tab “'+MONTH_TAB+'” trong Google Sheet).';
 }
 async function syncMonthly(){
   const ep=sheetEndpoint();if(!ep)return;
