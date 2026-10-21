@@ -1143,13 +1143,18 @@ const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luong
   load(base+'firebase-app-compat.js').then(()=>load(base+'firebase-database-compat.js')).then(()=>{
     firebase.initializeApp(FB_CFG);const db=firebase.database();
     let sid='';try{sid=sessionStorage.getItem('lt_sid')||'';if(!sid){sid=Math.random().toString(36).slice(2,10)+Date.now().toString(36);sessionStorage.setItem('lt_sid',sid)}}catch(_){sid=Math.random().toString(36).slice(2,10)}
-    const me=db.ref('presence/'+sid);
-    db.ref('.info/connected').on('value',s=>{if(s.val()===true){me.onDisconnect().remove().then(()=>me.set(true))}});
-    db.ref('presence').on('value',s=>{set('online',Math.max(1,s.numChildren()));show()},()=>{});
-    const vr=db.ref('stats/visits');
+    const me=db.ref('presence/'+sid),vr=db.ref('stats/visits'),pr=db.ref('presence');
+    // Chỉ hiện số đã được máy chủ xác nhận (không dùng giá trị tạm trên máy khách)
+    let pOn=false,vOn=false;
+    const startPresence=()=>{if(pOn)return;pOn=true;pr.on('value',s=>{if(s.exists()){set('online',Math.max(1,s.numChildren()));gate('p')}},()=>{})};
+    const startVisits=()=>{if(vOn)return;vOn=true;vr.on('value',s=>{if(s.exists()){set('total',Number(s.val())||0);gate('v')}},()=>{})};
+    const ok={p:false,v:false};const gate=k=>{ok[k]=true;if(ok.p&&ok.v)show()};
+    db.ref('.info/connected').on('value',s=>{if(s.val()===true){
+      me.onDisconnect().remove().then(()=>me.set(true)).then(startPresence).catch(()=>{});
+    }});
     let counted=false;try{counted=sessionStorage.getItem('lt_counted')==='1'}catch(_){}
-    if(!counted){vr.transaction(n=>(n||0)+1,(err,ok)=>{if(!err&&ok){try{sessionStorage.setItem('lt_counted','1')}catch(_){}}})}
-    vr.on('value',s=>{set('total',s.val()||0);show()},()=>{});
+    if(!counted){vr.transaction(n=>(n||0)+1,(err,committed)=>{if(!err&&committed){try{sessionStorage.setItem('lt_counted','1')}catch(_){}startVisits()}})}
+    else{vr.get().then(()=>startVisits()).catch(()=>{})}
   }).catch(()=>{});
 })();
 </script>
