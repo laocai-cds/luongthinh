@@ -660,7 +660,6 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
           <button class="chip" data-filter="all" aria-pressed="true">Tất cả</button>
           <button class="chip" data-filter="has" aria-pressed="false">Có phát sinh</button>
           <button class="chip" data-filter="need" aria-pressed="false">Còn cần theo dõi</button>
-          <button class="chip tsync" id="tableSyncBtn" type="button" title="Gửi bảng này lên tab “Bảng đơn vị” trong Google Sheet">⇪ Đồng bộ Google Sheet</button>
         </div>
       </div>
       <div class="tw"><table>
@@ -1141,7 +1140,7 @@ async function syncTable(silent){
   }catch(e){if(!silent)toast('Không gửi được bảng lên Google Sheet.');return false}
   finally{if(b){b.disabled=false;b.textContent='⇪ Đồng bộ Google Sheet'}}
 }
-$('#tableSyncBtn').onclick=()=>syncTable(false);
+const tsb=$('#tableSyncBtn');if(tsb)tsb.onclick=()=>syncTable(false);
 
 
 /* ===== Nhật ký đồng bộ (đọc từ tab "Nhật ký đồng bộ") ===== */
