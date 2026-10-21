@@ -756,11 +756,15 @@ const num=n=>nf.format(Math.round(n||0));
 const money=n=>num(n)+' ₫';
 const pct=n=>(Number(n||0)*100).toFixed(1).replace('.',',')+'%';
 // Tỷ lệ = đảng viên đã nộp / (tổng đảng viên - miễn giảm - chuyển sinh hoạt tạm thời)
+/* đọc số theo cả kiểu Việt Nam (1.072.000 · 0,9862 · 98,6%) lẫn kiểu thường */
+const pnum=x=>{if(typeof x==='number')return isFinite(x)?x:0;const t=String(x==null?'':x).trim().replace('%','').replace(/\s/g,'');if(!t)return 0;
+  if(/^-?\d{1,3}(\.\d{3})+(,\d+)?$/.test(t))return Number(t.replace(/\./g,'').replace(',','.'))||0;
+  if(/^-?\d+,\d+$/.test(t))return Number(t.replace(',','.'))||0;return Number(t)||0};
 const v=(r,k)=>{
   if(k==='due')return Math.max(0,v(r,'members')-v(r,'exempt')-v(r,'moved'));
   if(k==='noRecord')return Math.max(0,v(r,'unfiled')-v(r,'exempt'));
   if(k==='progress'){const d=v(r,'due');return d>0?Math.min(1,v(r,'paidCount')/d):0}
-  return Number(r[KEYS[k]])||0;
+  return pnum(r[KEYS[k]]);
 };
 const nm=r=>r[KEYS.name]||'';
 const short=r=>nm(r).replace(/^(Chi bộ|Đảng bộ)\s+/,'');
