@@ -589,6 +589,23 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .hero .btn.gold{background:linear-gradient(135deg,#ffe08a,#f2b705);border-color:#ffd24a}
 /* toàn bộ khung hình ở mức 80% trên máy tính */
 @media(min-width:901px){html{zoom:.8}}
+
+/* thu theo tháng */
+.mkpi{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.mkpi div{padding:10px 14px;border-radius:12px;border:1px solid var(--rule-2);background:#faf9f6;border-left:3px solid var(--c,#c8282f)}
+.mkpi small{display:block;font-size:11.5px;color:var(--muted)}
+.mkpi b{display:block;font:800 1.25rem/1.25 var(--display);letter-spacing:-.02em;margin-top:2px}
+.mkpi .up{color:#1f7a4a}.mkpi .dn{color:#b3261e}
+.mchart{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;height:170px;align-items:end;padding-top:6px;border-bottom:1px solid var(--rule-2)}
+.mcol{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;min-width:0}
+.mcol em{font:600 10.5px/1 var(--body);font-style:normal;color:var(--muted);margin-bottom:4px;white-space:nowrap}
+.mcol i{display:block;width:62%;max-width:34px;border-radius:6px 6px 0 0;background:linear-gradient(180deg,#e0868b,#c8282f);min-height:3px;transition:height .8s cubic-bezier(.22,.7,.2,1)}
+.mcol.cur i{background:linear-gradient(180deg,#f2c14b,#d99a06)}.mcol.cur em{color:#8a6208;font-weight:700}
+.mcol.none i{background:#e8e4dc;min-height:3px}
+.mlab{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin-top:6px;font-size:11px;color:var(--muted);text-align:center}
+.mlab .cur{color:#8a6208;font-weight:700}
+.mnote{margin:10px 0 0;font-size:12px;color:var(--muted)}
+@media(max-width:700px){.mkpi{grid-template-columns:1fr}.mchart{gap:3px;height:140px}.mcol em{display:none}.mcol.cur em{display:block}.mlab{gap:3px;font-size:10px}}
 </style>
 </head>
 <body>
@@ -650,6 +667,12 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
         <div class="cscroll"><div class="plot" id="colchart" role="img"></div><div class="names" id="colnames" aria-hidden="true"></div></div>
       </div>
       <div class="legend" id="chartlegend" style="margin:16px 0 0"></div>
+    </div>
+    <div class="panel pad" id="monthPanel" style="margin-bottom:20px">
+      <div class="ph"><h2>Thu đảng phí theo tháng</h2><small id="monthYear"></small></div>
+      <div class="mkpi" id="monthKpi"></div>
+      <div class="mchart" id="monthChart" role="img" aria-label="Biểu đồ số tiền thu theo từng tháng"></div>
+      <p class="mnote" id="monthNote"></p>
     </div>
     <div class="cols">
       <div class="panel pad">
@@ -837,13 +860,52 @@ function applySheet(d){
 async function loadFromSheet(){const ep=sheetEndpoint();if(!ep){dataSrc='backup';return{state:'noep'}}
   const done=r=>{dataSrc=r.state==='ok'?'sheet':(dataSrc==='sheet'?'sheet':'backup');return r};
   try{const d=await jsonp(ep+'?action=read');if(!d||!d.ok)return done({state:'bad'});const hit=applySheet(d);return done(hit?{state:'ok',hit,lastSync:d.lastSync}:{state:'empty',lastSync:d.lastSync})}catch(e){return done({state:'fail'})}}
+
+/* ===== Thu theo tháng ===== */
+const MONTH_TAB='Thu theo tháng';
+let monthly={};try{monthly=JSON.parse(localStorage.getItem('lt_monthly')||'{}')||{}}catch(_){}
+const mkey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+const mshort=n=>n>=1e6?(Math.round(n/1e5)/10).toLocaleString('vi-VN')+' tr':n>=1e3?Math.round(n/1e3).toLocaleString('vi-VN')+' k':String(n);
+function monthlySeries(year){
+  const keys=Object.keys(monthly).sort();const out=[];
+  for(let m=1;m<=12;m++){const k=year+'-'+String(m).padStart(2,'0');if(!(k in monthly)){out.push({m,k,has:false,v:0});continue}
+    const prev=keys.filter(x=>x<k).pop();const cum=monthly[k].cum;
+    out.push({m,k,has:true,cum,first:prev===undefined,v:prev===undefined?cum:Math.max(0,cum-monthly[prev].cum)})}
+  return out}
+function renderMonthly(){
+  const el=$('#monthChart');if(!el)return;
+  const now=new Date(),y=now.getFullYear(),ck=mkey(now),S=monthlySeries(y);
+  $('#monthYear').textContent='Năm '+y+' · số tiền thu thêm trong từng tháng';
+  const mx=Math.max(1,...S.map(x=>x.v));
+  el.innerHTML=S.map(x=>`<div class="mcol${x.k===ck?' cur':''}${x.has?'':' none'}" title="Tháng ${x.m}: ${x.has?money(x.v):'chưa có số liệu'}"><em>${x.has?mshort(x.v):''}</em><i style="height:${x.has?Math.max(3,x.v/mx*118):3}px"></i></div>`).join('');
+  let lab=$('#monthLab');if(!lab){lab=document.createElement('div');lab.id='monthLab';lab.className='mlab';el.after(lab)}
+  lab.innerHTML=S.map(x=>`<span class="${x.k===ck?'cur':''}">T${x.m}</span>`).join('');
+  const cur=S.find(x=>x.k===ck),prev=S.find(x=>x.m===now.getMonth()&&x.has);
+  const ytd=S.reduce((a,x)=>a+x.v,0);
+  let cmp='—',cc='';if(cur&&cur.has&&prev&&prev.v>0){const d=(cur.v-prev.v)/prev.v*100;cmp=(d>=0?'▲ +':'▼ ')+d.toFixed(1).replace('.',',')+'%';cc=d>=0?'up':'dn'}
+  $('#monthKpi').innerHTML=`<div style="--c:#d99a06"><small>Thu trong tháng ${now.getMonth()+1}</small><b>${cur&&cur.has?money(cur.v):'—'}</b></div><div style="--c:#2f7d4f"><small>So với tháng trước</small><b class="${cc}">${cmp}</b></div><div style="--c:#c8282f"><small>Tổng thu năm ${y}</small><b>${money(ytd)}</b></div>`;
+  const n=Object.keys(monthly).length;
+  $('#monthNote').textContent=n<=1?'Hệ thống bắt đầu ghi nhận từ tháng này; từ các tháng sau, số thu mỗi tháng = số lũy kế đã nộp − số lũy kế cuối tháng trước.':'Số thu mỗi tháng = số lũy kế đã nộp − số lũy kế cuối tháng trước, tự ghi mỗi khi đồng bộ số liệu (tab “'+MONTH_TAB+'” trong Google Sheet).';
+}
+async function syncMonthly(){
+  const ep=sheetEndpoint();if(!ep)return;
+  try{const d=await jsonp(ep+'?action=read&tab='+encodeURIComponent(MONTH_TAB),9000);
+    if(d&&d.ok&&Array.isArray(d.rows))d.rows.forEach(r=>{const k=String(r[0]||'').trim(),c=pnum(r[1]);if(/^\d{4}-\d{2}$/.test(k)&&c>=0&&!(k in monthly))monthly[k]={cum:c}})}catch(_){}
+  if(dataSrc!=='sheet')return renderMonthly();
+  const ck=mkey(new Date()),cum=totals().paid;
+  if(!monthly[ck]||monthly[ck].cum!==cum){monthly[ck]={cum};
+    try{localStorage.setItem('lt_monthly',JSON.stringify(monthly))}catch(_){}
+    const rows=Object.keys(monthly).sort().map(k=>[k,monthly[k].cum,'Lúc '+new Date().toLocaleString('vi-VN',{hour12:false})]);
+    try{fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:MONTH_TAB,headers:['Tháng','Lũy kế đã nộp (₫)','Ghi nhận'],rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-monthly'})})}catch(_){}}
+  renderMonthly();
+}
 function start(){
   units=[...INITIAL_UNITS].sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid'));
   units.forEach((r,i)=>rankOf.set(r,i+1));
   try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
   dataSrc=sheetEndpoint()?'loading':'backup';
   render();
-  loadFromSheet().then(()=>render());
+  loadFromSheet().then(()=>{render();syncMonthly()});
   const tick=()=>{if(!document.hidden)loadFromSheet().then(x=>{if(x.state==='ok')render()})};
   setInterval(tick,60000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
   const h=location.hash.slice(1);page(['overview','units','import'].includes(h)?h:'overview',true);
@@ -915,7 +977,7 @@ function render(){
 
   $('#lede').textContent=dataSrc==='sheet'?'Số liệu đồng bộ trực tiếp từ Google Sheet, chỉ lấy 26 đơn vị trực thuộc.':dataSrc==='loading'?'Đang tải số liệu từ Google Sheet…':'Chưa đọc được Google Sheet, đang hiển thị số liệu lưu sẵn ngày '+dataStamp+'.';
   $('#heroline').innerHTML=`<div><b>${money(t.paid)}</b><small>Đã thu</small></div><div><b>${t.paidCount}/${t.due}</b><small>Đảng viên đã nộp</small></div><div><b>${done}/${units.length}</b><small>Đơn vị hoàn thành</small></div><div><b>${dataSrc==='loading'?'…':dataStamp}</b><small>${dataSrc==='sheet'?'Google Sheet cập nhật':'Dữ liệu cập nhật'}</small></div>`;
-  renderDonut(t,rate,active);
+  renderDonut(t,rate,active);renderMonthly();
 
   $('#stats').innerHTML=[
     ['Tổng số đảng viên',`<strong data-c="${t.members}" data-f="num">0</strong>`,`Tại ${units.length} đơn vị · ${num(t.exempt)} miễn giảm`],
