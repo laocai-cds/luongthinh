@@ -1094,7 +1094,7 @@ function tableMatrix(stamp){
 async function syncTable(silent){
   const ep=sheetEndpoint();if(!ep){if(!silent)toast('Chưa có địa chỉ Google Sheet. Vào mục Nhập dữ liệu để cấu hình.');return false}
   const b=$('#tableSyncBtn');if(b){b.disabled=true;b.textContent='Đang đồng bộ…'}
-  const stamp=new Date().toLocaleString('vi-VN',{hour12:false});
+  const stamp='Lúc '+new Date().toLocaleString('vi-VN',{hour12:false});
   try{
     const m=tableMatrix(stamp);
     await fetch(ep,{method:'POST',mode:'no-cors',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({tab:TABLE_TAB,headers:m.headers,rows:m.rows,token:($('#syncToken')&&$('#syncToken').value.trim())||'',source:'website-luong-thinh-bang',sentAt:new Date().toISOString()})});
