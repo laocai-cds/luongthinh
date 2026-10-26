@@ -486,7 +486,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .flagwave i{flex:1 0 auto;display:block;margin-right:-.3px;background:url(logo.png) no-repeat;background-size:1400% 100%;background-position:calc(var(--i)*100%/13) 0;transform-origin:50% 50%;animation:flagfly 1.7s ease-in-out infinite;animation-delay:calc(var(--i)*-.13s);will-change:transform}
 @keyframes flagfly{0%,100%{transform:translateY(-1.6px) skewY(-6deg)}50%{transform:translateY(1.6px) skewY(6deg)}}
 @media not all{/* hiệu ứng luôn bật: máy dùng chế độ giảm chuyển động của Windows vẫn thấy biểu đồ chạy */.flagwave i{animation:none}}
-/* ===== trang nhập dữ liệu ===== */
+/* ===== trang  ===== */
 .imp{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start}
 .impmain{display:grid;gap:20px;min-width:0}
 .step .ph{align-items:center}
@@ -735,6 +735,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
       <button class="tab" data-page="overview">Tổng quan</button>
       <button class="tab" data-page="units">Đơn vị trực thuộc</button>
       <button class="tab" data-page="import">Nhập dữ liệu</button>
+      <a class="btn" href="bang-ty-gia-usd-gia-vang.html" target="_blank" rel="noopener">Giá vàng &amp; USD</a>
     </nav>
     <div class="barright">
       <div class="livepill" id="livePill" hidden aria-label="Lượt truy cập"><span class="ldot"></span><b data-live="online">0</b><small>online</small><i></i><b data-live="total">0</b><small>lượt</small></div>
@@ -845,7 +846,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
   </div>
 </section>
 
-<section class="page" id="import" aria-label="Nhập dữ liệu">
+<section class="page" id="import" aria-label="">
   <div class="wrap">
     <div class="pagehead"><h1>Nhập Excel và đồng bộ Google Sheet</h1><p>Làm lần lượt 3 bước: kết nối, chọn tệp, gửi dữ liệu.</p></div>
     <div class="imp">
@@ -1509,7 +1510,7 @@ function tableMatrix(stamp){
 }
 async function syncTable(silent){
   if(viewingPast()){if(!silent)toast('Đang xem số liệu tháng cũ. Bấm “Xem số liệu mới nhất” trước khi đồng bộ.');return false}
-  const ep=sheetEndpoint();if(!ep){if(!silent)toast('Chưa có địa chỉ Google Sheet. Vào mục Nhập dữ liệu để cấu hình.');return false}
+  const ep=sheetEndpoint();if(!ep){if(!silent)toast('Chưa có địa chỉ Google Sheet. Vào mục  để cấu hình.');return false}
   const b=$('#tableSyncBtn');if(b){b.disabled=true;b.textContent='Đang đồng bộ…'}
   const stamp='Lúc '+new Date().toLocaleString('vi-VN',{hour12:false});
   try{
