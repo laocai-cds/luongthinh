@@ -1443,7 +1443,7 @@ function showSheetLink(){const u=($('#sheetUrl').value||'').trim(),a=$('#openShe
 ['#endpoint','#syncToken'].forEach(i=>$(i).addEventListener('input',checkEndpoint));
 $('#sheetUrl').addEventListener('input',showSheetLink);
 $('#showTok').onclick=()=>{const t=$('#syncToken');const h=t.type==='password';t.type=h?'text':'password';$('#showTok').textContent=h?'Ẩn':'Hiện'};
-try{$('#sheetUrl').value=localStorage.getItem('lt_sheet')||''}catch(e){}
+try{$('#sheetUrl').value=localStorage.getItem('lt_sheet')||'https://docs.google.com/spreadsheets/d/14NsI_oDQrWBd_otB1R1wY6bWEpxos4vdy0gxGi8NrEE/edit'}catch(e){}
 checkEndpoint();showSheetLink();
 $('#saveEndpoint').onclick=()=>{
   const url=checkEndpoint();
