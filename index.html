@@ -1088,7 +1088,7 @@ try{const io=new IntersectionObserver(es=>es.forEach(e=>e.target.classList.toggl
 document.addEventListener('visibilitychange',()=>document.documentElement.classList.toggle('nanim',document.hidden));
 function start(){
   liveUnits=[...INITIAL_UNITS];applyView();fillSyncMonth();
-  try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||'';$('#syncToken').value=localStorage.getItem('lt_token')||''}catch(e){}
+  try{$('#endpoint').value=localStorage.getItem('lt_endpoint')||SHEET_EP_DEFAULT;$('#syncToken').value=localStorage.getItem('lt_token')||'';$('#sheetUrl').value=localStorage.getItem('lt_sheet')||'https://docs.google.com/spreadsheets/d/14NsI_oDQrWBd_otB1R1wY6bWEpxos4vdy0gxGi8NrEE/edit'}catch(e){}
   dataSrc=sheetEndpoint()?'loading':'backup';
   render();
   loadFromSheet().then(()=>{render();syncMonthly()});
