@@ -1900,6 +1900,16 @@ document.addEventListener('keydown',function(e){const o=ov();if(e.key==='Escape'
 @media(max-width:760px){.foot.pf{width:calc(100% - 24px)!important}}
 @media print{.foot.pf{display:none}}
 .bar{background:linear-gradient(180deg,#b0222b,#8e1a22)!important;border-bottom:2px solid #e3b23c!important}
+.bar .wrap{gap:clamp(8px,1.6vw,22px)!important;padding-left:18px!important;padding-right:18px!important}
+.bar .brand{gap:10px;min-width:0}.bar .seal{width:38px;height:38px}
+.bar .brand b{font-size:clamp(13px,1.25vw,17px)!important}
+.bar .tabs{flex:0 1 auto!important;min-width:0}.bar .tab{flex:0 1 auto!important;padding:0 clamp(8px,1vw,14px)!important;font-size:clamp(12.5px,1vw,14.5px)}
+.bar .barright{gap:6px!important;flex:none}
+.bar .barright .btn{width:34px;height:34px;padding:0!important;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;font-size:15px;line-height:1}
+.bar .barright .btn .lbl{display:none}
+.bar .livepill{padding:5px 10px!important;font-size:12px!important;gap:5px!important;white-space:nowrap}
+@media(max-width:1180px){.bar .livepill small{display:none}.bar .brand small{display:none}}
+@media(max-width:900px){.bar .tab{padding:0 7px!important;font-size:12px}.bar .brand b{font-size:12px!important}}
 </style>
 </body>
 </html>
