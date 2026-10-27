@@ -870,9 +870,7 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
           <p class="hint" style="margin:6px 0 12px">Mỗi tháng có một sheet riêng trong Google Sheet (Thang1 … Thang12, ví dụ “Thang10”). Mặc định là tháng hiện tại theo giờ thực; chọn tháng cũ để bổ sung số liệu lịch sử, không ghi đè số liệu mới nhất.</p>
           <div class="sendrow">
             <button class="btn solid" id="syncBtn" type="button" disabled>Đồng bộ lên Google Sheet</button>
-            <a class="btn" id="openSheet" href="#" target="_blank" rel="noopener" hidden>Mở Google Sheet để kiểm tra</a>
           </div>
-          <p class="hint" style="margin:12px 0 0">Trình duyệt không đọc được phản hồi của Apps Script, nên sau khi gửi hãy mở Google Sheet kiểm tra trước khi gửi lại.</p>
         </div>
         <div class="panel pad step" id="logPanel">
           <div class="ph"><h2>Nhật ký đồng bộ</h2><button class="btn" id="logReload" type="button">↻ Tải lại</button></div>
@@ -1441,7 +1439,7 @@ function checkEndpoint(){
   if(r.err){epChip('URL chưa đúng','bad');epMsg(r.err,'bad');return null}
   epChip('Đã cấu hình','ok');epMsg(r.note||'','ok');return r.url;
 }
-function showSheetLink(){const u=($('#sheetUrl').value||'').trim(),a=$('#openSheet');if(/^https:\/\/docs\.google\.com\/spreadsheets\//.test(u)){a.href=u;a.hidden=false}else a.hidden=true}
+function showSheetLink(){const u=($('#sheetUrl').value||'').trim(),a=$('#openSheet');if(!a)return;if(/^https:\/\/docs\.google\.com\/spreadsheets\//.test(u)){a.href=u;a.hidden=false}else a.hidden=true}
 ['#endpoint','#syncToken'].forEach(i=>$(i).addEventListener('input',checkEndpoint));
 $('#sheetUrl').addEventListener('input',showSheetLink);
 $('#showTok').onclick=()=>{const t=$('#syncToken');const h=t.type==='password';t.type=h?'text':'password';$('#showTok').textContent=h?'Ẩn':'Hiện'};
