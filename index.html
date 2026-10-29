@@ -802,9 +802,9 @@ go();document.addEventListener('DOMContentLoaded',go);
     </nav>
     <div class="barright">
       <div class="livepill" id="livePill" hidden aria-label="Lượt truy cập"><span class="ldot"></span><b data-live="online">0</b><small>online</small><i></i><b data-live="total">0</b><small>lượt</small></div>
-      <button class="btn" id="loginBtn" type="button" title="Đăng nhập quản trị bằng Gmail"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg><span class="lbl" id="loginLbl">Đăng nhập</span></button>
       <button class="btn" id="reportBtn" title="Tạo báo cáo (In/PDF, Excel, Word)">📄<span class="lbl"> Tạo báo cáo</span></button>
       <button class="btn" id="exportBtn" title="Xuất bảng tính Excel">⇩<span class="lbl">Xuất Excel</span></button>
+      <button class="btn" id="loginBtn" type="button" title="Đăng nhập quản trị bằng Gmail"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg><span class="lbl" id="loginLbl">Đăng nhập</span></button>
     </div>
   </div>
 </header>
@@ -2317,6 +2317,13 @@ document.addEventListener('keydown',function(e){const o=ov();if(e.key==='Escape'
 .bar .livepill{padding:5px 10px!important;font-size:12px!important;gap:5px!important;white-space:nowrap}
 @media(max-width:1180px){.bar .livepill small{display:none}.bar .brand small{display:none}}
 @media(max-width:900px){.bar .tab{padding:0 7px!important;font-size:12px}.bar .brand b{font-size:12px!important}}
+</style>
+<style id="barBtnColors">
+.bar .barright #reportBtn{background:#fff7dc!important;border:1px solid #e3be4f!important;color:#8a6500!important}
+.bar .barright #exportBtn{background:#e8f1ff!important;border:1px solid #8fb4f3!important;color:#1d4ed8!important}
+.bar .barright #loginBtn{background:#fff!important;border:1px solid #fff!important;color:#8c0f16!important;box-shadow:0 2px 8px -2px #00000050!important}
+.bar .barright .btn{font-weight:800}
+.bar .barright .btn:hover{filter:brightness(.95)}
 </style>
 </body>
 </html>
