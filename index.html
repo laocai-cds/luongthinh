@@ -1930,7 +1930,7 @@ const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luong
   if('requestIdleCallback' in window)requestIdleCallback(go,{timeout:3000});else setTimeout(go,1500);
 })();
 </script>
-<script>window.RSS_PRAISE_ONLY=true;window.RSS_UNIT='xã Lương Thịnh';window.RSS_POOL='https://laocai-cds.github.io/mau/news/pool.json';</script>
+<script>window.RSS_PRAISE_ONLY=true;window.RSS_UNIT='xã Lương Thịnh';window.RSS_POOL='https://laocai-cds.github.io/tthc/news/pool.json';</script>
 <style>
 #unit-news{--son:var(--lac);--sans:var(--body);--giay:var(--mist);--giay-2:#f6f7f4;--ink-2:#3a4448;--vang-bg:#fbf1d3;--r-s:4px;--sh:none;margin:0 0 20px;background:#fff;border:1px solid var(--rule);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;color:#202936}
 #unit-news .un-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px 18px;flex-wrap:wrap;padding:20px 22px 16px;border-bottom:1px solid var(--rule-2);background:linear-gradient(115deg,#fff 58%,#fbf4dc88)}
@@ -2010,7 +2010,7 @@ const FB_CFG={apiKey:"AIzaSyDU6jSgizxKSfsWp0VwoGtZC3r6ghiUDLg",authDomain:"luong
   const pod=document.querySelector('#podium');const anchor=pod&&pod.closest('.panel');
   if(!anchor||document.querySelector('#unit-news'))return;
   /* Dữ liệu tin do GitHub Actions gom mỗi 30 phút (news/pool.json). Trang con có thể đặt
-     window.RSS_POOL='https://laocai-cds.github.io/mau/news/pool.json' để dùng chung; window.RSS_UNIT để ghi đè tên đơn vị. */
+     window.RSS_POOL='https://laocai-cds.github.io/tthc/news/pool.json' để dùng chung; window.RSS_UNIT để ghi đè tên đơn vị. */
   const POOL_URL=window.RSS_POOL||'news/pool.json';
   /* So khớp có dấu để "Võ Lao" không trùng "vỏ lao động"; chỉ khi văn bản hoàn toàn không dấu mới so không dấu. */
   const keep=t=>' '+String(t||'').normalize('NFC').toLowerCase().replace(/[^\p{L}\p{N}]+/gu,' ').trim()+' ';
