@@ -700,6 +700,16 @@ body{overflow-x:hidden;-webkit-tap-highlight-color:transparent;padding-bottom:en
 .nt-set{flex:none;width:40px;display:grid;place-items:center;border:0;border-left:1px solid #e6edf7;background:#f6f9fd;color:#4a6285;cursor:pointer}
 .nt-set:hover{background:#eaf1fb;color:#12335c}.nt-set:focus-visible{outline:2px solid #1f5fae;outline-offset:-2px}
 @media(max-width:700px){.notice{width:calc(100% - 24px);height:34px;margin-top:8px}.nt-badge span{display:none}.nt-badge{padding:0 16px 0 12px}}
+/* Online + Tổng truy cập: góc phải dải thông báo */
+.notice .livepill{flex:none;display:flex;align-items:stretch;gap:0;padding:0;margin:0;border:0;border-left:1px solid #dbe5f3;border-radius:0;background:linear-gradient(180deg,#fff,#f7f9fc);color:var(--ink,#1b2433);white-space:nowrap}
+.notice .livepill[hidden]{display:none!important}
+.notice .livepill .lp{display:flex;align-items:center;gap:7px;padding:0 14px}
+.notice .livepill .lp+.lp{border-left:1px solid #dbe5f3}
+.notice .livepill small{font:600 10.5px/1 inherit;letter-spacing:.06em;text-transform:uppercase;color:#6b7280}
+.notice .livepill b{font:800 15px/1 inherit;color:var(--lac,#b0222b);font-variant-numeric:tabular-nums}
+.notice .livepill svg{color:var(--lac,#b0222b);flex:none}
+@media(max-width:1180px){.notice .livepill{display:flex}}
+@media(max-width:700px){.notice .livepill small{display:none}.notice .livepill .lp{padding:0 9px;gap:5px}.notice .livepill b{font-size:13px}}
 .ntm{width:min(520px,100%)}.ntm textarea{resize:vertical;font:inherit;min-height:74px}
 .ntrow{display:grid;grid-template-columns:90px 1fr 1fr;gap:10px}.ntcolor{padding:3px;height:40px}
 .ntprev{border:1px dashed #c9d6ea;border-radius:8px;background:#f6f9fd;overflow:hidden;padding:9px 12px;white-space:nowrap;text-overflow:ellipsis}
@@ -818,7 +828,6 @@ go();document.addEventListener('DOMContentLoaded',go);
       <button class="tab" id="lnkBtn" type="button" aria-haspopup="dialog"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1"/></svg><span>Liên kết website</span></button>
     </nav>
     <div class="barright">
-      <div class="livepill" id="livePill" hidden aria-label="Lượt truy cập"><span class="ldot"></span><b data-live="online">0</b><small>online</small><i></i><b data-live="total">0</b><small>lượt</small></div>
       <button class="btn" id="reportBtn" title="Tạo báo cáo (In/PDF, Excel, Word)">📄<span class="lbl"> Tạo báo cáo</span></button>
       <button class="btn" id="exportBtn" title="Xuất bảng tính Excel">⇩<span class="lbl">Xuất Excel</span></button>
       <button class="btn" id="loginBtn" type="button" title="Đăng nhập quản trị bằng Gmail"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5"/><path d="M15 12H3"/></svg><span class="lbl" id="loginLbl">Đăng nhập</span></button>
@@ -829,6 +838,7 @@ go();document.addEventListener('DOMContentLoaded',go);
 <section class="notice" id="notice" aria-label="Thông báo">
   <div class="nt-badge"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10v4h3l6 4V6L7 10H4z"/><path d="M16.5 9a4 4 0 0 1 0 6"/></svg><span>Thông báo</span></div>
   <div class="nt-track" id="ntTrack"><span class="nt-text" id="ntText"></span></div>
+  <div class="livepill" id="livePill" hidden aria-label="Thống kê truy cập"><span class="lp" title="Số người đang mở trang"><span class="ldot"></span><small>Đang online</small><b data-live="online">0</b></span><span class="lp" title="Tổng số lượt truy cập"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 12s3.6-6.5 9.5-6.5S21.5 12 21.5 12s-3.6 6.5-9.5 6.5S2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.8"/></svg><small>Tổng truy cập</small><b data-live="total">0</b></span></div>
   <button class="nt-set admin-only" id="ntSet" type="button" title="Cài đặt thông báo" aria-label="Cài đặt thông báo"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 </section>
 
