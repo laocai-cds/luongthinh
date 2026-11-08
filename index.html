@@ -1496,7 +1496,7 @@ function render(){
   ].map(([a,b,c],i)=>`<div class="stat k${i+1}"><i class="ico" aria-hidden="true">${['👥','💰','✅','📋'][i]}</i><span>${a}</span>${b}<small>${c}</small></div>`).join('');
 
   // top 3
-  const lead=units.filter(r=>v(r,'paidCount')>0).slice(0,3);
+  const lead=units.filter(r=>v(r,'paidCount')>0).sort((a,b)=>v(b,'progress')-v(a,'progress')||v(b,'paid')-v(a,'paid')).slice(0,3);
   $('#podium').innerHTML=[0,1,2].filter(i=>lead[i]).map(i=>{const r=lead[i],pc=Math.max(0,Math.min(100,v(r,'progress')*(v(r,'progress')<=1.0001?100:1)));return `<div class="step s${i+1}"><span class="no">${i+1}</span><b title="${esc(nm(r))}">${esc(nm(r))}</b><strong>${pct(v(r,'progress'))}</strong><small>${v(r,'paidCount')}/${v(r,'due')} đã nộp · ${money(v(r,'paid'))}</small><i class="pb"><u style="width:${pc}%"></u></i></div>`}).join('');
 
   // column chart: tiến độ từng đơn vị, theo hạng
