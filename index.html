@@ -1614,10 +1614,10 @@ function fillTables(){
   list=sorted(list);
   $('#rowcount').textContent=`Hiển thị ${list.length} / ${units.length} đơn vị`;
   $('#noresult').hidden=list.length>0;
-  $('#tbody').innerHTML=list.map(r=>{const[s,c]=status(r);return `<tr class="row ${cls(r)}"><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n pc"><b>${v(r,'paidCount')}</b>/${v(r,'due')}</td>${zc(v(r,'pending'),'amb')}${zc(v(r,'noRecord'),'red')}<td class="n">${money(v(r,'declared'))}</td><td class="n mny"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td><td><span class="pill ${c}">${s}</span></td></tr>`}).join('');
+  $('#tbody').innerHTML=list.map(r=>{const[s,c]=status(r);return `<tr class="row ${cls(r)}" data-u="${units.indexOf(r)}" title="Bấm để xem thông tin đơn vị"><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n pc"><b>${v(r,'paidCount')}</b>/${v(r,'due')}</td>${zc(v(r,'pending'),'amb')}${zc(v(r,'noRecord'),'red')}<td class="n">${money(v(r,'declared'))}</td><td class="n mny"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td><td><span class="pill ${c}">${s}</span></td></tr>`}).join('');
   const q2=($('#search2').value||'').toLocaleLowerCase('vi');
   const l2=sorted(units.filter(r=>nm(r).toLocaleLowerCase('vi').includes(q2)));
-  $('#tbody2').innerHTML=l2.map(r=>`<tr class="row ${cls(r)}"><td class="hint">${esc(r[KEYS.stt])}</td><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'members')}</td>${zc(v(r,'pending'),'amb')}<td class="n pc"><b>${v(r,'paidCount')}</b></td><td class="n mny"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td></tr>`).join('');
+  $('#tbody2').innerHTML=l2.map(r=>`<tr class="row ${cls(r)}" data-u="${units.indexOf(r)}" title="Bấm để xem thông tin đơn vị"><td class="hint">${esc(r[KEYS.stt])}</td><td>${rk(r)}</td><td class="uname">${esc(nm(r))}</td><td class="n">${v(r,'members')}</td>${zc(v(r,'pending'),'amb')}<td class="n pc"><b>${v(r,'paidCount')}</b></td><td class="n mny"><b>${money(v(r,'paid'))}</b></td><td>${progCell(r)}</td></tr>`).join('');
   $$('th[data-sort]').forEach(th=>th.setAttribute('aria-sort',th.dataset.sort===state.sort.k?(state.sort.dir>0?'ascending':'descending'):'none'));
   growBars('#overview .tw');growBars('#units .tw');
 }
@@ -2300,22 +2300,24 @@ function ltCbMsg(r){const p=Math.max(0,Math.min(1,v(r,'progress'))),left=Math.ma
   if(cls(r)==='complete')return `[Đảng ủy xã Lương Thịnh] ${nm(r)} đã hoàn thành thu nộp đảng phí: ${num(v(r,'paidCount'))}/${num(v(r,'due'))} đảng viên đã nộp (100%). Cảm ơn chi bộ!`;
   const parts=[];if(v(r,'noRecord'))parts.push(num(v(r,'noRecord'))+' đảng viên chưa có hồ sơ');if(v(r,'pending'))parts.push(num(v(r,'pending'))+' hồ sơ chưa được duyệt');if(v(r,'approved'))parts.push(num(v(r,'approved'))+' hồ sơ đã duyệt chưa nộp');if(left)parts.push('còn phải thu '+money(left));
   return `[Đảng ủy xã Lương Thịnh] Đề nghị ${nm(r)} đôn đốc hoàn thành thu nộp đảng phí. Hiện đã nộp ${num(v(r,'paidCount'))}/${num(v(r,'due'))} đảng viên (${pct(p)})${parts.length?'; '+parts.join(', '):''}.`}
-function ltCbOpen(i){const r=(window.__ltLead||[])[i];if(!r)return;let bk=document.getElementById('cbModal');
+function ltCbOpen(i){const r=(window.__ltLead||[])[i];if(r)ltCbShow(r,['Dẫn đầu','Hạng nhì','Hạng ba'][i])}
+function ltCbShow(r,tag){let bk=document.getElementById('cbModal');
   if(!bk){bk=document.createElement('div');bk.className='back';bk.id='cbModal';bk.setAttribute('role','dialog');bk.setAttribute('aria-modal','true');document.body.appendChild(bk);
     bk.addEventListener('click',e=>{if(e.target===bk||e.target.closest('[data-cbclose]'))bk.classList.remove('on')});
     document.addEventListener('keydown',e=>{if(e.key==='Escape')bk.classList.remove('on')})}
-  const [st,sc]=status(r),p=Math.max(0,Math.min(1,v(r,'progress'))),left=Math.max(0,v(r,'declared')-v(r,'paid')),rk=(typeof rankOf!=='undefined'&&rankOf.get&&rankOf.get(r))||(i+1);
-  bk.innerHTML=`<div class="modal cbm"><div class="cbm-head"><small>Đảng bộ xã Lương Thịnh · ${['Dẫn đầu','Hạng nhì','Hạng ba'][i]}</small><h3>${esc(nm(r))}</h3><button class="cbm-x" type="button" data-cbclose aria-label="Đóng">×</button></div>
+  const [st,sc]=status(r),p=Math.max(0,Math.min(1,v(r,'progress'))),left=Math.max(0,v(r,'declared')-v(r,'paid')),rk=(typeof rankOf!=='undefined'&&rankOf.get&&rankOf.get(r))||1;
+  bk.innerHTML=`<div class="modal cbm"><div class="cbm-head"><small>Đảng bộ xã Lương Thịnh · ${tag||('Hạng '+rk)}</small><h3>${esc(nm(r))}</h3><button class="cbm-x" type="button" data-cbclose aria-label="Đóng">×</button></div>
   <div class="cbm-body"><div class="cbm-top"><strong>${pct(p)}</strong><span class="pill ${sc}">${st}</span></div>
   <p class="cbm-rank">Xếp hạng <b>${rk}/${units.length}</b> đơn vị · <b>${num(v(r,'paidCount'))}/${num(v(r,'due'))}</b> đảng viên đã nộp</p>
   <div class="cbm-track"><i style="width:${(p*100).toFixed(1)}%"></i></div>
   <div class="cbm-grid"><div class="${v(r,'noRecord')?'warn':''}"><small>Chưa có hồ sơ</small><b>${num(v(r,'noRecord'))}</b></div><div class="${v(r,'pending')?'warn':''}"><small>Chưa được duyệt</small><b>${num(v(r,'pending'))}</b></div><div class="${v(r,'approved')?'warn':''}"><small>Đã duyệt, chưa nộp</small><b>${num(v(r,'approved'))}</b></div><div><small>Đã nộp</small><b>${money(v(r,'paid'))}</b></div><div><small>Kê khai</small><b>${money(v(r,'declared'))}</b></div><div class="${left?'warn':''}"><small>Còn phải thu</small><b>${money(left)}</b></div></div>
-  <p class="cbm-msgh">Tin nhắn đôn đốc (soạn sẵn, sửa được trước khi gửi)</p><textarea class="input cbm-msg" id="cbMsg" rows="4">${esc(ltCbMsg(r))}</textarea>
+  <p class="cbm-msgh">Tin nhắn đôn đốc (soạn sẵn, sửa được trước khi gửi)</p><textarea class="input cbm-msg" id="cbMsg" rows="3">${esc(ltCbMsg(r))}</textarea>
   <div class="cbm-acts"><button class="btn solid" type="button" id="cbCopy">${navigator.share?'Gửi Zalo / khác':'Sao chép tin nhắn'}</button><button class="btn" type="button" data-cbclose>Đóng</button></div></div></div>`;
   document.getElementById('cbCopy').onclick=async()=>{const t=document.getElementById('cbMsg').value;
     try{if(navigator.share){await navigator.share({text:t,title:nm(r)});return}await navigator.clipboard.writeText(t);toast('Đã sao chép tin nhắn.')}catch(_){}};
   bk.classList.add('on')}
-document.addEventListener('click',e=>{const c=e.target.closest('.podium .step[data-i]');if(c)ltCbOpen(+c.dataset.i)});
+document.addEventListener('click',e=>{const c=e.target.closest('.podium .step[data-i]');if(c){ltCbOpen(+c.dataset.i);return}
+ const t=e.target.closest('tr.row[data-u],.rkm-row[data-u]');if(t){const r=units[+t.dataset.u];if(!r)return;const rm=document.getElementById('rankModal');if(rm&&rm.classList.contains('on')){rm.classList.remove('on');document.body.style.overflow=''}ltCbShow(r)}});
 </script>
 <script>window.RSS_PRAISE_ONLY=true;window.RSS_UNIT='xã Lương Thịnh';window.RSS_POOL='https://laocai-cds.github.io/tthc/news/pool.json';</script>
 <style>
@@ -3234,7 +3236,7 @@ function open(){const L=units.filter(r=>v(r,'members')>0).sort((a,b)=>(rankOf.ge
  const n={complete:0,partial:0,empty:0};L.forEach(r=>{const c=cls(r);n[c in n?c:'empty']++});
  document.getElementById('rankSum').innerHTML=[['complete','Hoàn thành'],['partial','Đang thu'],['empty','Chưa phát sinh']].map(([k,l])=>`<span style="--c:${C[k][0]};--c-bg:${C[k][1]}">${l} <b>${n[k]}</b></span>`).join('');
  document.getElementById('rankList').innerHTML=L.map(r=>{const c=cls(r),col=(C[c]||C.empty)[0],p=Math.max(0,Math.min(1,v(r,'progress')));
-  return `<div class="rkm-row">${rk(r)}<div class="rkm-nm"><span class="uname">${esc(nm(r))}</span><small>${esc(status(r)[0])} · ${money(v(r,'paid'))}</small></div><div class="rkm-bar" style="--c:${col}"><i><b style="width:${(p*100).toFixed(1)}%"></b></i><em>${pct(p)}</em></div><div class="rkm-ct"><b>${num(v(r,'paidCount'))}</b>/${num(v(r,'due'))}<br>đảng viên</div></div>`}).join('')||'<p class="empty">Chưa có số liệu đơn vị.</p>';
+  return `<div class="rkm-row" data-u="${units.indexOf(r)}" style="cursor:pointer">${rk(r)}<div class="rkm-nm"><span class="uname">${esc(nm(r))}</span><small>${esc(status(r)[0])} · ${money(v(r,'paid'))}</small></div><div class="rkm-bar" style="--c:${col}"><i><b style="width:${(p*100).toFixed(1)}%"></b></i><em>${pct(p)}</em></div><div class="rkm-ct"><b>${num(v(r,'paidCount'))}</b>/${num(v(r,'due'))}<br>đảng viên</div></div>`}).join('')||'<p class="empty">Chưa có số liệu đơn vị.</p>';
  const q=document.getElementById('rankQ');q.value='';filt();
  M.classList.add('on');document.body.style.overflow='hidden';setTimeout(()=>q.focus(),30)}
 function fold(x){return String(x).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d')}
@@ -3249,5 +3251,24 @@ document.addEventListener('click',e=>{const t=e.target;if(!t.closest)return;
  if(M.classList.contains('on')&&false)close()},true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&M.classList.contains('on'))close()});
 })();</script>
+<style id="cbmFitCss">/* Popup thông tin đơn vị: gọn, vừa khung hình, cuộn bên trong nếu màn hình thấp */
+tr.row[data-u]{cursor:pointer}
+tr.row[data-u]:hover td{background:#fff3f1}
+html body .cbm{width:min(520px,100%)!important;max-height:calc(100dvh - 24px);display:flex!important;flex-direction:column}
+html body .cbm-head{flex:none;padding:14px 18px 12px!important}
+html body .cbm-head h3{font-size:1.05rem!important;margin:4px 0 0!important;padding-right:30px}
+html body .cbm-body{padding:12px 18px 14px!important;overflow-y:auto;overscroll-behavior:contain;min-height:0}
+html body .cbm-top strong{font-size:1.7rem!important}
+html body .cbm-track{margin:8px 0 10px!important}
+html body .cbm-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px!important}
+html body .cbm-grid div{padding:7px 9px!important}
+html body .cbm-grid small{font-size:10.5px!important}
+html body .cbm-grid b{font-size:.92rem!important}
+html body .cbm .cbm-msgh{margin:12px 0 6px!important}
+html body .cbm-msg{min-height:0!important;font-size:12.5px!important;padding:8px 10px!important}
+html body .cbm-acts{margin-top:10px!important}
+html body .cbm-acts .btn{padding:8px 10px!important}
+@media(max-width:480px){html body .cbm-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+</style>
 </body>
 </html>
