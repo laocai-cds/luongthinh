@@ -3154,5 +3154,21 @@ html body .btn:focus-visible,html body .bar .tab:focus-visible{outline:2px solid
 @media(hover:none){html body .bar .barright .btn:hover{transform:none}}
 @media(prefers-reduced-motion:reduce){html body .bar .barright .btn,html body .bar .barright .btn::before,html body .bar .tab::after{transition:none!important}}
 </style>
+<style id="tileFxCss">/* Hiệu ứng cho 4 thẻ số liệu ở banner */
+html body .heroline>div{transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease,background .22s ease;cursor:default}
+html body .heroline>div::before{transition:transform .25s ease,background-color .25s ease,box-shadow .25s ease}
+html body .heroline>div::after{transition:top .22s ease,bottom .22s ease,width .22s ease,box-shadow .22s ease}
+html body .heroline>div:hover{transform:translateY(-4px);border-color:#7dd3fcb3!important;background:linear-gradient(135deg,#ffffff30,#ffffff10);box-shadow:0 18px 34px -16px #000c,0 0 0 1px #38d4ff55,0 0 24px -4px #38d4ff66,inset 0 1px 0 #ffffff40}
+html body .heroline>div:hover::before{transform:translateY(-50%) scale(1.12) rotate(-6deg);background-color:#38d4ff45;box-shadow:0 0 16px #38d4ff88}
+html body .heroline>div:hover::after{top:6px;bottom:6px;width:4px;box-shadow:0 0 12px #38d4ff}
+html body .heroline b{transition:text-shadow .22s ease,letter-spacing .22s ease}
+html body .heroline>div:hover b{text-shadow:0 0 22px #38d4ffcc}
+html body .heroline>div:active{transform:translateY(-1px) scale(.985)}
+@keyframes hxIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+html body .heroline>div{animation:hxIn .55s ease both}
+html body .heroline>div:nth-child(2){animation-delay:.08s}html body .heroline>div:nth-child(3){animation-delay:.16s}html body .heroline>div:nth-child(4){animation-delay:.24s}
+@media(hover:none){html body .heroline>div:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){html body .heroline>div{animation:none;transition:none}}
+</style>
 </body>
 </html>
