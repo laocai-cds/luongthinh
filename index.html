@@ -3103,16 +3103,17 @@ html body .bar .barright .btn .lbl{display:inline!important}
 html body .bar .barright #reportBtn,html body .bar .barright #exportBtn,html body .bar .barright #loginBtn{background:#fff!important;border:1px solid #d9a5a8!important;color:#b0222b!important;box-shadow:none!important}
 html body .bar .barright .btn:hover,html body .bar .barright #reportBtn:hover,html body .bar .barright #exportBtn:hover,html body .bar .barright #loginBtn:hover{background:#fdf0ee!important;border-color:#b0222b!important;filter:none}
 @media(max-width:900px){
-html body .bar{top:0;padding:8px 0 0}
+html body .bar{top:-92px;padding:8px 0 0}
 html body .bar{width:calc(100% - 24px)}
 html body .bar .wrap{grid-template-columns:1fr;grid-template-rows:auto auto auto;background:linear-gradient(180deg,#b0222b,#7d141b)!important}
 html body .bar .wrap::after{display:none}
 html body .bar .brand{padding:12px 14px}
 html body .bn-chips{display:none}
 html body .bar .tabs{grid-row:2;background:#fff;padding:0 6px}
-html body .bar .barright{grid-column:1;grid-row:3;background:#fff;padding:8px 12px;border-top:1px solid #f0dcdc;justify-content:flex-end}
-html body .bar .barright .btn .lbl{display:none!important}
-html body .bar .barright .btn{width:34px!important;padding:0!important;justify-content:center}
+html body .bar .barright{grid-column:1;grid-row:3;background:#fff;border-top:1px solid #f0dcdc}
+html body .bar .barright{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px!important;padding:8px 10px}
+html body .bar .barright .btn{width:100%!important;padding:0 6px!important;justify-content:center;font-size:12px}
+html body .bar .barright .btn .lbl{display:inline!important;overflow:hidden;text-overflow:ellipsis}
 }
 @media print{.bn-chips{display:none}}
 </style>
@@ -3120,7 +3121,13 @@ html body .bar .barright .btn{width:34px!important;padding:0!important;justify-c
 <style id="heroXCss">/* Khối giới thiệu bên trái của banner: tiêu đề nổi bật + 4 thẻ số liệu */
 .hx-eye{display:inline-flex;align-items:center;gap:8px;margin:0 0 12px;padding:5px 12px;border-radius:999px;background:#ffffff14;border:1px solid #7dd3fc55;font:700 11px var(--display);letter-spacing:.16em;text-transform:uppercase;color:#9fe3ff}
 .hx-eye::before{content:"";width:7px;height:7px;border-radius:50%;background:#38d4ff;box-shadow:0 0 10px #38d4ff}
-html body .hero .wrap{grid-template-columns:minmax(0,1fr) minmax(0,460px)!important;gap:36px!important}
+@media(min-width:901px){html body .hero .wrap{grid-template-columns:minmax(0,1fr) minmax(0,460px)!important;gap:36px!important}}
+@media(max-width:900px){html body .hero .wrap{grid-template-columns:minmax(0,1fr)!important;gap:22px!important;padding-top:28px!important;padding-bottom:30px!important}
+html body .bar{margin-left:auto!important;margin-right:auto!important}
+.hx-eye{display:block;width:fit-content;max-width:100%;font-size:10px;letter-spacing:.08em;line-height:1.5;padding:4px 10px;border-radius:12px}
+html body .hero h1{font-size:min(1.9rem,5.4cqw)!important}
+.hx-sub{font-size:13px}
+html body .heroline{max-width:none!important;margin-top:18px!important}}
 .hero .wrap>div:first-child{container-type:inline-size}
 html body .hero h1{font:800 min(2.3rem,5.5cqw)/1.15 var(--display)!important;white-space:nowrap;text-shadow:none!important;letter-spacing:-.025em!important;margin:0 0 10px!important;background:linear-gradient(100deg,#ffe45c 0%,#fff08a 40%,#ffffff 50%,#fff08a 60%,#ffe45c 100%);background-size:260% 100%;background-position:100% 0;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:#ffd84d;filter:drop-shadow(0 2px 3px #00000066);animation:hxShine 3.4s ease-in-out infinite}
 @keyframes hxShine{0%,20%{background-position:100% 0}65%,100%{background-position:0 0}}
