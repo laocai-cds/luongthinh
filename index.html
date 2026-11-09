@@ -932,8 +932,9 @@ go();document.addEventListener('DOMContentLoaded',go);
   <div class="wrap">
     <div class="brand">
       <div class="seal"><img src="logo.png" alt="Cờ Đảng" width="40" height="40" decoding="async"></div>
-      <div><b>Đảng bộ xã Lương Thịnh</b></div>
+      <div><b>Đảng bộ xã Lương Thịnh</b><small class="bn-sub">Hệ thống theo dõi thu nộp đảng phí</small></div>
     </div>
+    <div class="bn-chips" aria-hidden="true"><div><small>Hôm nay</small><b id="bnToday"></b></div><div><small>Kỳ thu</small><b id="bnPeriod"></b></div></div>
     <nav class="tabs" aria-label="Chuyên mục">
       <button class="tab" data-page="overview">Tổng quan</button>
       <button class="tab" data-page="units">Đơn vị trực thuộc</button>
@@ -3072,5 +3073,44 @@ document.addEventListener('keydown',function(e){var o=ov();if(e.key==='Escape'&&
 })();
 </script>
 <script src="xa-bar.js"></script>
+<style id="barSplitCss">/* Đầu trang: banner (logo, tên, ngày) ở trên, thanh menu ở dưới */
+html body .bar{position:sticky;top:-78px;z-index:30;background:var(--mist)!important;border:0!important;padding:12px 0 0}
+html body .bar .wrap{display:grid!important;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:78px 48px;gap:0!important;height:auto!important;padding:0!important;width:100%;max-width:none!important;margin:0 auto;border-radius:14px;overflow:hidden;box-shadow:0 8px 22px -14px #0007;background:linear-gradient(180deg,#b0222b 0,#7d141b 78px,#fff 78px)!important;position:relative}
+html body .bar .wrap::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:linear-gradient(90deg,#c9a227,#f7e08a,#c9a227);z-index:1}
+html body .bar .wrap::after{content:"";position:absolute;left:0;right:0;top:78px;height:2px;background:linear-gradient(90deg,#c9a227,#f7e08a,#c9a227)}
+html body .bar .brand{grid-column:1;grid-row:1;padding:0 22px;gap:14px;align-items:center}
+html body .bar .seal{width:52px;height:52px;border-radius:12px;box-shadow:0 0 0 2px #e9cf7a,0 6px 14px #0005}
+html body .bar .brand b{font-size:clamp(16px,1.8vw,22px)!important;letter-spacing:.05em}
+html body .bar .bn-sub{display:block!important;margin-top:2px;font-size:12.5px;color:#f6dcd9}
+.bn-chips{grid-column:2;grid-row:1;display:flex;align-items:center;gap:10px;padding:0 22px}
+.bn-chips>div{padding:7px 16px;border-radius:10px;background:#ffffff1c;border:1px solid #ffffff38}
+.bn-chips small{display:block;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#f0c987}
+.bn-chips b{display:block;font-size:14.5px;font-weight:800;color:#fff;white-space:nowrap}
+html body .bar .tabs{grid-column:1;grid-row:2;margin:0!important;height:48px!important;padding:0 12px;align-items:stretch}
+html body .bar .tab{height:100%;color:#4b4f55!important;font-weight:600;padding:0 clamp(10px,1.1vw,16px)!important;font-size:clamp(12.5px,1vw,14px)!important}
+html body .bar .tab:hover{color:#b0222b!important;background:#fbf1ef}
+html body .bar .tab[aria-current=page]{color:#b0222b!important;font-weight:800;background:#fff3f1}
+html body .bar .tab[aria-current=page]::after{left:10px;right:10px;background:linear-gradient(90deg,#b0222b,#e3b23c)}
+html body .bar .tab svg{opacity:.8}
+html body .bar .barright{grid-column:2;grid-row:2;margin:0!important;padding:0 14px;gap:8px!important;align-items:center}
+html body .bar .barright .btn{width:auto!important;height:32px;padding:0 12px!important;gap:6px;font-size:12.5px;border-radius:8px;background:#fff!important;border:1px solid #d9a5a8!important;color:#b0222b!important;box-shadow:none!important;font-weight:700}
+html body .bar .barright .btn .lbl{display:inline!important}
+html body .bar .barright #reportBtn,html body .bar .barright #exportBtn,html body .bar .barright #loginBtn{background:#fff!important;border:1px solid #d9a5a8!important;color:#b0222b!important;box-shadow:none!important}
+html body .bar .barright .btn:hover,html body .bar .barright #reportBtn:hover,html body .bar .barright #exportBtn:hover,html body .bar .barright #loginBtn:hover{background:#fdf0ee!important;border-color:#b0222b!important;filter:none}
+@media(max-width:900px){
+html body .bar{top:0;padding:8px 0 0}
+html body .bar{width:calc(100% - 24px)}
+html body .bar .wrap{grid-template-columns:1fr;grid-template-rows:auto auto auto;background:linear-gradient(180deg,#b0222b,#7d141b)!important}
+html body .bar .wrap::after{display:none}
+html body .bar .brand{padding:12px 14px}
+html body .bn-chips{display:none}
+html body .bar .tabs{grid-row:2;background:#fff;padding:0 6px}
+html body .bar .barright{grid-column:1;grid-row:3;background:#fff;padding:8px 12px;border-top:1px solid #f0dcdc;justify-content:flex-end}
+html body .bar .barright .btn .lbl{display:none!important}
+html body .bar .barright .btn{width:34px!important;padding:0!important;justify-content:center}
+}
+@media print{.bn-chips{display:none}}
+</style>
+<script>(function(){function f(){var d=new Date(),p=function(n){return String(n).padStart(2,'0')},a=document.getElementById('bnToday'),b=document.getElementById('bnPeriod');if(a)a.textContent=p(d.getDate())+'/'+p(d.getMonth()+1)+'/'+d.getFullYear();if(b)b.textContent='Tháng '+p(d.getMonth()+1)+'/'+d.getFullYear()}f();setInterval(f,36e5)})();</script>
 </body>
 </html>
