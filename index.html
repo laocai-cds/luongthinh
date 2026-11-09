@@ -3137,5 +3137,22 @@ html body .heroline small{display:block;margin-top:3px;font-size:12px!important;
 @media(max-width:480px){html body .heroline{grid-template-columns:1fr!important}}
 </style>
 <script>(function(){var e=document.getElementById('hxEye');if(e){var d=new Date();e.textContent='Bảng điều hành · Ngày '+d.getDate()+' tháng '+(d.getMonth()+1)+' năm '+d.getFullYear()}})();</script>
+<style id="btnFxCss">/* Hiệu ứng cho nút và menu ở đầu trang */
+html body .bar .barright .btn{position:relative;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,background .18s ease,color .18s ease,border-color .18s ease!important}
+html body .bar .barright .btn::before{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,#ffffff99,transparent);transform:skewX(-20deg);transition:left .5s ease;pointer-events:none}
+html body .bar .barright .btn:hover::before{left:130%}
+html body .bar .barright .btn svg,html body .bar .barright .btn .lbl{position:relative;transition:transform .18s ease}
+html body .bar .barright .btn:hover svg{transform:translateX(2px)}
+html body .bar .barright #reportBtn:hover,html body .bar .barright #exportBtn:hover,html body .bar .barright #loginBtn:hover,html body .bar .barright .btn:hover{background:linear-gradient(135deg,#c8282f,#8e1a22)!important;border-color:#8e1a22!important;color:#fff!important;transform:translateY(-2px);box-shadow:0 8px 16px -6px #8e1a2299!important}
+html body .bar .barright .btn:active{transform:translateY(0) scale(.96);box-shadow:0 2px 6px -2px #8e1a2299!important}
+html body .bar .tab{transition:color .18s ease,background .18s ease}
+html body .bar .tab::after{transition:transform .22s ease,opacity .22s ease}
+html body .bar .tab:not([aria-current=page])::after{content:'';position:absolute;left:10px;right:10px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:linear-gradient(90deg,#b0222b,#e3b23c);transform:scaleX(0);opacity:0}
+html body .bar .tab:not([aria-current=page]):hover::after{transform:scaleX(1);opacity:1}
+html body .bar .tab:active{background:#f7dcd8}
+html body .btn:focus-visible,html body .bar .tab:focus-visible{outline:2px solid #e3b23c;outline-offset:2px}
+@media(hover:none){html body .bar .barright .btn:hover{transform:none}}
+@media(prefers-reduced-motion:reduce){html body .bar .barright .btn,html body .bar .barright .btn::before,html body .bar .tab::after{transition:none!important}}
+</style>
 </body>
 </html>
